@@ -11,21 +11,29 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 PINBuzzer = 22 # Sets the buzzer pin 22
+LEDPin = 18
 
 # Sets PINBuzzer as an output pin and initialise it to 'off'
 GPIO.setup(PINBuzzer, GPIO.OUT)
 GPIO.output(PINBuzzer, GPIO.LOW)
 
+GPIO.setup(LEDPin, GPIO.OUT)
+GPIO.setup(LEDPin, GPIO.LOW)
+
 def dot(): # A single Morse dot
     GPIO.output(PINBuzzer, GPIO.HIGH)
+    GPIO.output(LEDPin, GPIO.HIGH)
     time.sleep(0.1)
     GPIO.output(PINBuzzer, GPIO.LOW)
+    GPIO.output(LEDPin, GPIO.LOW)
     time.sleep(0.1)
     
 def dash(): # A single Morse dash
     GPIO.output(PINBuzzer, GPIO.HIGH)
+    GPIO.output(LEDPin, GPIO.HIGH)
     time.sleep(0.3)
     GPIO.output(PINBuzzer, GPIO.LOW)
+    GPIO.output(LEDPin, GPIO.LOW)
     time.sleep(0.1)
 def letterspace(): # The space between letters
     time.sleep(0.2)

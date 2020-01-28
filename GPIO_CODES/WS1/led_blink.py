@@ -12,7 +12,6 @@ GPIO.setup(18, GPIO.OUT)
 GPIO.setup(23, GPIO.OUT)
 GPIO.setup(24, GPIO.OUT)
 
-Flag = True
 
 count = 0
 
