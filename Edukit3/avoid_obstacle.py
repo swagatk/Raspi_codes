@@ -23,8 +23,8 @@ pinEcho = 18
 
 # PWM parameters
 Frequency = 20
-DutyCycleA = 30
-DutyCycleB = 30
+DutyCycleA = 70
+DutyCycleB = 70
 Stop = 0
 
 # Set the GPIO Pin Mode
@@ -145,7 +145,7 @@ try:
         if isnearobstacle(hownear):
             stopmotors()
             avoidobstacle()
-except KeyboardInterrupt():
+except KeyboardInterrupt:
     GPIO.cleanup()
     
         

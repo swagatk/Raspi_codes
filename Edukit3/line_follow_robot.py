@@ -18,8 +18,6 @@ pinMotorBBackward = 7
 pinLineFollower = 25  
 
 
-
-
 # PWM parameters
 Frequency = 20
 DutyCycleA = 30

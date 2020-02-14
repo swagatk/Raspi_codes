@@ -1,8 +1,5 @@
 # cam Jam Edukit 3 - Robotics
 # Driving and turning
-
-
-
 import RPi.GPIO as GPIO
 import time
 
@@ -58,14 +55,14 @@ def turnright():
 
 
 ####
-##forward()
-##time.sleep(1)
-##backward()
-##time.sleep(1)
+forward()
+time.sleep(1)
+backward()
+time.sleep(1)
 turnleft()
 time.sleep(1)
-#turnright()
-#time.sleep(1)
+turnright()
+time.sleep(1)
 stopmotors()
 
 GPIO.cleanup()

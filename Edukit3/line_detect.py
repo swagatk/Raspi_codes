@@ -23,7 +23,7 @@ try:
         else:
             print('The sensor is seeing white surface')
         time.sleep(0.2)
-except KeyboardInterrupt():
+except KeyboardInterrupt:
     GPIO.cleanup()
         
             
