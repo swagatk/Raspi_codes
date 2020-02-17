@@ -1,16 +1,19 @@
+# OpenCV Face detection
+
 import numpy as np
 import cv2
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 import time
 
-
+# Configure the PiCamera
 camera = PiCamera()
 camera.resolution = (640,480)
 camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(640,480))
 
-time.sleep(0.1)
+# Give time for the camera to stabilize
+time.sleep(1)
 
 
 # Load a cascade file for detecting faces

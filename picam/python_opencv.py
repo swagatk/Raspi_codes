@@ -6,21 +6,21 @@ import cv2
 import numpy
 
 
-# Create a memory stream so photos don't need to be saved in a file
-stream = io.BytesIO()
-
-# Get the picture with low resolution
-with picamera.PiCamera() as camera:
-    camera.resolution = (320, 240)
-    camera.capture(stream, format='jpeg')
-
-
-# convert the picture into a binary array
-buff = numpy.fromstring(stream.getvalue(), dtype=numpy.uint8)
-
-# Now create an OpenCV image
-image = cv2.imdecode(buff,1)
-#image = cv2.imread('/home/pi/face.jpg')
+### Create a memory stream so photos don't need to be saved in a file
+##stream = io.BytesIO()
+##
+### Get the picture with low resolution
+##with picamera.PiCamera() as camera:
+##    camera.resolution = (320, 240)
+##    camera.capture(stream, format='jpeg')
+##
+##
+### convert the picture into a binary array
+##buff = numpy.fromstring(stream.getvalue(), dtype=numpy.uint8)
+##
+### Now create an OpenCV image
+##image = cv2.imdecode(buff,1)
+image = cv2.imread('/home/pi/face.jpg')
 
 # Load a cascade file for detecting faces
 face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml')
