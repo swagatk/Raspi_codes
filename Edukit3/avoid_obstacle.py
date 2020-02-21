@@ -133,19 +133,20 @@ def avoidobstacle():
     stopmotors()
 
 ############
-try:
-    GPIO.output(pinTrigger, False)
+if __name__ == '__main__':
+    try:
+        GPIO.output(pinTrigger, False)
 
-    # Allow module to settle
-    time.sleep(0.1)
-
-    while True:
-        forward()
+        # Allow module to settle
         time.sleep(0.1)
-        if isnearobstacle(hownear):
-            stopmotors()
-            avoidobstacle()
-except KeyboardInterrupt:
-    GPIO.cleanup()
+
+        while True:
+            forward()
+            time.sleep(0.1)
+            if isnearobstacle(hownear):
+                stopmotors()
+                avoidobstacle()
+    except KeyboardInterrupt:
+        GPIO.cleanup()
     
         

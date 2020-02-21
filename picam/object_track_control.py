@@ -1,10 +1,17 @@
-# Camshift object tracking
-# runs on Python 2.7
+# Robot Control with Object Tracking
+# runs on Python 2.7 / 3.x
+
 import numpy as np
 import cv2
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 import time
+
+# We need to load robot control functions
+import sys
+sys.path.append('/home/pi/Raspi_codes/Edukit3/')
+from avoid_obstacle import turnright, turnleft, stopmotors
+
 
 # Configure the PiCamera
 camera = PiCamera()
@@ -20,6 +27,7 @@ selection = None
 track_window = None
 show_backproj = False
 drag_start = None
+center = ()  # define an empty tuple
 
 
 
@@ -42,7 +50,7 @@ def show_hist(hist):
     bin_count = hist.shape[0]
     bin_w = 24
     img = np.zeros((256, bin_count*bin_w, 3), np.uint8)
-    for i in xrange(bin_count):
+    for i in range(bin_count):
         h = int(hist[i])
         cv2.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h),\
                       (int(180.0*i/bin_count), 255, 255), -1)
@@ -94,25 +102,28 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         pts = cv2.boxPoints(track_box)
         mp = np.mean(pts, axis=0)
         center = tuple(mp)
-        l = np.linalg.norm(pts[0] - pts[1])
-        h = np.linalg.norm(pts[0] - pts[3])
-        area = l * h
-        print(area)
-        x,y,w,h = track_window
-        print(w*h)
-        
+        #l = np.linalg.norm(pts[0] - pts[1])
+        #h = np.linalg.norm(pts[0] - pts[3])
+        #area = l * h
+        #print(area)
+        #x,y,w,h = track_window
+        #print(w*h)
         ctrl_img = cv2.line(vis, center, (160,120), (255,0,0), 2)
 
-
- 
+        if center[0] < 160:
+            turnleft()
+        elif center[0] > 160:
+            turnright()
+        else:
+            stopmotors()
+            
+       
     # Draw horizontal and vertical line passing through centre of the image
-
-    
     cv2.imshow('camshift', vis)
 
     ctrl_img = cv2.line(vis, (0, 120), (320, 120), (255,0,0), 2)
     ctrl_img = cv2.line(vis, (160, 240), (160, 0), (255,0,0), 2)
-    
+   
     cv2.imshow('Control', ctrl_img)
     
     ch = cv2.waitKey(5)
