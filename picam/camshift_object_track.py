@@ -8,10 +8,10 @@ import time
 
 # Configure the PiCamera
 camera = PiCamera()
-camera.resolution = (640,480)
+camera.resolution = (320,240)
 camera.rotation = 180
 camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(640,480))
+rawCapture = PiRGBArray(camera, size=(320,240))
 
 # Give time for the camera to stabilize
 time.sleep(1)
@@ -41,7 +41,7 @@ def show_hist(hist):
     bin_count = hist.shape[0]
     bin_w = 24
     img = np.zeros((256, bin_count*bin_w, 3), np.uint8)
-    for i in xrange(bin_count):
+    for i in range(bin_count):
         h = int(hist[i])
         cv2.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h),\
                       (int(180.0*i/bin_count), 255, 255), -1)

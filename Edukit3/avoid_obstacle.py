@@ -105,7 +105,7 @@ def measure():
 
     while GPIO.input(pinEcho) == 1:
         stoptime = time.time()
-        if stoptime - starttime >= 0.04:
+        if stoptime - starttime <= 0.04:
             print('Hold on there! you are too close to me to see.')
             stoptime = starttime
             break
