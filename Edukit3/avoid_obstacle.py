@@ -5,6 +5,7 @@
 # load the libraries
 import RPi.GPIO as GPIO
 import time
+import numpy as np
 
 #set GPIO modes
 GPIO.setmode(GPIO.BCM)
@@ -36,7 +37,7 @@ GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
 # Distance variables
-hownear = 10.0
+hownear = 20.0
 reversetime = 0.5
 turntime = 0.75
 
@@ -89,30 +90,46 @@ def turnright():
     pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
 
 
-
 def measure():
-        
-    GPIO.output(pinTrigger, True)
-    time.sleep(0.00001)
-    GPIO.output(pinTrigger, False)
+
+    #  Average over 5 readings to reduce noise
+    dist = []
+    for i in range(5):
+
+        #set trigger to False
+        GPIO.output(pinTrigger, False)
+        time.sleep(0.0001)
+
+        # send out a pulse at a freq of 10 micro hertz
+        GPIO.output(pinTrigger, True)
+        time.sleep(0.00001)
+        GPIO.output(pinTrigger, False)
+
+        # start the timer
+        StartTime = time.time()
+
+        # start time is reset until the Echo Pin is taken high
+        while GPIO.input(pinEcho) == 0:
+            StartTime = time.time()
+            
+        # stop when echo pin is no longer high - end time
+        while GPIO.input(pinEcho) == 1:
+            StopTime = time.time()
+            interval = StopTime - StartTime
+            if interval >= 0.02:
+                #print('Either you are too close or too far to me to see.')
+                #StopTime = StartTime
+                break
     
-    starttime = time.time()
-    stoptime = starttime
+        # calculate pulse length
+        ElapsedTime = StopTime - StartTime
 
-    while GPIO.input(pinEcho) == 0:
-        starttime = time.time()
-        stoptime = starttime
+        # Distance travelled by the pulse in that time in cm
+        Distance = (ElapsedTime * 34326)/2.0
 
-    while GPIO.input(pinEcho) == 1:
-        stoptime = time.time()
-        if stoptime - starttime <= 0.04:
-            print('Hold on there! you are too close to me to see.')
-            stoptime = starttime
-            break
-    elapsedtime = stoptime - starttime
-    distance = (elapsedtime * 34300) / 2
+        dist.append(Distance)
 
-    return distance
+    return np.mean(dist) 
     
 def isnearobstacle(localhownear):
     distance = measure()

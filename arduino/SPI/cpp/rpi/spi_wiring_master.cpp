@@ -1,3 +1,16 @@
+/* Needs wiringPi library to compile this code. 
+ * Install wiringPi library from the following git library
+ *
+ * $ git clone https://github.com/WiringPi/WiringPi.git
+ * $ cd WiringPi
+ * $ ./build
+ *
+ * While compiling this file, use library flag to link this library
+ *
+ * $ g++ spi_wiring_master.cpp -lwiringPi -o spi_master
+ * $ ./spi_master
+ * ---------------------------------------------------------------- */
+
 #include <iostream>
 #include <wiringPiSPI.h>
 #define SPI_CHANNEL 0

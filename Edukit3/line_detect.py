@@ -18,7 +18,9 @@ GPIO.setup(pinLineFollower, GPIO.IN)
 
 try:
     while True:
-        if GPIO.input(pinLineFollower) == 0:
+        c = GPIO.input(pinLineFollower)
+        print(c)
+        if c == 0:
             print('The sensor is seeing black surface')
         else:
             print('The sensor is seeing white surface')

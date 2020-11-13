@@ -3,6 +3,7 @@
 
 import RPi.GPIO as GPIO
 import time
+import numpy as np
 
 #set GPIO modes
 GPIO.setmode(GPIO.BCM)
@@ -19,13 +20,15 @@ print('Ultrasonic measurement')
 GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
+def measure():
 
-try:
-    while True:
-        
+    #  Average over 5 readings to reduce noise
+    dist = []
+    for i in range(5):
+
         #set trigger to False
         GPIO.output(pinTrigger, False)
-        time.sleep(0.5)
+        time.sleep(0.001)
 
         # send out a pulse at a freq of 10 micro hertz
         GPIO.output(pinTrigger, True)
@@ -43,21 +46,32 @@ try:
         while GPIO.input(pinEcho) == 1:
             StopTime = time.time()
             interval = StopTime - StartTime
-            if StopTime - StartTime >= 0.04:
-                print('Hold on there! you are too close to me to see.')
-                StopTime = StartTime
+            #print('Interval: ', interval)
+            # this block is really not required
+            if interval >= 0.04:
+                #print('Either you are too close or too far to me to see.')
+                #StopTime = StartTime
                 break
-        
+    
         # calculate pulse length
         ElapsedTime = StopTime - StartTime
 
         # Distance travelled by the pulse in that time in cm
-        Distance = ElapsedTime * 34326
+        Distance = (ElapsedTime * 34326)/2.0
 
-        Distance = Distance / 2
-        print('Distance: {}'.format(Distance))
+        dist.append(Distance)
 
-        time.sleep(0.5)
+    return np.mean(dist) 
+        
+    
+
+
+
+try:
+    while True:
+        dist = measure()
+        print('Distance in cm: ', dist)
+        time.sleep(0.1)
 except KeyboardInterrupt:
     GPIO.cleanup()
         
