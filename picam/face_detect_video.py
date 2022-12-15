@@ -8,6 +8,7 @@ import time
 
 # Configure the PiCamera
 camera = PiCamera()
+camera.rotation=180
 camera.resolution = (320,240)
 camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(320,240))

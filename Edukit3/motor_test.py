@@ -22,16 +22,24 @@ GPIO.output(8, 0)
 GPIO.output(9, 0)
 GPIO.output(10, 0)
 
+print('Right motor forward')
 # Turn the right motor forwards
-GPIO.output(9, 0)
-GPIO.output(10, 1)
+GPIO.output(9, 1)
+GPIO.output(10, 0)
 
+input("Press Enter to Continue:")
 
+GPIO.output(9,0)
+
+print('Left motor forward')
 # Turn the left motor forward
 GPIO.output(7, 0)
 GPIO.output(8, 1)
 
+input('Press enter to stop')
+GPIO.output(8, 0)
+
 # Wait for 1 second
-time.sleep(1)
+
 
 GPIO.cleanup()

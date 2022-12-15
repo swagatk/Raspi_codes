@@ -15,8 +15,8 @@ GPIO.setwarnings(False)
 # set variables for GPIO  Pins
 pinMotorAForward = 9
 pinMotorABackward = 10
-pinMotorBForward = 7
-pinMotorBBackward = 8
+pinMotorBForward = 8
+pinMotorBBackward = 7
 pinTrigger = 17
 pinEcho = 18
 
@@ -37,7 +37,7 @@ GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
 # Distance variables
-hownear = 20.0
+hownear = 40.0
 reversetime = 0.5
 turntime = 0.75
 
@@ -140,14 +140,20 @@ def isnearobstacle(localhownear):
     else:
         return False
 
-def avoidobstacle():
+def avoidobstacle(left=False):
     backward() 
     time.sleep(reversetime)
     stopmotors()
 
-    turnright()
+    if left:
+        turnright()
+        left = False
+    else:
+        turnleft()
+        left = True
     time.sleep(turntime)
     stopmotors()
+    return left
 
 ############
 if __name__ == '__main__':
@@ -156,13 +162,13 @@ if __name__ == '__main__':
 
         # Allow module to settle
         time.sleep(0.1)
-
+        left = False
         while True:
             forward()
             time.sleep(0.1)
             if isnearobstacle(hownear):
                 stopmotors()
-                avoidobstacle()
+                left = avoidobstacle()
     except KeyboardInterrupt:
         GPIO.cleanup()
     
