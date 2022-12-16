@@ -12,3 +12,5 @@ Contains experimental codes with Raspberry Pi
 - Interfacing with Arduino
    - using I2C
    - using SPI
+- Integration with ROS
+  

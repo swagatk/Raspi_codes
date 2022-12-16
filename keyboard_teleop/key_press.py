@@ -16,6 +16,12 @@ def getKey(keyName):
     pygame.display.update()
     return ans
 
+def stop():
+    print('Stopping pygame')
+    pygame.quit()
+    sys.exit()
+    
+
 def main():
     if getKey('LEFT'):
         print('Key Left is pressed')
@@ -26,8 +32,8 @@ def main():
     if getKey('DOWN'):
         print('Key Down is pressed')
     if getKey('ESCAPE'):
-        pygame.quit()
-        sys.exit()
+        stop()
+        
 
 if __name__ == '__main__':
     init()
