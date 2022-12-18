@@ -99,13 +99,32 @@ def key_control():
         
     elif kp.getKey('DOWN'):
         backward()
+
+    elif kp.getKey('ESCAPE'):
+        stopmotors()
+        kp.stop()
+        GPIO.cleanup()
+
     else:
         stopmotors()
         
-    if kp.getKey('ESCAPE'):
+
+def exec_cmd(cmd_str):
+    if cmd_str == 'LEFT':
+        turnleft()
+        print('Turning Left')
+    elif cmd_str == 'RIGHT':
+        turnright()
+        print('Turning Right')
+    elif cmd_str == 'UP':
+        forward()
+        print('Moving Forward')
+    elif cmd_str == 'DOWN':
+        backward()
+        print('Moving Downward')
+    else:
         stopmotors()
-        GPIO.cleanup()
-        kp.stop()
+        
     
 
 if __name__ == '__main__':

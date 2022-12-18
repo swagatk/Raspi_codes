@@ -33,6 +33,19 @@ def main():
         print('Key Down is pressed')
     if getKey('ESCAPE'):
         stop()
+
+def fetch_command():
+    if getKey('LEFT'):
+        return 'LEFT'
+    elif getKey('RIGHT'):
+        return 'RIGHT'
+    elif getKey('UP'):
+        return 'UP'
+    elif getKey('DOWN'):
+        return 'DOWN'
+    else:
+        return 'STOP'
+
         
 
 if __name__ == '__main__':
