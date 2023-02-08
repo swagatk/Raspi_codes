@@ -6,7 +6,7 @@ camera.rotation = 180
 camera.resolution = (320, 320)
 camera.framerate = 25
 camera.awb_mode = 'auto'
-camera.exposure_mode = 'night'
+camera.exposure_mode = 'auto'
 camera.start_preview()
-sleep(5)
+sleep(10)
 camera.stop_preview()

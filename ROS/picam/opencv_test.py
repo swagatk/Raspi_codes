@@ -11,7 +11,8 @@ cap.set(cv2.CAP_PROP_FPS, 30)
 
 if not cap.isOpened():
     print('Cannot open camera')
-    
+
+print("Press key 'q' to exit ...")
 while True:
     ret, frame = cap.read()
     rframe = cv2.rotate(frame, cv2.ROTATE_180)
