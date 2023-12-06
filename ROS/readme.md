@@ -4,11 +4,13 @@
 https://varhowto.com/install-ros-noetic-raspberry-pi-4/
 ## Install OpenCV 4.x on Raspbian Buster
 * For RPi 4, follow instruction available at this site:
+
 https://qengineering.eu/install-opencv-4.5-on-raspberry-pi-4.html
 
 
 * For RPI 3, we need to install the available debian package
-$ sudo apt-get install python-opencv python3-opencv
+
+`$ sudo apt-get install python-opencv python3-opencv`
 
 
 ## Installation Instruction
