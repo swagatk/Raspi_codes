@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 import time
 import numpy as np
 import key_press as kp
+import avoid_obstacle as ao
 
 #set GPIO modes
 GPIO.setmode(GPIO.BCM)
@@ -110,6 +111,8 @@ def key_control():
         
 
 def exec_cmd(cmd_str):
+    if cmd_str == 'a':
+        ao.main()
     if cmd_str == 'LEFT':
         turnleft()
         print('Turning Left')

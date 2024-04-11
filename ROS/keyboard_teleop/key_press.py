@@ -3,7 +3,7 @@ import sys
 
 def init():
     pygame.init()
-    win = pygame.display.set_mode((100, 100))
+    win = pygame.display.set_mode((200, 200))
 
 def getKey(keyName):
     ans = False
@@ -22,7 +22,9 @@ def stop():
     sys.exit()
     
 
-def main():
+def main():          
+    if getKey('a'):
+        print("Key A is pressed")
     if getKey('LEFT'):
         print('Key Left is pressed')
     if getKey('RIGHT'):
@@ -35,6 +37,8 @@ def main():
         stop()
 
 def fetch_command():
+    if getKey('a'):
+        return 'a'
     if getKey('LEFT'):
         return 'LEFT'
     elif getKey('RIGHT'):
