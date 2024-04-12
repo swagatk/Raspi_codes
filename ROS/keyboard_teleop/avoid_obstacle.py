@@ -1,9 +1,12 @@
-#!/usr/bin/env python
+# CamJam Edukit 3 - Robots
+# Worksheet 9 - Obstacle Avoidance
+
 
 # load the libraries
 import RPi.GPIO as GPIO
 import time
 import numpy as np
+from motor_control import *
 
 #set GPIO modes
 GPIO.setmode(GPIO.BCM)
@@ -11,20 +14,25 @@ GPIO.setwarnings(False)
 
 
 # set variables for GPIO  Pins
-pinTrigger = 17     # ultrasonic sensor is required
+pinTrigger = 17
 pinEcho = 18
 
-# configure pins to activate Ultrasonic Sensor
+# Enable Ultrasonic sensors
 GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
+# Distance variables
+hownear = 40.0
+reversetime = 0.5
+turntime = 0.75
 
+# global variable needed for obstacle avoidance
+left = False 
 
 def measure():
     #  Average over 5 readings to reduce noise
     dist = []
     for i in range(5):
-
         #set trigger to False
         GPIO.output(pinTrigger, False)
         time.sleep(0.0001)
@@ -49,31 +57,27 @@ def measure():
                 #print('Either you are too close or too far to me to see.')
                 #StopTime = StartTime
                 break
-    
         # calculate pulse length
         ElapsedTime = StopTime - StartTime
 
         # Distance travelled by the pulse in that time in cm
         Distance = (ElapsedTime * 34326)/2.0
-
         dist.append(Distance)
-
     return np.mean(dist) 
     
-def isnearobstacle(localhownear):
+def nearobstacle(localhownear):
     distance = measure()
-
-    print('Is near obstacle: ' + str(distance))
+    #print('Is near obstacle: ' + str(distance))
     if distance < localhownear:
         return True
     else:
         return False
 
-def avoidobstacle(left=False):
+def avoidobstacle():
+    global left
     backward() 
     time.sleep(reversetime)
     stopmotors()
-
     if left:
         turnright()
         left = False
@@ -82,28 +86,39 @@ def avoidobstacle(left=False):
         left = True
     time.sleep(turntime)
     stopmotors()
-    return left
 
-def main():
-    hownear = 40.0
+def ao_main():
     try:
         GPIO.output(pinTrigger, False)
+        # Allow module to settle
+        time.sleep(0.1)
+        if nearobstacle(hownear):
+            stopmotors()
+            avoidobstacle()
+            msg = 'Avoiding Obstacle'
+            return msg
+        else:
+            forward()
+            time.sleep(0.1)
+            msg = 'Moving forward'
+            return msg
+    except KeyboardInterrupt:
+        GPIO.cleanup()
 
+############
+if __name__ == '__main__':
+    try:
+        GPIO.output(pinTrigger, False)
         # Allow module to settle
         time.sleep(0.1)
         left = False
         while True:
             forward()
             time.sleep(0.1)
-            if isnearobstacle(hownear):
+            if nearobstacle(hownear):
                 stopmotors()
-                left = avoidobstacle()
+                left = avoidobstacle(left)
     except KeyboardInterrupt:
         GPIO.cleanup()
     
-
-
-############
-if __name__ == '__main__':
-    main_ao()
         
