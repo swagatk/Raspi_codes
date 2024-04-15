@@ -87,11 +87,12 @@ def avoidobstacle():
     time.sleep(turntime)
     stopmotors()
 
+def initialize_sensor():
+    GPIO.output(pinTrigger, False)
+    time.sleep(0.1)
+    
 def ao_main():
     try:
-        GPIO.output(pinTrigger, False)
-        # Allow module to settle
-        time.sleep(0.1)
         if nearobstacle(hownear):
             stopmotors()
             avoidobstacle()

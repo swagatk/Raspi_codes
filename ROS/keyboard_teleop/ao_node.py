@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
-from avoid_obstacle import ao_main
+from avoid_obstacle import ao_main, initialize_sensor
 def move():
     pub = rospy.Publisher('status', String, queue_size=10)
     rospy.init_node('avoid_obstacle', anonymous=True)
@@ -15,6 +15,7 @@ def move():
 
 if __name__ == '__main__':
     try:
+        initialize_sensor()
         move()
     except rospy.ROSInterruptException:
         rospy.loginfo('Keyboard Interrupt')
