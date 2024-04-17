@@ -1,0 +1,17 @@
+<launch>
+   <!-- This launch script is to executed on Pirobot /-->
+   <!-- comment/uncomment lines as needed /-->
+
+   <!-- Uncomment the line below to test the picamera /-->
+   <!-- node name="picam" pkg="pirobot" type="opencv_test.py" output="screen" respawn="true"/-->
+
+   <!-- for publishing images from picamera to camera topic /-->
+	<node name="imagepub" pkg="pirobot" type="image_publisher.py" output="screen" respawn="true"/>
+
+   <!--required for robot motion />
+   <node name="robot_motion" pkg="pirobot" type="robot_motion.py" /-->
+
+   <!-- uncomment the below line to enable autonomous obstacle avoidance capability /-->
+   <!-- node name="avoid_obstacle" pkg="pirobot" type="ao_node.py"/-->
+
+</launch>

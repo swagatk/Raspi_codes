@@ -1,0 +1,14 @@
+<launch>
+   <!-- This script is for remote machine /-->
+   <!-- comment/uncomment lines as needed /-->
+
+   <!-- Required for keyboard based teleoperation/-->
+   <node name="kb_teleop" pkg="pirobot" type="kb_teleop.py" output="screen" respawn="true" />
+
+   <!-- for viewing images from picamera mounted on robot /-->
+	<node name="imagesub" pkg="pirobot" type="image_subscriber.py" output="screen" respawn="true"/>
+
+   <!-- for hand pose recognition, requires webcam on remote machine/-->
+   <node name="hand_teleop" pkg="pirobot" type="hand_teleop.py" output="screen" respawn="true"/>
+
+</launch>

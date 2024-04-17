@@ -1,6 +1,0 @@
-<launch>
-	<!-- node name="picam" pkg="pirobot" type="opencv_test.py" output="screen" respawn="true"/-->
-	<node name="imagepub" pkg="pirobot" type="image_publisher.py" output="screen" respawn="true"/>
-
-	<!-- node name="imagesub" pkg="pirobot" type="image_subscriber.py" output="screen" respawn="true"/-->
-</launch>
