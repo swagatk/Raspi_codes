@@ -64,3 +64,6 @@ $ roslaunch pirobot pirobot.launch
 ```
 
 Please refer to the presentation present in `doc` folder for more details on how to run various nodes. 
+
+### Acknowledgement
+The code for Gesture Control for Pirobot is contributed by Mr. Tomasz Szmidt (a student from EHU). 
