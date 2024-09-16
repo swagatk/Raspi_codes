@@ -9,22 +9,26 @@
 
 ## Steps
 * Download the this repo in your home directory:
-`git clone https://github.com/swagatk/Raspi_codes.git`
+```
+git clone https://github.com/swagatk/Raspi_codes.git
+```
 
 * Create an overlay workspace for you to build:
-``
+```
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src/
 ros2 pkg create --build-type ament_python --license Apache-2.0 pirobot
-``
+```
 * Copy the folder `Raspi_codes/ROS2/pirobot/` to `~/ros2_ws/src/pirobot/`.
 * Build the package:
-``
+```
 cd ~/ros2_ws/
 colcon build --packages-select pirobot
-``
+```
 * Once the build is completed without any errors. Source setup file to use the executables:
-`source install/local_setup.bash`
+```
+source install/local_setup.bash
+```
 
 * Run the following codes on two differential terminals:
 ``
