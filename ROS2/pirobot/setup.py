@@ -21,6 +21,8 @@ setup(
         'console_scripts': [
 		'keypub=pirobot.keyboard_publisher:main',
 		'motionsub=pirobot.motion_subscriber:main',
+		'imagepub=pirobot.image_publisher:main',
+		'imagesub=pirobot.image_subscriber:main',
         ],
     },
 )

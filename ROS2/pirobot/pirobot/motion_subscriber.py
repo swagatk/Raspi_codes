@@ -12,7 +12,7 @@ class MotionSubscriber(Node):
         super().__init__('motion_subscriber')
         self.subscription = self.create_subscription(
             String,
-            'topic',
+            '/pirobot/command',
             self.listener_callback,
             10)
         self.subscription # prevents unused variable warning

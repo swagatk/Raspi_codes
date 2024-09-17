@@ -30,11 +30,13 @@ colcon build --packages-select pirobot
 source install/local_setup.bash
 ```
 
-* Run the following codes on two differential terminals:
+* Run the following codes on differential terminals:
 ``
 ros2 run pirobot keypub
 ros2 run pirobot motionsub
+ros2 run pirobot imagepub
+ros2 run pirobot imagesub
 `` 
-`keypub` can run on a remote computer and `motionsub` can run on the pirobot. 
+`keypub` and `imagesub` can run on a remote computer and `motionsub` and `imagepub' should run on the pirobot. 
 
 I use this code to control Pirobot created using [CamJamEdukit3](https://camjam.me/?page_id=1035). 
