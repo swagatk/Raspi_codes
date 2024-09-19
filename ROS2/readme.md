@@ -3,6 +3,12 @@
 ## Dependencies:
 * Tested on Raspberry Pi 4 with Raspberry Pi OS (Bookworm)
 * Install ROS2 Iron 
+* OpenCV 4.x
+
+## Capabilities
+* Teleoperation using arrow keys
+* Viewing Picamera video from remote machine
+* Service to start/stop autonomous navigation while avoiding obstacle
 
 ## Installing ROS2 Iron
 * Follow the steps provided [here](https://github.com/Ar-Ray-code/rpi-bullseye-ros2) to install ROS2/Iron on Bookworm
@@ -37,6 +43,21 @@ ros2 run pirobot motionsub
 ros2 run pirobot imagepub
 ros2 run pirobot imagesub
 ``` 
-`keypub` and `imagesub` can run on a remote computer and `motionsub` and `imagepub' should run on the pirobot. 
 
+`keypub` and `imagesub` can run on a remote computer and `motionsub` and `imagepub` should run on the pirobot. 
+
+* To run the avoid obstacle service
+
+run the folllowing command on the pirobot:
+```
+ros2 run pirobot aoservice
+```
+run the following command on the remote machine with last term being one among the list ['True', 'true', '1', 'yes'] etc.
+```
+ros2 run pirobot aoclient True
+```
+For instance, to stop the robot motion, type:
+```
+ros2 run pirobot aoclient stop
+```
 I use this code to control Pirobot created using [CamJamEdukit3](https://camjam.me/?page_id=1035). 

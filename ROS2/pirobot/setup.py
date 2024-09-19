@@ -23,6 +23,8 @@ setup(
 		'motionsub=pirobot.motion_subscriber:main',
 		'imagepub=pirobot.image_publisher:main',
 		'imagesub=pirobot.image_subscriber:main',
+		'aoservice=pirobot.avoid_obstacle_service:main',
+		'aoclient=pirobot.avoid_obstacle_client:main',
         ],
     },
 )
