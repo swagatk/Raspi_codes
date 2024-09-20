@@ -8,17 +8,12 @@ import numpy as np
 import sys
 from pirobot import key_press as kp
 
-#set GPIO modes
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-
 
 # set variables for GPIO  Pins
 pinMotorAForward = 9
 pinMotorABackward = 10
 pinMotorBForward = 8
 pinMotorBBackward = 7
-
 
 
 # PWM parameters
@@ -29,27 +24,33 @@ Stop = 0
 
 
 
-# Set the GPIO Pin Mode
-GPIO.setup(pinMotorAForward, GPIO.OUT)
-GPIO.setup(pinMotorABackward, GPIO.OUT)
-GPIO.setup(pinMotorBForward, GPIO.OUT)
-GPIO.setup(pinMotorBBackward, GPIO.OUT)
+def initialize_motors():
+    #set GPIO modes
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    
+    # Set the GPIO Pin Mode
+    GPIO.setup(pinMotorAForward, GPIO.OUT)
+    GPIO.setup(pinMotorABackward, GPIO.OUT)
+    GPIO.setup(pinMotorBForward, GPIO.OUT)
+    GPIO.setup(pinMotorBBackward, GPIO.OUT)
 
+    global pwmMotorAForward,\
+       pwmMotorBForward,\
+       pwmMotorABackward,\
+       pwmMotorBBackward
 
+    # Set the GPIO to Software PWM at 'Frequency' Hertz
+    pwmMotorAForward = GPIO.PWM(pinMotorAForward, Frequency)
+    pwmMotorABackward = GPIO.PWM(pinMotorABackward, Frequency)
+    pwmMotorBForward = GPIO.PWM(pinMotorBForward, Frequency)
+    pwmMotorBBackward = GPIO.PWM(pinMotorBBackward, Frequency)
 
-# Set the GPIO to Software PWM at 'Frequency' Hertz
-pwmMotorAForward = GPIO.PWM(pinMotorAForward, Frequency)
-pwmMotorABackward = GPIO.PWM(pinMotorABackward, Frequency)
-pwmMotorBForward = GPIO.PWM(pinMotorBForward, Frequency)
-pwmMotorBBackward = GPIO.PWM(pinMotorBBackward, Frequency)
-
-
-
-# set the duty cycle for software PWM - initially to 0
-pwmMotorAForward.start(Stop)
-pwmMotorABackward.start(Stop)
-pwmMotorBForward.start(Stop)
-pwmMotorBBackward.start(Stop)
+    # set the duty cycle for software PWM - initially to 0
+    pwmMotorAForward.start(Stop)
+    pwmMotorABackward.start(Stop)
+    pwmMotorBForward.start(Stop)
+    pwmMotorBBackward.start(Stop)
 
 def stopmotors():
     pwmMotorAForward.ChangeDutyCycle(Stop)
@@ -132,6 +133,7 @@ def exec_cmd(cmd_str):
     
 
 if __name__ == '__main__':
+    initialize_motors()
     stopmotors()
     kp.init()
     print('Controlling using keyboard')

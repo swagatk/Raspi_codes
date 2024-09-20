@@ -94,10 +94,12 @@ def avoidobstacle():
 
 def halt():
     stopmotors()
-    GPIO.cleanup()
+
+def initialize():
+    initialize_motors()
+    initialize_sensors()
     
 def main():
-    initialize_sensor()
     if nearobstacle(hownear):
         stopmotors()
         avoidobstacle()

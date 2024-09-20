@@ -19,8 +19,6 @@ class AvoidObstacleService(Node):
             
 
     def avoid_obstacle_callback(self, request, response):
-        #request # request must be specified even if it is not used
-        print('request data:', request.data)
         if request.data:
             self.get_logger().info('Received Request to start autonomous navigation ...')
             response.success=True
@@ -49,7 +47,7 @@ class AvoidObstacleService(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    ao.initialize_sensor()
+    ao.initialize()
     ao_service = AvoidObstacleService()
     rclpy.spin(ao_service)
     ao_service.destroy_node()

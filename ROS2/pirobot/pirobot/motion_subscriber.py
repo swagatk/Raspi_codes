@@ -24,6 +24,7 @@ class MotionSubscriber(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    mc.initalize_motors()
     motion_subscriber = MotionSubscriber()
     rclpy.spin(motion_subscriber)
     motion_subscriber.destroy_node()
