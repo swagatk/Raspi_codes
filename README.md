@@ -11,14 +11,22 @@ Contains experimental codes with Raspberry Pi
 	- Object detection
 	- Hand recognition
 	- Camshift object tracking
+- Using Picamera 2 Library
 - Using STS-PI Rover and Pimoroni HAT
    - Keyboard control
 - Interfacing with Arduino
    - using I2C
    - using SPI
+- Joystick Control for CamJam Edukit
 - Integration with ROS
 	- Keyboard Teleop
 	- PiCam Image Publisher & Subscriber
+	- Avoid obstacle node
+	- Hand gesture Recognition (Credits: [Tomasz Szmidt](https://github.com/tomszmi))
 
+- Integration with ROS2
+	- Keyboard Teleop
+	- Picam image publisher & Subscriber
+	- Avoid obstacle service
 
   
