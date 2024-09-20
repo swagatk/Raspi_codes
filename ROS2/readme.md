@@ -13,7 +13,22 @@
 ## Installing ROS2 Iron
 * Follow the steps provided [here](https://github.com/Ar-Ray-code/rpi-bullseye-ros2) to install ROS2/Iron on Bookworm
 
-## Steps
+## Installing Opencv
+```
+sudo apt install python3-opencv opencv-data
+```
+Make sure that you are able to `import cv2` inside a python console successfully
+```
+python3
+Python 3.11.2 (main, Aug 26 2024, 07:20:54) [GCC 12.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import cv2
+>>> cv2.__version__
+'4.6.0'
+>>> 
+
+```
+## Steps to build your package
 * Download the this repo in your home directory:
 ```
 git clone https://github.com/swagatk/Raspi_codes.git
