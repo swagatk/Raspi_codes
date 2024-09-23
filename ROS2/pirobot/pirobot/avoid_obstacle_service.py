@@ -60,6 +60,7 @@ class AvoidObstacleService(Node):
                 response.success=False
                 response.message="Robot is not running. Nothing to do"
                 self.get_logger().info('Robot Status: "%d"' % current_status)
+                self.get_logger().info('Waiting for Client command to start moving')
 
         return response
 
