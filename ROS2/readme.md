@@ -8,7 +8,7 @@
 ## Capabilities
 * Teleoperation using arrow keys
 * Viewing Picamera video from remote machine
-* Service to start/stop autonomous navigation while avoiding obstacle
+* Service to start/stop autonomous obstacle avoidance motion 
 
 ## Installing ROS2 Iron
 * Follow the steps provided [here](https://github.com/Ar-Ray-code/rpi-bullseye-ros2) to install ROS2/Iron on Bookworm

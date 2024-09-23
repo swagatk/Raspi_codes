@@ -19,7 +19,7 @@ hownear = 40.0
 reversetime = 0.5
 turntime = 0.75
 
-def initialize_sensor():
+def initialize_sensors():
     #set GPIO modes
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)

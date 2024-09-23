@@ -29,7 +29,7 @@ def main(args=None):
         input_bool = bool(True)
     else:
         input_bool = bool(False)
-    print('Input argument 2:', input_bool)
+    #print('Input argument:', input_bool)
     ao_client = AvoidObstacleClient()
     response = ao_client.send_request(input_bool)
     ao_client.get_logger().info(
