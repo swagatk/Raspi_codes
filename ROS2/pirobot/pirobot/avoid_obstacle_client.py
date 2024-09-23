@@ -25,7 +25,7 @@ class AvoidObstacleClient(Node):
 def main(args=None):
     rclpy.init(args=args)
     input_string = sys.argv[1]
-    if input_string.lower() in ['start', 'true', 'True', '1', 't', 'y', 'yes', 'yup']:
+    if input_string.lower() in ['start', 'Start', 'true', 'True', '1', 't', 'y', 'yes', 'yup']:
         input_bool = bool(True)
     else:
         input_bool = bool(False)

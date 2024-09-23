@@ -70,7 +70,7 @@ run the folllowing command on the pirobot:
 ```
 ros2 run pirobot aoservice
 ```
-run the following command on the remote machine with last term being one among the list ['True', 'true', '1', 'yes'] etc.
+run the following command on the remote machine with last term being one among the list ['start', 'true', '1', 'yes'] etc.
 ```
 ros2 run pirobot aoclient True
 ```
