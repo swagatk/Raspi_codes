@@ -78,9 +78,9 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src/
 ros2 pkg create --build-type ament_python --license Apache-2.0 pirobot
 ```
-* Copy the folder `Raspi_codes/ROS2/pirobot/` to `~/ros2_ws/src/pirobot/`.
+* Copy the folder `Raspi_codes/ROS2/pirobot/` to `~/ros2_ws/src/`.
 ```
-cp -r ~/Raspi_codes/ROS2/pirobot ~/ros2_ws/src/pirobot/
+cp -r ~/Raspi_codes/ROS2/pirobot ~/ros2_ws/src/
 ```
 * Build the package:
 ```
