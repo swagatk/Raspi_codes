@@ -25,6 +25,7 @@ setup(
 		'imagesub=pirobot.image_subscriber:main',
 		'aoservice=pirobot.avoid_obstacle_service:main',
 		'aoclient=pirobot.avoid_obstacle_client:main',
+		'handpub=pirobot.hand_recogn_publisher:main',
         ],
     },
 )

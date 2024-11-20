@@ -9,6 +9,7 @@
 * Teleoperation using arrow keys
 * Viewing Picamera video from remote machine
 * Service to start/stop autonomous obstacle avoidance motion 
+* Teleoperation using hand pose
 
 ## Installing ROS2 Iron
 * Follow the steps provided [here](https://github.com/Ar-Ray-code/rpi-bullseye-ros2) to install ROS2/Iron on Bookworm
@@ -28,7 +29,42 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> 
 
 ```
+
+## Installing media pipe
+
+install `pip` and `venv` packages.
+```
+sudo apt install -y python3-pip python3-venv
+
+```
+create a virtual environment:
+```
+python3 -m venv "MediaPipeEnv" --system-site-packages
+```
+activate the virtual environment created above
+```
+source MediapipeEnv/bin/activate
+```
+install mediapipe inside the virtualenv
+
+```
+pip3 install mediapipe
+```
+You can run python idle editor inside this environment to use the current python interpreter:
+
+```
+python -m idlelib.idle & 
+```
+Build and execute ROS2 packages within this environment to obtain desired result.
+
+Exit the virtual environment using the following command:
+```
+deactivate
+```
+
 ## Steps to build your package
+Note that you will have to download and build the ROS2 packages both on the remote machine and on the Pirobot.
+
 * Download the this repo in your home directory:
 ```
 git clone https://github.com/swagatk/Raspi_codes.git
@@ -59,10 +95,9 @@ source install/local_setup.bash
 ros2 run pirobot keypub
 ros2 run pirobot motionsub
 ros2 run pirobot imagepub
-ros2 run pirobot imagesub
-``` 
-
-`keypub` and `imagesub` can run on a remote computer and `motionsub` and `imagepub` should run on the pirobot. 
+ros2 run pirobot imagesub 
+```
+The nodes `keypub` and `imagesub` can run on a remote computer and `motionsub` and `imagepub` should run on the pirobot. 
 
 * To run the avoid obstacle service
 
@@ -79,3 +114,17 @@ For instance, to stop the robot motion, type:
 ros2 run pirobot aoclient stop
 ```
 I use this code to control Pirobot created using [CamJamEdukit3](https://camjam.me/?page_id=1035). 
+
+* To run nodes for teleoperation using hand gestures
+
+run the following command on the remote machine having a camera on a remote machine. Note that I am using a USB-Camera on a remote Pi400 machine. If you want to use 'Picamera' instead, you may need to modify the corresponding gesture recognition code file.
+
+```
+ros2 run pirobot handpub
+```
+Run the following code on the pirobot
+
+```
+ros2 run pirobot motionsub
+```
+Now you can use your palm to generate "UP", "DOWN", "LEFT", "RIGH" motion and a closed fist to generate "EXIT" command. 

@@ -28,5 +28,6 @@ Contains experimental codes with Raspberry Pi
 	- Keyboard Teleop
 	- Picam image publisher & Subscriber
 	- Avoid obstacle service
+	- teleop with hand pose
 
   
