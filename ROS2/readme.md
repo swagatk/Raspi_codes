@@ -117,7 +117,8 @@ I use this code to control Pirobot created using [CamJamEdukit3](https://camjam.
 
 * To run nodes for teleoperation using hand gestures
 
-run the following command on the remote machine having a camera on a remote machine. Note that I am using a USB-Camera on a remote Pi400 machine. If you want to use 'Picamera' instead, you may need to modify the corresponding gesture recognition code file.
+Run the following command on the remote machine having a camera on a remote machine. 
+(Note that I am using a USB-Camera on a remote Pi400 machine. If you want to use 'Picamera' instead, you may need to modify the corresponding gesture recognition code file.)
 
 ```
 ros2 run pirobot handpub
@@ -127,4 +128,4 @@ Run the following code on the pirobot
 ```
 ros2 run pirobot motionsub
 ```
-Now you can use your palm to generate "UP", "DOWN", "LEFT", "RIGH" motion and a closed fist to generate "EXIT" command. 
+Now you can use your open palm to generate "UP", "DOWN", "LEFT", "RIGHT" motion and a closed fist to generate "EXIT" command. 
