@@ -1,9 +1,11 @@
 # ROS2 Control Interface for Pirobot
 
 ## Dependencies:
-* Tested on Raspberry Pi 4 with Raspberry Pi OS (Bookworm)
+* Tested on Raspberry Pi 4 with Raspberry Pi OS (Bookworm), Release 12, Kernel 6.6.51
 * Install ROS2 Iron 
-* OpenCV 4.x
+* OpenCV 4.10.0
+* Mediapipe 0.10.18
+* Python 3.11.2
 
 ## Capabilities
 * Teleoperation using arrow keys
