@@ -47,11 +47,11 @@ def measure():
             StopTime = time.time()
             interval = StopTime - StartTime
             #print('Interval: ', interval)
-            # this block is really not required
             if interval >= 0.04:
                 #print('Either you are too close or too far to me to see.')
-                #StopTime = StartTime
+                StopTime = StartTime
                 break
+            
     
         # calculate pulse length
         ElapsedTime = StopTime - StartTime
