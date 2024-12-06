@@ -42,3 +42,7 @@ python3 recognize.py
 ```
 press 'q' on the image screen to exit. 
 
+- Exit the virtual environment when finished
+```
+deactivate
+```
