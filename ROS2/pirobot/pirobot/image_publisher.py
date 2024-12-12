@@ -13,9 +13,6 @@ picam2 = Picamera2()
 picam2.preview_configuration.size=(320,240)
 picam2.preview_configuration.format = "RGB888"
 picam2.preview_configuration.transform = Transform(hflip=0, vflip=1)
-##config=picam2.create_preview_configuration(main={"size": (320, 240),
-##                                 "format": "RGB888",},
-##                                transform=Transform(hflip=1, vflip=0)})
 picam2.configure("preview")
 picam2.start()
 
