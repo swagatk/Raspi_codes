@@ -98,6 +98,9 @@ def halt():
 def initialize():
     mc.initialize_motors()
     initialize_sensors()
+
+def cleanup():
+    GPIO.cleanup()
     
 def main():
     if nearobstacle(hownear):

@@ -1,6 +1,3 @@
-'''
-This code is inspired by Mandana Bakhshi@EHU. She helped simplify this code.
-'''
 from std_srvs.srv import Trigger, SetBool
 import rclpy
 from rclpy.node import Node
@@ -65,6 +62,7 @@ def main(args=None):
     ao_service = AvoidObstacleService()
     rclpy.spin(ao_service)
     ao_service.destroy_node()
+    ao.cleanup()
     rclpy.shutdown()
 
 if __name__ == '__main__':
