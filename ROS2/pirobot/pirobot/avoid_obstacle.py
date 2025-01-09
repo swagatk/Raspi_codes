@@ -6,7 +6,7 @@
 import RPi.GPIO as GPIO
 import time
 import numpy as np
-from pirobot.motor_control import *
+from pirobot import motor_control as mc
 
 
 
@@ -78,35 +78,35 @@ def nearobstacle(localhownear):
 
 def avoidobstacle():
     global left
-    backward() 
+    mc.backward() 
     time.sleep(reversetime)
-    stopmotors()
+    mc.stopmotors()
     if left:
-        turnright()
+        mc.turnright()
         left = False
     else:
-        turnleft()
+        mc.turnleft()
         left = True
     time.sleep(turntime)
-    stopmotors()
+    mc.stopmotors()
 
 
 
 def halt():
-    stopmotors()
+    mc.stopmotors()
 
 def initialize():
-    initialize_motors()
+    mc.initialize_motors()
     initialize_sensors()
     
 def main():
     if nearobstacle(hownear):
-        stopmotors()
+        mc.stopmotors()
         avoidobstacle()
         msg = 'Turning to avoid obstacle'
         return msg
     else:
-        forward()
+        mc.forward()
         time.sleep(0.1)
         msg = 'Moving forward'
         return msg
