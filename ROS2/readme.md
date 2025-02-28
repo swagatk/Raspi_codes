@@ -50,7 +50,7 @@ source mediapipevenv/bin/activate
 install mediapipe inside the virtualenv
 
 ```
-(mediapipevenv) $ cd ~/mediapipenv
+(mediapipevenv) $ cd ~/mediapipevenv
 (mediapipevenv) $ pip3 install mediapipe
 ```
 You can run python idle editor inside this environment to use the current python interpreter:
