@@ -41,7 +41,7 @@ sudo apt install -y python3-pip python3-venv
 ```
 create a virtual environment:
 ```
-python3 -m venv "mediapipevenv" --system-site-packages
+python3 -m venv ~/mediapipevenv --system-site-packages
 ```
 activate the virtual environment created above
 ```
