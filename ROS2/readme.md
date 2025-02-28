@@ -76,7 +76,11 @@ Verify that `PYTHONPATH` shows folders to python site-packages both under `/opt/
 (/home/pi/ros2_ws/install/pirobot/lib/python3.11/site-packages:/ros2_ws/jazzy/lib/python3.11/dist-packages:/opt/ros/jazzy/lib/python3.11/site-packages:/home/pi/mediapipevenv/lib/python3.11/site-packages
 
 ```
-Exit the virtual environment using the following command:
+Run the node that imports mediapipe module:
+```
+(mediapipevenv) $ ros2 run pirobot handpub
+```
+It should run without errors. To exit the virtual environment using the following command:
 ```
 deactivate
 ```
