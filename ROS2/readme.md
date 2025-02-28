@@ -13,8 +13,8 @@
 * Service to start/stop autonomous obstacle avoidance motion 
 * Teleoperation using hand pose
 
-## Installing ROS2 Iron
-* Follow the steps provided [here](https://github.com/Ar-Ray-code/rpi-bullseye-ros2) to install ROS2/Iron on Bookworm
+## Installing ROS2 Iron/Jazzy
+* Follow the steps provided [here](https://github.com/Ar-Ray-code/rpi-bullseye-ros2) to install ROS2/Iron or Jazzy on Bookworm
 
 ## Installing Opencv
 ```
@@ -41,33 +41,39 @@ sudo apt install -y python3-pip python3-venv
 ```
 create a virtual environment:
 ```
-python3 -m venv "MediaPipeEnv" --system-site-packages
+python3 -m venv "mediapipevenv" --system-site-packages
 ```
 activate the virtual environment created above
 ```
-source MediaPipeEnv/bin/activate
+source mediapipevenv/bin/activate
 ```
 install mediapipe inside the virtualenv
 
 ```
-pip3 install mediapipe
+(mediapipevenv) $ cd ~/mediapipenv
+(mediapipevenv) $ pip3 install mediapipe
 ```
 You can run python idle editor inside this environment to use the current python interpreter:
 
 ```
-python -m idlelib.idle & 
+(mediapipevenv) $ python -m idlelib.idle & 
 ```
 Build and execute ROS2 packages within this environment to obtain desired result.
+```
+(mediapipevenv) $ cd ~/ros2_ws
+(mediapipevev) $ colcon build --packages-select pirobot
+(mediapipevenv) $ source install/setup.bash
 
+```
 Make sure to update your python path before running your node that imports mediapipe
 ```
-export PYTHONPATH="$PYTHONPATH:/home/pi/MediaPipeEnv/lib/python3.11/site-packages"
+(mediapipevenv) $ export PYTHONPATH="$PYTHONPATH:/home/pi/mediapipevenv/lib/python3.11/site-packages"
 ```
-Verify that `PYTHONPATH` shows both shows folder to python site-packages both under `/opt/ros/iron/...` and `/home/pi/MediaPipeEnv/...` folders.
+Verify that `PYTHONPATH` shows both shows folder to python site-packages both under `/opt/ros/jazzy/...` and `/home/pi/mediapipevenv/...` folders.
 
 ```
-echo $PYTHONPATH
-/home/pi/ros2_ws/install/pirobot/lib/python3.11/site-packages:/ros2_ws/jazzy/lib/python3.11/dist-packages:/opt/ros/jazzy/lib/python3.11/site-packages:/home/pi/mediapipevenv/lib/python3.11/site-packages
+(mediapipevenv) $ echo $PYTHONPATH
+(/home/pi/ros2_ws/install/pirobot/lib/python3.11/site-packages:/ros2_ws/jazzy/lib/python3.11/dist-packages:/opt/ros/jazzy/lib/python3.11/site-packages:/home/pi/mediapipevenv/lib/python3.11/site-packages
 
 ```
 Exit the virtual environment using the following command:
@@ -87,7 +93,7 @@ git clone https://github.com/swagatk/Raspi_codes.git
 ```
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src/
-ros2 pkg create --build-type ament_python --license Apache-2.0 pirobot
+
 ```
 * Copy the folder `Raspi_codes/ROS2/pirobot/` to `~/ros2_ws/src/`.
 ```
