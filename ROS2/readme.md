@@ -69,7 +69,7 @@ Make sure to update your python path before running your node that imports media
 ```
 (mediapipevenv) $ export PYTHONPATH="$PYTHONPATH:/home/pi/mediapipevenv/lib/python3.11/site-packages"
 ```
-Verify that `PYTHONPATH` shows both shows folder to python site-packages both under `/opt/ros/jazzy/...` and `/home/pi/mediapipevenv/...` folders.
+Verify that `PYTHONPATH` shows folders to python site-packages both under `/opt/ros/jazzy/...` and `/home/pi/mediapipevenv/...` folders as shown below:
 
 ```
 (mediapipevenv) $ echo $PYTHONPATH
