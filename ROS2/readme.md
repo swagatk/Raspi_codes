@@ -45,7 +45,7 @@ python3 -m venv "MediaPipeEnv" --system-site-packages
 ```
 activate the virtual environment created above
 ```
-source MediapipeEnv/bin/activate
+source MediaPipeEnv/bin/activate
 ```
 install mediapipe inside the virtualenv
 
@@ -59,6 +59,17 @@ python -m idlelib.idle &
 ```
 Build and execute ROS2 packages within this environment to obtain desired result.
 
+Make sure to update your python path before running your node that imports mediapipe
+```
+export PYTHONPATH="$PYTHONPATH:/home/pi/MediaPipeEnv/lib/python3.11/site-packages"
+```
+Verify that `PYTHONPATH` shows both shows folder to python site-packages both under `/opt/ros/iron/...` and `/home/pi/MediaPipeEnv/...` folders.
+
+```
+echo $PYTHONPATH
+/home/pi/ros2_ws/install/pirobot/lib/python3.11/site-packages:/ros2_ws/jazzy/lib/python3.11/dist-packages:/opt/ros/jazzy/lib/python3.11/site-packages:/home/pi/mediapipevenv/lib/python3.11/site-packages
+
+```
 Exit the virtual environment using the following command:
 ```
 deactivate
