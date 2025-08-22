@@ -37,8 +37,9 @@ git clone https://github.com/swagatk/Raspi_codes.git
 - Navigate the folder `~/virtualenv/Raspi_codes/mediapipe/examples` and execute the following commands:
 ``` 
 sh setup.py
-python3 detect.py
-python3 recognize.py
+python3 face_detect.py
+python3 gesture_recog.py
+python3 object_detect.py
 ```
 press 'q' on the image screen to exit. 
 
