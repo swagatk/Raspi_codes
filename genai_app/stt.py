@@ -5,16 +5,6 @@ import os
 import wave
 
 
-
-def speak(text):
-    if not text or text == 'No speech detected':
-        print("No valid text to speak")
-        return 
-    try:
-        subprocess.run(["espeak", "-ven-us+f4", "-k5", "-s130 -p60 -a100", text])
-    except subprocess.CalledProcessError as e:
-        print(f"Error during espeak: {e.stderr.decode()}")
-
 def speech_to_text(wav_file, model_path='/home/pi/vosk-model-small-en-us-0.15'):
     """
     Converts a WAV file into text using VOSK speech recognition library

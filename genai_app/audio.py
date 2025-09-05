@@ -4,9 +4,8 @@ import pyaudio
 import sys
 import time
 
-        
 
-def record_audio(input_device_index=1):
+def record_audio(input_device_index=1, button=None):
     """
     Record audio from a specified input device
     save into a .wav file.
@@ -15,7 +14,8 @@ def record_audio(input_device_index=1):
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 16000
-    OUTPUT_FILENAME= "output.wav"
+    OUTPUT_FILENAME= "input.wav"
+    RECORD_SECONDS = 5 # if button is not defined.
     audio = None
     stream = None
     try:
@@ -35,13 +35,20 @@ def record_audio(input_device_index=1):
                             channels=CHANNELS,
                             rate=RATE,
                             input=True,
-                            frame_per_buffer=CHUNK,
+                            frames_per_buffer=CHUNK,
                             input_device_index=input_device_index)
         frames = []
         print("Recording ...")
-        while button.is_pressed:
-            data = stream.read(CHUNK)
-            frames.append(data)
+        if button is not None:
+            print('Button detected. record while pressed')
+            while button.is_pressed:
+                data = stream.read(CHUNK, exception_on_overflow=False)
+                frames.append(data)
+        else: # record for five seconds
+            print('Button not defined, recording for 5 seconds')
+            for _ in range(int(RATE / CHUNK * RECORD_SECONDS)):
+                data = stream.read(CHUNK, exception_on_overflow=False)
+                frames.append(data)
         print("Recording stopped")
 
         print(f"saving to {OUTPUT_FILENAME}....")
@@ -49,7 +56,7 @@ def record_audio(input_device_index=1):
             wf.setnchannels(CHANNELS)
             wf.setsampwidth(audio.get_sample_size(FORMAT))
             wf.setframerate(RATE)
-            wf.writeframe(b''.join(frames))
+            wf.writeframes(b''.join(frames))
         print(f'Audio saved successfully as {OUTPUT_FILENAME}')
         return OUTPUT_FILENAME
     
@@ -71,6 +78,6 @@ def record_audio(input_device_index=1):
         if audio is not None:
             audio.terminate()
         time.sleep(0.2)
-
+        
 if __name__ == '__main__':
-    record_audio(input_device_index=1)
+    record_audio(input_device_index=2)

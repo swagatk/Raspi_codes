@@ -1,43 +1,34 @@
-from espeak import Espeak
 import os
+import subprocess
 
-def text_to_speech(text, output_file="output_speech.wav", voice="en-us", speed=150, pitch=50):
+def speak(text, model_path=None, output_file="output.wav"):
     """
-    Convert text to speech using the eSpeak library and save as a WAV file.
-    
-    Args:
-        text (str): The text to convert to speech.
-        output_file (str): Path to save the output WAV file.
-        voice (str): eSpeak voice (e.g., 'en-us', 'en-uk'). Default: 'en-us'.
-        speed (int): Speech speed (words per minute, 80-450). Default: 150.
-        pitch (int): Pitch adjustment (0-99). Default: 50.
-    
-    Returns:
-        str: Path to the generated WAV file or None if an error occurs.
+    Speak the given text using piper TTS.
     """
-    if not text or text.strip() == "No speech detected":
-        print("No valid text to convert to speech.")
-        return None
-    
+    if not text or text == "No speech detected":
+        print("No valid text to speak.")
+        return
+    if model_path is None:
+        model_path = os.getenv('PIPER_MODEL_PATH',
+            '/home/pi/en-us-lessac-medium/en-us-lessac-medium.onnx')
     try:
-        # Initialize eSpeak
-        espeak = Espeak()
-        
-        # Set parameters
-        espeak.speed = speed  # Words per minute
-        espeak.pitch = pitch  # Pitch adjustment
-        espeak.voice = voice  # Voice selection
-        
-        # Convert text to speech and save to WAV file
-        espeak.say(text, output=output_file)
-        print(f"Text-to-speech saved to {output_file}")
-        return output_file
-    
+        with open("/tmp/speech.txt", "w") as f:
+            f.write(text)
+        subprocess.run([
+            "piper",
+            "--model", model_path,
+            "--input_file", "/tmp/speech.txt",
+            "--output_file", output_file
+        ], check=True)
+        subprocess.run(["paplay", output_file], check=True)
+        print(f"Speech saved to {output_file}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during piper TTS: {e.stderr.decode()}")
     except Exception as e:
-        print(f"Error during text-to-speech conversion: {str(e)}")
-        return None
+        print(f"Error during piper TTS: {str(e)}")
 
-if __name__ == "__main__":
-    # Example usage
-    sample_text = "Hello, this is a test of text to speech."
-    text_to_speech(sample_text)
+
+if __name__ == '__main__':
+    text = "Hello! How are you today?"
+    speak(text)
+    

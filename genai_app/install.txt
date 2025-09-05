@@ -1,0 +1,24 @@
+sudo apt update
+sudo apt install -y python3-pip
+pip3 install vosk
+pip3 install pyaudio
+pip3 install google-generativeai
+
+# Download vosk model in your home folder
+wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip -O /home/pi/vosk-model-small-en-us-0.15.zip
+unzip /home/pi/vosk-model-small-en-us-0.15.zip
+
+# Create directory for the model
+mkdir -p /home/pi/en-us-lessac-medium
+
+# Download model and config files
+wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx?download=true -O /home/pi/en-us-lessac-medium/en-us-lessac-medium.onnx
+wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json?download=true -O /home/pi/en-us-lessac-medium/en-us-lessac-medium.onnx.json
+
+# Verify files
+ls -lh /home/pi/en-us-lessac-medium
+
+# install piper packages
+sudo apt update
+sudo apt install -y libsndfile1
+pip3 install piper-tts
