@@ -36,7 +36,8 @@ Now activate this virtual environment and install the packages necessary for thi
 source ~/geminivenv/bin/activate
 (geminivenv) $
 ```
-Install PyAudio for recording audio into a file
+### Capturing audio from Microphone
+Install PyAudio for recording audio from microphone and save it as a `wav` file. file
 ```
 pip3 install pyaudio
 ```
@@ -94,6 +95,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3-picamera2
 pip3 install pillow
 ```
+Also, you need to enable the Picamera using `raspi-config` tool. 
 
 ## Getting Bluetooth headphone/microphone to work properly
 You can use the Desktop Bluetooth application to connect to your wireless headset. Make sure that the following
