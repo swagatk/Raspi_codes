@@ -1,0 +1,3 @@
+# ignore sensitive environment information
+.env
+
