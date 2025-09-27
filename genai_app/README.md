@@ -39,6 +39,7 @@ source ~/geminivenv/bin/activate
 ### Capturing audio from Microphone
 Install PyAudio for recording audio from microphone and save it as a `wav` file. file
 ```
+sudo apt-get install portaudio19-dev python3-dev
 pip3 install pyaudio
 ```
 
