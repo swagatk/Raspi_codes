@@ -270,7 +270,8 @@ GPIO cleaned up
 ```
 
 ## Automatically start application on reboot
-We use autorun.desktop script to launch the application on reboot. For this you will have to first create a `autostart` folder as follows: 
+We use autorun.desktop script to launch the application on reboot. 
+For this you will have to first create a `autostart` folder as follows: 
 ```
 mkdir -p ~/.config/autostart
 ```
@@ -283,13 +284,13 @@ Add the following content to the file:
 [Desktop Entry]
 Name=iSight
 Comment=Start iSight Python application at login
-Exec=/home/pi/geminivenv/bin/python3 /home/pi/Raspi_codes/genai_app/genai_app.py
-Terminal=true
+Exec=lxterminal -e /home/pi/geminivenv/bin/python3 /home/pi/Raspi_codes/genai_app/genai_app.py
+Terminal=false
 Type=Application
 ```
 This script can not access the `GEMINI_API_KEY` defined in `~/.bashrc` file. So, define this key inside the `~/.profile` file instead. 
 
-Save the above file and reboot the system. 
+Since we are installing packages inside a python virtual environment, make sure to use the correction python interpreter to execute your script file. Save the above file and reboot the system to see the effect. 
 
 ## Credits / Acknowledgement
 - This application was originally developed by Luke Irven, a former student at Edge
