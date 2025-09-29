@@ -1,7 +1,8 @@
 import os
 import subprocess
+import time
 
-def speak(text, model_path=None, output_file="output.wav"):
+def speak(text, model_path=None):
     """
     Speak the given text using piper TTS.
     """
@@ -11,17 +12,16 @@ def speak(text, model_path=None, output_file="output.wav"):
     if model_path is None:
         model_path = os.getenv('PIPER_MODEL_PATH',
             '/home/pi/en-us-lessac-medium/en-us-lessac-medium.onnx')
+
+    # This command generates the speech and pipes it directly to the audio player
+    piper_command = (
+        f'echo "{text}" | '
+        f'/home/pi/geminivenv/bin/piper --model {model_path} --output_raw | '
+        f'paplay --raw --rate=22050 --channels=1'
+    )
     try:
-        with open("/tmp/speech.txt", "w") as f:
-            f.write(text)
-        subprocess.run([
-            "piper",
-            "--model", model_path,
-            "--input_file", "/tmp/speech.txt",
-            "--output_file", output_file
-        ], check=True)
-        subprocess.run(["paplay", output_file], check=True)
-        print(f"Speech saved to {output_file}")
+        subprocess.run(piper_command, shell=True, check=True)
+        print("Speech playback complete")
     except subprocess.CalledProcessError as e:
         print(f"Error during piper TTS: {e.stderr.decode()}")
     except Exception as e:
