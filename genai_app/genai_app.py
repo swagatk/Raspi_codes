@@ -57,7 +57,7 @@ def button_pressed():
         print(f'Response: {response.text}')
         speak(response.text)
     except Exception as e:
-        print('fError occurred: {str(e)}')
+        print(f'Error occurred: {e}')
     finally:
         recording_lock.release()
 

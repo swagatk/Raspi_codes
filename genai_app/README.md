@@ -292,6 +292,31 @@ This script can not access the `GEMINI_API_KEY` defined in `~/.bashrc` file. So,
 
 Since we are installing packages inside a python virtual environment, make sure to use the correction python interpreter to execute your script file. Save the above file and reboot the system to see the effect. 
 
+## DEBUGGING
+
+- Pyaudio recording failure: If you are getting error as below
+```
+An error occurred:Device 2 (sysdefault) does not support input
+Available input devices:
+Device 6: pulse, Inputs: 32
+Device 11: default, Inputs: 32
+file saved as /home/pi/Pictures/test.jpg
+fError occurred: {str(e)}
+```
+Please provide the 'right' Microphone device in the file `genai_app.py` file. 
+```
+MICROPHONE_DEVICE = 6
+```
+
+- Gemini error related to FreeTier API Key: In this case, you need to use paid account. 
+
+- Error related to piper: If you are getting error as shown below:
+```
+/bin/sh: 1: /home/pi/geminivenv/bin/piper: not found
+Speech playback complete
+```
+Make sure that you are providing the correct path to your virtual environment where piper is installed in file `tts.py`
+
 ## Credits / Acknowledgement
 - This application was originally developed by Luke Irven, a former student at Edge
 Hill University under my supervision. The original source codes for this device could be found at
