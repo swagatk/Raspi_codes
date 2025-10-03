@@ -26,7 +26,6 @@ button = Button(16, bounce_time=0.1)
 # Thread lock for recording
 recording_lock = Lock()
 
-MICROPHONE_DEVICE = 2
 
     
 def button_pressed():
@@ -35,8 +34,7 @@ def button_pressed():
         return
     try:
         # record your voice while button is pressed.
-        wav_file = record_audio(input_device_index=MICROPHONE_DEVICE,
-                                button=button)
+        wav_file = record_audio(button=button)
 
         # Take a photo
         picam2.start()

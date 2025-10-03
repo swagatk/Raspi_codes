@@ -4,8 +4,25 @@ import pyaudio
 import sys
 import time
 
+def find_input_device():
+    """
+    Finds the first available audio input device.
+    """
+    audio = pyaudio.PyAudio()
+    device_index = None
+    for i in range(audio.get_device_count()):
+        dev = audio.get_device_info_by_index(i)
+        # Check for devices that have input channels
+        if dev['maxInputChannels'] > 0:
+            print(f"Found input device {i}: {dev['name']}")
+            device_index = i
+            break # Use the first one found
 
-def record_audio(input_device_index=1, button=None):
+    audio.terminate()
+    return device_index
+
+
+def record_audio(button=None):
     """
     Record audio from a specified input device
     save into a .wav file.
@@ -18,6 +35,9 @@ def record_audio(input_device_index=1, button=None):
     RECORD_SECONDS = 5 # if button is not defined.
     audio = None
     stream = None
+    input_device_index = find_input_device()
+    if device_index is None:
+        raise ValueError("❌ No audio input device found. Please connect a microphone.")
     try:
         # initialize PyAudio
         audio = pyaudio.PyAudio()
@@ -80,4 +100,4 @@ def record_audio(input_device_index=1, button=None):
         time.sleep(0.2)
         
 if __name__ == '__main__':
-    record_audio(input_device_index=2)
+    record_audio()
