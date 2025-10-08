@@ -28,6 +28,7 @@ def speak(text, model_path=None):
         print(f"Error during piper TTS: {str(e)}")
 
 
+
 if __name__ == '__main__':
     text = "Hello! How are you today?"
     speak(text)
