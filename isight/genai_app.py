@@ -35,10 +35,10 @@ def button_pressed():
     try:
         # record your voice while button is pressed.
         wav_file = record_audio(button=button)
-
+        
         # Take a photo
         picam2.start()
-        time.sleep(0.1)
+        time.sleep(0.2)
         file_path = os.path.expanduser("~/Pictures/test.jpg")
         picam2.capture_file(file_path)
         picam2.stop()
@@ -48,11 +48,12 @@ def button_pressed():
         prompt = speech_to_text(wav_file)
         print(f'prompt:{prompt}')
 
-        if prompt is None or len(prompt) == 0:
-            speak("No speech detected, please try again")
+        if prompt is None or prompt.strip() == '':
+            print('No speech detected, exiting')
+            speak("No speech detected, Please try again")
             return
-        else:
-            speak('Image captured. Generating response, please wait.')
+        else: 
+            speak(f'Image captured. Generating response. please wait.')
             # Get image from stored file
             image = Image.open(file_path)
             response = ai_model.generate_content([prompt, image])
