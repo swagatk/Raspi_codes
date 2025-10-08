@@ -1,3 +1,6 @@
 # ignore sensitive environment information
 .env
 **/.wav
+**/__pycache__/*
+**/*.pyc
+.DS_Store

@@ -16,7 +16,7 @@ def speak(text, model_path=None):
     # This command generates the speech and pipes it directly to the audio player
     piper_command = (
         f'echo "{text}" | '
-        f'/home/pi/geminivenv/bin/piper --model {model_path} --output_raw | '
+        f'/home/pi/genai_app/bin/piper --model {model_path} --output_raw | '
         f'paplay --raw --rate=22050 --channels=1'
     )
     try:

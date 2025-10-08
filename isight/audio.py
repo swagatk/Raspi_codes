@@ -36,7 +36,7 @@ def record_audio(button=None):
     audio = None
     stream = None
     input_device_index = find_input_device()
-    if device_index is None:
+    if input_device_index is None:
         raise ValueError("❌ No audio input device found. Please connect a microphone.")
     try:
         # initialize PyAudio
