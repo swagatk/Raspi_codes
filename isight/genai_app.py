@@ -33,12 +33,13 @@ def button_pressed():
         print('recording in progress, ignore button press')
         return
     try:
+        speak("Please speak while the button is pressed.")
         # record your voice while button is pressed.
         wav_file = record_audio(button=button)
         
         # Take a photo
         picam2.start()
-        time.sleep(0.2)
+        time.sleep(0.1)
         file_path = os.path.expanduser("~/Pictures/test.jpg")
         picam2.capture_file(file_path)
         picam2.stop()
