@@ -84,7 +84,7 @@ Even though `piper` provides very natural human voice, it is extremely slow. The
 ```
 sudo apt install flite
 ```
-If you are using `flite` instead of `piper`, make sure to comment out the right line as shown below:
+If you are using `flite` instead of `piper`, make sure to comment out the right line in the file `genai_app.py` as shown below:
 ```
 # from tts import speak
 from tts_flite import speak
