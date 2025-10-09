@@ -88,7 +88,7 @@ If you are using `flite` instead of `piper`, make sure to comment out the right 
 ```
 # from tts import speak
 from tts_flite import speak
-``
+```
 
 ### Setting up Google Gemini
 Install google generative ai python package using `pip`. 
