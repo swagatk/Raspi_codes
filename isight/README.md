@@ -79,7 +79,7 @@ total 61M
 ```
 Make sure that the piper model path is correctly provided in the `speak()` function in `tts.py` file.
 
-### Installing Flite
+### Text-to-Speech with Flite
 Even though `piper` provides very natural human voice, it is extremely slow. Therefore, I decided to use `Flite` which is much faster. The downside is, it is a robotic voice.  Install the following package:
 ```
 sudo apt install flite
