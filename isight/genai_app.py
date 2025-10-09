@@ -10,7 +10,8 @@ from PIL import Image
 from picamera2 import Picamera2
 from gemini import ai_model
 from stt import speech_to_text
-from tts import speak
+#from tts import speak  # uses piper which is slow
+from tts_flite import speak
 from audio import record_audio
 
 # iniitialize camera
@@ -57,7 +58,11 @@ def button_pressed():
             speak(f'Image captured. Generating response. please wait.')
             # Get image from stored file
             image = Image.open(file_path)
+            start_time = time.monotonic()
             response = ai_model.generate_content([prompt, image])
+            end_time = time.monotonic()
+            duration = end_time - start_time
+            print(f'Response generated in {duration:.2f} seconds')
             print(f'Response: {response.text}')
             speak(response.text)
     except Exception as e:

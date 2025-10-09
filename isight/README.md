@@ -18,7 +18,8 @@ precise answers to their queries.
     - Raspberry Pi OS (Bookworm)
     - PiCamera2 Library (available by default on bookworm)
     - Vosk for speech recognition
-    - Piper for text to speech
+    - Piper for text to speech  (natural voice but very slow)
+	- flite for text to speech
     - Access to Generative AI APIs (Gemini)
 
 ## Installation
@@ -77,6 +78,17 @@ total 61M
 
 ```
 Make sure that the piper model path is correctly provided in the `speak()` function in `tts.py` file.
+
+### Installing Flite
+Even though `piper` provides very natural human voice, it is extremely slow. Therefore, I decided to use `Flite` which is much faster. The downside is, it is a robotic voice.  Install the following package:
+```
+sudo apt install flite
+```
+If you are using `flite` instead of `piper`, make sure to comment out the right line as shown below:
+```
+# from tts import speak
+from tts_flite import speak
+``
 
 ### Setting up Google Gemini
 Install google generative ai python package using `pip`. 

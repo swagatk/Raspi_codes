@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-def say_text(text_to_speak, voice="slt"):
+def speak(text_to_speak, voice="slt"):
     """
     Uses the Flite command-line tool to speak the provided text.
     """
@@ -34,6 +34,7 @@ def say_text(text_to_speak, voice="slt"):
 if __name__ == "__main__":
     try:
         user_text = input("What would you like me to say? ")
-        say_text(user_text)
+        #user_text = "Hello, this is a test of the Flite text-to-speech system."
+        speak(user_text)
     except KeyboardInterrupt:
         print("\nExiting.")
