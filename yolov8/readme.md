@@ -34,4 +34,11 @@ yolo predict model=yolov8n.pt source='https://ultralytics.com/images/bus.jpg'
 This will download a file 'yolov8n.pt' in the current folder and save the output image 
 with bounding box at `~/yolo_project/runs/detect/predict/'.
 
-Now you can run the codes provided here with an active `yolov8env`. 
+Now you can run the codes provided here with an active `yolov8env` environment.
+
+To deactivate the environment, run the following command
+
+```
+deactivate
+```
+
