@@ -5,10 +5,12 @@ import time  # <--- 1. Import time library
 # --- Model and Camera Setup ---
 
 # Load the YOLOv8 "nano" model
-model = YOLO("yolov8n.pt")
+#model = YOLO("yolov8n.pt")
+model = YOLO("yolo11n.pt")
+
 
 # Open the default USB camera (usually index 0)
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 # Set the desired resolution
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)

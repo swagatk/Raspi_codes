@@ -32,7 +32,13 @@ If everything goes fine, you should be able to run the following command without
 yolo predict model=yolov8n.pt source='https://ultralytics.com/images/bus.jpg'
 ```
 This will download a file 'yolov8n.pt' in the current folder and save the output image 
-with bounding box at `~/yolo_project/runs/detect/predict/'.
+with bounding box at `~/yolo_project/runs/detect/predict/`.
+
+You can download other models as well
+```
+yolo detect predict model=yolo11n.pt
+```
+This will also save the output of prediction on test images at `~/yolo_project/runs/detect/predict2/`
 
 Now you can run the codes provided here with an active `yolov8env` environment.
 
