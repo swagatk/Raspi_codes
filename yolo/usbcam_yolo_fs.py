@@ -6,16 +6,24 @@ import math  # Needed for rounding box coordinates
 # --- Configuration ---
 SKIP_FRAMES = 3  # Run detection 1 out of every 3 frames
 INFERENCE_SIZE = 320 # Resolution for YOLO inference
-WEBCAM_WIDTH = 640   # Webcam capture width
-WEBCAM_HEIGHT = 480  # Webcam capture height
+WEBCAM_WIDTH = 320   # Webcam capture width
+WEBCAM_HEIGHT = 240  # Webcam capture height
+NCNN = True     # use ncnn model
+camera_index = 0 # run v4l2-ctl --list-devices
 
-# --- Model and Camera SetuP
+# --- Model Setup ------
 
 # Load the YOLOv8 "nano" model
-model = YOLO("yolov8n.pt")
+if not NCNN:
+    model = YOLO("yolov8n.pt")
+    #model = YOLO("yolo11n.pt")
+else:
+    model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
+    #model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
 
+# -------USB Camera Setup ------
 # Open the default USB camera (usually index 0)
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(camera_index)
 
 # Set the desired resolution
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, WEBCAM_WIDTH)
@@ -27,7 +35,7 @@ if not cap.isOpened():
     exit()
 
 # --- Variables for Loop ---
-prev_time = 0
+prev_time = time.time()
 frame_counter = 0
 last_results = None  # Store the last detection results
 

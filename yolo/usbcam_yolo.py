@@ -2,19 +2,28 @@ import cv2
 from ultralytics import YOLO
 import time  # <--- 1. Import time library
 
+# ------- configuration ----
+IMAGE_WIDTH = 320
+IMAGE_HEIGHT = 240
+INFERENCE_SIZE=320 # used by yolo 
+CAMERA_INDEX = 0
+NCNN = True
 # --- Model and Camera Setup ---
 
-# Load the YOLOv8 "nano" model
-#model = YOLO("yolov8n.pt")
-model = YOLO("yolo11n.pt")
-
-
+# Load the YOLO "nano" model
+if not NCNN:
+    model = YOLO("yolov8n.pt")
+    #model = YOLO("yolo11n.pt")
+else:
+    model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
+    #model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
+ 
 # Open the default USB camera (usually index 0)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(CAMERA_INDEX)
 
 # Set the desired resolution
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT)
 
 # Check if the camera opened successfully
 if not cap.isOpened():
@@ -34,7 +43,7 @@ while True:
         break
 
     # Run YOLOv8 inference
-    results = model.predict(frame, imgsz=320, verbose=False)
+    results = model.predict(frame, imgsz=INFERENCE_SIZE, verbose=False)
 
     # Get the annotated frame
     annotated_frame = results[0].plot()

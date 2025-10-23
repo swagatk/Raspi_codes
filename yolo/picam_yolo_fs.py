@@ -9,8 +9,21 @@ SKIP_FRAMES = 3  # Run detection 1 out of every 3 frames
 INFERENCE_SIZE = 320 # Resolution for YOLO inference
 WEBCAM_WIDTH = 320   # Webcam capture width
 WEBCAM_HEIGHT = 240  # Webcam capture height
+NCNN = True
 
-# --- Camera and Model Setup --- 
+# ----- YOLO Model Setup ---
+
+# Load the YOLO "nano" model
+if not NCNN:
+    model = YOLO("yolov8n.pt")
+    #model = YOLO("yolo11n.pt")
+else:
+    print("Using NCNN model")
+    model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
+    #model = YOLO("/home/pi/yolo_project/yolo11n_ncnn_model")
+
+# --- Camera Setup ---
+
 
 # Initialize Picamera2
 picam2 = Picamera2()
@@ -26,12 +39,9 @@ picam2.configure(config)
 # Start the camera
 picam2.start()
 
-# Load the YOLOv8 "nano" model (yolov8n.pt)
-# This is the fastest model, ideal for Raspberry Pi
-model = YOLO("yolov8n.pt")
 
 # --- Variables for Loop ---
-prev_time = 0
+prev_time = time.time()
 frame_counter = 0
 last_results = None  # Store the last detection results
 
@@ -100,7 +110,7 @@ while True:
     # We use cv2.imshow to display the window
     # Note: YOLO's .plot() returns an RGB image, but cv2.imshow expects BGR.
     # We must convert the color format before displaying.
-    cv2.imshow("YOLOv8 Live Detection", cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
+    cv2.imshow("YOLO Live Detection", cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
 
     # 5. Check for 'q' key press to exit
     if cv2.waitKey(1) & 0xFF == ord('q'):
