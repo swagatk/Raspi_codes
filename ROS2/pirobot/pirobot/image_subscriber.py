@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 import cv2
 import numpy as np
 import sys
@@ -23,15 +24,22 @@ def imgmsg_to_cv2(img_msg):
 class ImageSubscriber(Node):
     def __init__(self):
         super().__init__('image_subscriber')
+        # QoS Must Match Publisher
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
         self.subscription = self.create_subscription(
             Image,
             '/pirobot/camera',
             self.listener_callback,
-            10)
-        self.subscription
+            qos_profile) 
+            
+        #self.subscription
 
     def listener_callback(self, msg):
-        self.get_logger().info('Received data of size: "%s" bytes' % sys.getsizeof(msg.data))
+        #self.get_logger('image_subscriber').info('Received data of size: "%s" bytes' % sys.getsizeof(msg.data))
         cv2_img = imgmsg_to_cv2(msg)
         cv2.imshow("Subscriber", cv2_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -43,7 +51,7 @@ def main(args=None):
     try:
         rclpy.spin(image_subscriber)
     except SystemExit:
-        rclpy.logging.get_logger().info('Quitting. Done!')
+        rclpy.logging.get_logger('image_subscriber').info('Quitting. Done!')
         cv2.destroyAllWindows()
     image_subscriber.destroy_node()
     rclpy.shutdown()
