@@ -126,7 +126,4 @@ Run the following command inside the docker container (inside the virtual eviron
 (gpio_env) (ROS-DOCKER) pi@raspberrypi:~/hardware_test$ python3 ./picam_video.py 
 
 ```
-
-Install the following packages inside the virtual environment
-(gpio_env) pip3 install rpi-lgpio
-
+You should be able to see video stream on an opencv window.
