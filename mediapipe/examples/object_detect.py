@@ -17,7 +17,7 @@ USBCAM = True
 # Step 1: Initialize camera
 
 if USBCAM: 
-    capture = cv2.VideoCapture(cv2.CAP_V4L2)
+    capture = cv2.VideoCapture(-1, cv2.CAP_V4L2)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 else:

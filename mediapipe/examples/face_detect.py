@@ -39,7 +39,8 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 
 # Create a face detector instance with the video mode:
 options = FaceDetectorOptions(
-    base_options=BaseOptions(model_asset_path='./face_detector.tflite'),
+    base_options=BaseOptions(model_asset_path='./face_detector.tflite',
+    delegate=python.BaseOptions.Delegate.CPU),
     running_mode=VisionRunningMode.VIDEO)
 
 with FaceDetector.create_from_options(options) as detector:    
