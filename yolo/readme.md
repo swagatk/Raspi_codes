@@ -111,5 +111,9 @@ pip uninstall numpy -y
 ```
 Install compatible version
 ```
+pip install "numpy<2.0"
+```
+Now you can execute the code as follows: 
+```
 python3 ./picam_yolo_fs.py
 ```
