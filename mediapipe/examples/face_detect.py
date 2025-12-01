@@ -11,7 +11,7 @@ from utils import visualize
 import time
 
 # Choose between Picam or USB Camera
-USBCAM = True
+USBCAM = False
 
 
 # Step 1: Initialize camera

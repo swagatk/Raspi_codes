@@ -1,3 +1,7 @@
+"""
+Obstacle avoidance and video streaming happens in parallel 
+"""
+
 import RPi.GPIO as GPIO
 import time
 import cv2
@@ -51,8 +55,8 @@ if __name__ == '__main__':
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
-        cam_proc = Process(target=view_camera, args=(""))
-        mot_proc = Process(target=robot_motion, args=(""))
+        cam_proc = Process(target=view_camera, args=())
+        mot_proc = Process(target=robot_motion, args=())
 
         cam_proc.start()
         mot_proc.start()
@@ -60,11 +64,21 @@ if __name__ == '__main__':
             time.sleep(1)
     except KeyboardInterrupt:
         print('Keyboard Interrupt .. stopping')
-        # wait for processes to join
+        # 1. TELL PROCESSES TO STOP IMMEDIATELY
+        if cam_proc.is_alive():
+            cam_proc.terminate()
+        if mot_proc.is_alive():
+            mot_proc.terminate()
+        
+        # 2. WAIT FOR THEM TO ACTUALLY STOP
         cam_proc.join()
         mot_proc.join()
+        print("Processes joined successfully.")
     finally:
+		# 3. ONLY NOW IS IT SAFE TO CLEAN UP GPIO
+        print("Cleaning up GPIO...")
         GPIO.cleanup()
+        print("Done.")
         
         
     
