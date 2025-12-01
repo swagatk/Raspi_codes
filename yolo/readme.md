@@ -101,3 +101,15 @@ we can increase the speed by skipping frames between detection. This is controll
 
 * `usbcam_yolo_fs.py`
 * `picam_yolo_fs.py`
+
+## Numpy related errors
+You may get numpy related errors as Ultralytics installed NumPy version 2.0+, but the Raspberry Pi system library (simplejpeg, used by picamera2) was built for NumPy 1.x. They are not compatible.
+
+Uninstall numpy in your virtualenv:
+```
+pip uninstall numpy -y
+```
+Install compatible version
+```
+python3 ./picam_yolo_fs.py
+```
