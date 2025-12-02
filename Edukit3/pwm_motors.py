@@ -34,10 +34,12 @@ pwmMotorBForward = GPIO.PWM(pinMotorBForward, Frequency)
 pwmMotorBBackward = GPIO.PWM(pinMotorBBackward, Frequency)
 
 # set the duty cycle for software PWM - initially to 0
-pwmMotorAForward.start(Stop)
-pwmMotorABackward.start(Stop)
-pwmMotorBForward.start(Stop)
-pwmMotorBBackward.start(Stop)
+
+def start_pwm():
+	pwmMotorAForward.start(Stop)
+	pwmMotorABackward.start(Stop)
+	pwmMotorBForward.start(Stop)
+	pwmMotorBBackward.start(Stop)
 
 def stopmotors():
     pwmMotorAForward.ChangeDutyCycle(Stop)
@@ -46,57 +48,74 @@ def stopmotors():
     pwmMotorBBackward.ChangeDutyCycle(Stop)
 
 def forward():
-    pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorABackward.ChangeDutyCycle(Stop)
-    pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
-    pwmMotorBBackward.ChangeDutyCycle(Stop)
+	print('Moving Forward')
+	pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorABackward.ChangeDutyCycle(Stop)
+	pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
+	pwmMotorBBackward.ChangeDutyCycle(Stop)
 
 def backward():
-    pwmMotorAForward.ChangeDutyCycle(Stop)
-    pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorBForward.ChangeDutyCycle(Stop)
-    pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
+	print('Moving Backward')
+	pwmMotorAForward.ChangeDutyCycle(Stop)
+	pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorBForward.ChangeDutyCycle(Stop)
+	pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
 
 def turnleft():
-    pwmMotorAForward.ChangeDutyCycle(Stop)
-    pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
-    pwmMotorBBackward.ChangeDutyCycle(Stop)
+	print('Turn left') 
+	pwmMotorAForward.ChangeDutyCycle(Stop)
+	pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
+	pwmMotorBBackward.ChangeDutyCycle(Stop)
 
 
 def turnright():
-    pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorABackward.ChangeDutyCycle(Stop)
-    pwmMotorBForward.ChangeDutyCycle(Stop)
-    pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
+	print('Turn right')
+	pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorABackward.ChangeDutyCycle(Stop)
+	pwmMotorBForward.ChangeDutyCycle(Stop)
+	pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
     
     
+def stop_pwm():
+	# stop pwm motors
+	pwmMotorAForward.stop()
+	pwmMotorABackward.stop()
+	pwmMotorBForward.stop()
+	pwmMotorBBackward.stop()
+	
+
+def delete_pwm():
+	global pwmMotorABackward, pwmMotorAForward
+	global pwmMotorBBackward, pwmMotorBForward
+	# Delete PWM objects 
+	del pwmMotorAForward
+	del pwmMotorABackward
+	del pwmMotorBForward
+	del pwmMotorBBackward
+	
 
 ######
-forward()
-time.sleep(1)
+if __name__ == '__main__':
+	
+	# start pwm
+	start_pwm()
+		
+	forward()
+	time.sleep(1)
 
-turnleft()
-time.sleep(0.5)
+	turnleft()
+	time.sleep(0.5)
 
-forward()
-time.sleep(1)
+	forward()
+	time.sleep(1)
 
-turnright()
-time.sleep(0.5)
+	turnright()
+	time.sleep(0.5)
 
-stopmotors()
+	stopmotors()
 
-# stop pwm motors
-pwmMotorAForward.stop()
-pwmMotorABackward.stop()
-pwmMotorBForward.stop()
-pwmMotorBBackward.stop()
-
-
-# Delete PWM objects 
-del pwmMotorAForward
-del pwmMotorABackward
-del pwmMotorBForward
-del pwmMotorBBackward
-GPIO.cleanup()
+	# stop pwm
+	stop_pwm()
+	delete_pwm()
+	GPIO.cleanup()

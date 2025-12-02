@@ -1,137 +1,13 @@
-# CamJam Edukit 3 - Robots
-# Worksheet 9 - Obstacle Avoidance
-
-
-# load the libraries
-import RPi.GPIO as GPIO
-import time
-import numpy as np
-
-#set GPIO modes
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-
-
-# set variables for GPIO  Pins
-pinMotorAForward = 9
-pinMotorABackward = 10
-pinMotorBForward = 8
-pinMotorBBackward = 7
-pinTrigger = 17
-pinEcho = 18
-
-
-
-# PWM parameters
-Frequency = 20
-DutyCycleA = 40
-DutyCycleB = 40
-Stop = 0
-
-# Set the GPIO Pin Mode
-GPIO.setup(pinMotorAForward, GPIO.OUT)
-GPIO.setup(pinMotorABackward, GPIO.OUT)
-GPIO.setup(pinMotorBForward, GPIO.OUT)
-GPIO.setup(pinMotorBBackward, GPIO.OUT)
-GPIO.setup(pinTrigger, GPIO.OUT)
-GPIO.setup(pinEcho, GPIO.IN)
+from pwm_motors import *
+from distance_measure import * 
 
 # Distance variables
 hownear = 40.0
-reversetime = 0.5
+reverse_time = 0.5
 turntime = 0.75
 
 
-# Set the GPIO to Software PWM at 'Frequency' Hertz
-pwmMotorAForward = GPIO.PWM(pinMotorAForward, Frequency)
-pwmMotorABackward = GPIO.PWM(pinMotorABackward, Frequency)
-pwmMotorBForward = GPIO.PWM(pinMotorBForward, Frequency)
-pwmMotorBBackward = GPIO.PWM(pinMotorBBackward, Frequency)
-
-# set the duty cycle for software PWM - initially to 0
-pwmMotorAForward.start(Stop)
-pwmMotorABackward.start(Stop)
-pwmMotorBForward.start(Stop)
-pwmMotorBBackward.start(Stop)
-
-def stopmotors():
-    pwmMotorAForward.ChangeDutyCycle(Stop)
-    pwmMotorABackward.ChangeDutyCycle(Stop)
-    pwmMotorBForward.ChangeDutyCycle(Stop)
-    pwmMotorBBackward.ChangeDutyCycle(Stop)
-
-def forward():
-    print('Moving Forward')
-    pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorABackward.ChangeDutyCycle(Stop)
-    pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
-    pwmMotorBBackward.ChangeDutyCycle(Stop)
-
-def backward():
-    print('Moving backward')
-    pwmMotorAForward.ChangeDutyCycle(Stop)
-    pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorBForward.ChangeDutyCycle(Stop)
-    pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
-
-def turnleft():
-    print('Turning Left')
-    pwmMotorAForward.ChangeDutyCycle(Stop)
-    pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
-    pwmMotorBBackward.ChangeDutyCycle(Stop)
-
-
-def turnright():
-    print('Turning Right')
-    pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
-    pwmMotorABackward.ChangeDutyCycle(Stop)
-    pwmMotorBForward.ChangeDutyCycle(Stop)
-    pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
-
-
-def measure():
-
-    #  Average over 5 readings to reduce noise
-    dist = []
-    for i in range(5):
-
-        #set trigger to False
-        GPIO.output(pinTrigger, False)
-        time.sleep(0.0001)
-
-        # send out a pulse at a freq of 10 micro hertz
-        GPIO.output(pinTrigger, True)
-        time.sleep(0.00001)
-        GPIO.output(pinTrigger, False)
-
-        # start the timer
-        StartTime = time.time()
-
-        # start time is reset until the Echo Pin is taken high
-        while GPIO.input(pinEcho) == 0:
-            StartTime = time.time()
-            
-        # stop when echo pin is no longer high - end time
-        while GPIO.input(pinEcho) == 1:
-            StopTime = time.time()
-            interval = StopTime - StartTime
-            if interval >= 0.02:
-                #print('Either you are too close or too far to me to see.')
-                #StopTime = StartTime
-                break
-    
-        # calculate pulse length
-        ElapsedTime = StopTime - StartTime
-
-        # Distance travelled by the pulse in that time in cm
-        Distance = (ElapsedTime * 34326)/2.0
-
-        dist.append(Distance)
-
-    return np.mean(dist) 
-    
-def isnearobstacle(localhownear):
+def is_near_obstacle(localhownear):
     distance = measure()
 
     print('Is near obstacle: ' + str(distance))
@@ -140,9 +16,9 @@ def isnearobstacle(localhownear):
     else:
         return False
 
-def avoidobstacle(left=False):
+def avoid_obstacle(left=False):
     backward() 
-    time.sleep(reversetime)
+    time.sleep(reverse_time)
     stopmotors()
 
     if left:
@@ -157,19 +33,40 @@ def avoidobstacle(left=False):
 
 ############
 if __name__ == '__main__':
-    try:
-        GPIO.output(pinTrigger, False)
+	try:
+		# start PWM control
+		start_pwm()
+		
 
-        # Allow module to settle
-        time.sleep(0.1)
-        left = False
-        while True:
-            forward()
-            time.sleep(0.1)
-            if isnearobstacle(hownear):
-                stopmotors()
-                left = avoidobstacle()
-    except KeyboardInterrupt:
-        GPIO.cleanup()
-    
-        
+		# Allow module to settle
+		time.sleep(0.1)
+		left = False
+		while True:
+			forward()
+			time.sleep(0.1)
+			if is_near_obstacle(hownear):
+				stopmotors()
+				left = avoid_obstacle()
+	except KeyboardInterrupt:
+		stopmotors()
+		print("User stopped the robot")
+	finally:
+		stop_pwm() # stop motors
+		
+		# delete local copies
+		try:
+			del pwmMotorAForward
+			del pwmMotorABackward
+			del pwmMotorBForward
+			del pwmMotorBBackward
+		except:
+			pass # Ignore if they are already gone
+			
+		try: # delete original file's copies
+			delete_pwm()
+		except:
+			pass
+		GPIO.cleanup() # close GPIO connection
+
+		
+
