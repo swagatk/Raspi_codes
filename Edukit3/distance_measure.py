@@ -1,5 +1,4 @@
-# camjam edukit 3 - Robotics
-# worksheet 6  - measuring distance
+# measuring distance
 
 import RPi.GPIO as GPIO
 import time
@@ -21,11 +20,9 @@ GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
 def measure():
-
     #  Average over 5 readings to reduce noise
     dist = []
-    for i in range(5):
-
+    for i in range(3):
         #set trigger to False
         GPIO.output(pinTrigger, False)
         time.sleep(0.001)
@@ -47,32 +44,26 @@ def measure():
             StopTime = time.time()
             interval = StopTime - StartTime
             #print('Interval: ', interval)
-            if interval >= 0.04:
+            if interval >= 0.02:
                 #print('Either you are too close or too far to me to see.')
                 StopTime = StartTime
-                break
-            
-    
+                break    
         # calculate pulse length
         ElapsedTime = StopTime - StartTime
-
+        
         # Distance travelled by the pulse in that time in cm
         Distance = (ElapsedTime * 34326)/2.0
-
         dist.append(Distance)
-
     return np.mean(dist) 
         
     
-
-
-
-try:
-    while True:
-        dist = measure()
-        print('Distance in cm: ', dist)
-        time.sleep(0.1)
-except KeyboardInterrupt:
-    GPIO.cleanup()
-        
+if __name__ == '__main__':
+	try:
+		while True:
+			dist = measure()
+			print('Distance in cm: ', dist)
+			time.sleep(0.1)
+	except KeyboardInterrupt:
+		GPIO.cleanup()
+			
     

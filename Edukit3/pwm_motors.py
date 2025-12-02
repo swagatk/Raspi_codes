@@ -1,6 +1,4 @@
-# CamJam Edukit 3 - robotics
-# Worksheet - 7: controlling motors with PWM
-
+#controlling motors with PWM
 import RPi.GPIO as GPIO
 import time
 
@@ -88,4 +86,17 @@ turnright()
 time.sleep(0.5)
 
 stopmotors()
+
+# stop pwm motors
+pwmMotorAForward.stop()
+pwmMotorABackward.stop()
+pwmMotorBForward.stop()
+pwmMotorBBackward.stop()
+
+
+# Delete PWM objects 
+del pwmMotorAForward
+del pwmMotorABackward
+del pwmMotorBForward
+del pwmMotorBBackward
 GPIO.cleanup()

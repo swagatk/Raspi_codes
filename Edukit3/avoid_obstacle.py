@@ -24,8 +24,8 @@ pinEcho = 18
 
 # PWM parameters
 Frequency = 20
-DutyCycleA = 70
-DutyCycleB = 70
+DutyCycleA = 40
+DutyCycleB = 40
 Stop = 0
 
 # Set the GPIO Pin Mode
