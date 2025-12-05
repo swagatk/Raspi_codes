@@ -1,14 +1,21 @@
-from pwm_motors import *
-from distance_measure import * 
+import RPi.GPIO as GPIO
+import pwm_motors as pm
+import distance_measure as dm
+import time
+
+
+#set GPIO modes
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 # Distance variables
-hownear = 40.0
+hownear = 15.0
 reverse_time = 0.5
-turntime = 0.75
-
+turn_time = 0.5
+duty_cycle = 50  # (0 - 100)
 
 def is_near_obstacle(localhownear):
-    distance = measure()
+    distance = dm.measure()
 
     print('Is near obstacle: ' + str(distance))
     if distance < localhownear:
@@ -17,41 +24,42 @@ def is_near_obstacle(localhownear):
         return False
 
 def avoid_obstacle(left=False):
-    backward() 
+    pm.backward(duty_cycle) 
     time.sleep(reverse_time)
-    stopmotors()
+    pm.stopmotors()
 
     if left:
-        turnright()
+        pm.turnright(duty_cycle)
         left = False
     else:
-        turnleft()
+        pm.turnleft(duty_cycle)
         left = True
-    time.sleep(turntime)
-    stopmotors()
+    time.sleep(turn_time)
+    pm.stopmotors()
     return left
 
 ############
 if __name__ == '__main__':
 	try:
 		# start PWM control
-		start_pwm()
+		pm.start_pwm()
 		
 
 		# Allow module to settle
 		time.sleep(0.1)
 		left = False
 		while True:
-			forward()
+			pm.forward(duty_cycle)
 			time.sleep(0.1)
 			if is_near_obstacle(hownear):
-				stopmotors()
-				left = avoid_obstacle()
+				pm.stopmotors()
+				print('Turning Left:', left)
+				left = avoid_obstacle(left)
 	except KeyboardInterrupt:
-		stopmotors()
+		pm.stopmotors()
 		print("User stopped the robot")
 	finally:
-		stop_pwm() # stop motors
+		pm.stop_pwm() # stop motors
 		
 		# delete local copies
 		try:
@@ -63,7 +71,7 @@ if __name__ == '__main__':
 			pass # Ignore if they are already gone
 			
 		try: # delete original file's copies
-			delete_pwm()
+			pm.delete_pwm()
 		except:
 			pass
 		GPIO.cleanup() # close GPIO connection

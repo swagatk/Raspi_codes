@@ -8,7 +8,7 @@ import time
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 INFERENCE_SIZE = 320
-NCNN = False
+NCNN = True
 # --- Model and Camera Setup ---
 
 # Load the YOLO "nano" model

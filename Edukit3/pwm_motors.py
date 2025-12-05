@@ -8,16 +8,14 @@ GPIO.setwarnings(False)
 
 
 # set variables for GPIO motor Pins
-pinMotorAForward = 10
-pinMotorABackward = 9
+pinMotorAForward = 9
+pinMotorABackward = 10
 pinMotorBForward = 8
 pinMotorBBackward = 7
 
 
 # PWM parameters
 Frequency = 20
-DutyCycleA = 30
-DutyCycleB = 30
 Stop = 0
 
 
@@ -47,34 +45,34 @@ def stopmotors():
     pwmMotorBForward.ChangeDutyCycle(Stop)
     pwmMotorBBackward.ChangeDutyCycle(Stop)
 
-def forward():
+def forward(DutyCycle=70):
 	print('Moving Forward')
-	pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorAForward.ChangeDutyCycle(DutyCycle)
 	pwmMotorABackward.ChangeDutyCycle(Stop)
-	pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
+	pwmMotorBForward.ChangeDutyCycle(DutyCycle)
 	pwmMotorBBackward.ChangeDutyCycle(Stop)
 
-def backward():
+def backward(DutyCycle=70):
 	print('Moving Backward')
 	pwmMotorAForward.ChangeDutyCycle(Stop)
-	pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorABackward.ChangeDutyCycle(DutyCycle)
 	pwmMotorBForward.ChangeDutyCycle(Stop)
-	pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
+	pwmMotorBBackward.ChangeDutyCycle(DutyCycle)
 
-def turnleft():
+def turnleft(DutyCycle=70):
 	print('Turn left') 
 	pwmMotorAForward.ChangeDutyCycle(Stop)
-	pwmMotorABackward.ChangeDutyCycle(DutyCycleA)
-	pwmMotorBForward.ChangeDutyCycle(DutyCycleB)
+	pwmMotorABackward.ChangeDutyCycle(DutyCycle)
+	pwmMotorBForward.ChangeDutyCycle(DutyCycle)
 	pwmMotorBBackward.ChangeDutyCycle(Stop)
 
 
-def turnright():
+def turnright(DutyCycle=70):
 	print('Turn right')
-	pwmMotorAForward.ChangeDutyCycle(DutyCycleA)
+	pwmMotorAForward.ChangeDutyCycle(DutyCycle)
 	pwmMotorABackward.ChangeDutyCycle(Stop)
 	pwmMotorBForward.ChangeDutyCycle(Stop)
-	pwmMotorBBackward.ChangeDutyCycle(DutyCycleB)
+	pwmMotorBBackward.ChangeDutyCycle(DutyCycle)
     
     
 def stop_pwm():
@@ -98,20 +96,21 @@ def delete_pwm():
 ######
 if __name__ == '__main__':
 	
+	duty_cycle=50
 	# start pwm
 	start_pwm()
 		
-	forward()
+	forward(duty_cycle)
 	time.sleep(1)
 
-	turnleft()
+	turnleft(duty_cycle)
 	time.sleep(0.5)
 
-	forward()
+	forward(duty_cycle)
 	time.sleep(1)
 
-	turnright()
-	time.sleep(0.5)
+	turnright(duty_cycle)
+	time.sleep(1)
 
 	stopmotors()
 
