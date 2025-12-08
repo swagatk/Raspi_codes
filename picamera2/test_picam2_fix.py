@@ -1,3 +1,4 @@
+# use this file if picam2 is not properly installed
 from picamera2 import Picamera2, Preview
 import time
 from libcamera import controls
@@ -14,15 +15,15 @@ picam2.start()
 size = picam2.capture_metadata()['ScalerCrop'][2:]
 full_res = picam2.camera_properties['PixelArraySize']
 
-for _ in range(20):
+for _ in range(5):
     # This syncs us to the arrival of a new camera frame:
     picam2.capture_metadata()
     size = [int(s * 2) for s in size]
     offset = [(r - s) // 2 for r, s in zip(full_res, size)]
     picam2.set_controls({"ScalerCrop": offset + size})
     time.sleep(2)
-    
+
+picam2.capture_file("test.jpg")    
 picam2.stop_preview()
-picam2.capture_file("test.jpg")
-picam2.stop(Preview.QTGL)
+picam2.stop()
 picam2.close()

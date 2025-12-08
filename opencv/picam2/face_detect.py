@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+'''
+OpenCV Face Detection
+'''
 import cv2
 
 from picamera2 import Picamera2
