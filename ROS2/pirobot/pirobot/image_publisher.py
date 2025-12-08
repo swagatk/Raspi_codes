@@ -34,7 +34,7 @@ class ImagePublisher(Node):
         # --- FIX: Set Reliability to RELIABLE ---
         # This ensures compatibility if the Subscriber defaults to Reliable
         qos_profile = QoSProfile(
-            reliability=ReliabilityPolicy.RELIABLE, 
+            reliability=ReliabilityPolicy.BEST_EFFORT, 
             history=HistoryPolicy.KEEP_LAST,
             depth=1
         )
