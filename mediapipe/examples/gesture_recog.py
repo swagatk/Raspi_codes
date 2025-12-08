@@ -11,7 +11,7 @@ from utils import visualize_gestures
 import time
 
 # Choose between Picam or USB Camera
-USBCAM = True
+USBCAM = False	
 
 
 # Step 1: Initialize camera

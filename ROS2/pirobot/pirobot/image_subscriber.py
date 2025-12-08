@@ -39,7 +39,7 @@ class ImageSubscriber(Node):
         #self.subscription
 
     def listener_callback(self, msg):
-        #self.get_logger('image_subscriber').info('Received data of size: "%s" bytes' % sys.getsizeof(msg.data))
+        self.get_logger('image_subscriber').info('Received data of size: "%s" bytes' % sys.getsizeof(msg.data))
         cv2_img = imgmsg_to_cv2(msg)
         cv2.imshow("Subscriber", cv2_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
