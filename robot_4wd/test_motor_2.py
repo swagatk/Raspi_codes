@@ -11,11 +11,14 @@ if __name__ == '__main__':
 
     try:
         while True:
-            mc.move_forward()
+            mc.turn_left()
             time.sleep(1)
-            mc.move_backward()
-            time.sleep(1)
-            mc.stop()
+            
+            #mc.stop()
     except KeyboardInterrupt:
-        gpio.cleanup()
+        print('stopped by user')
+    finally:
+        mc.stop()
+        mc.release_pins()
+        
             

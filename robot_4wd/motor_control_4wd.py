@@ -29,6 +29,9 @@ def move_forward():
     global motorAll, af
     print("Robot Moving Forward ")
     af.on()
+    al.off()
+    ar.off()
+    ab.off()
     motorAll.forward(100)
 
 # Function to move backward
@@ -36,6 +39,8 @@ def move_backward():
     global motorAll, af, ab
     print("Robot Moving Backward ")
     af.off()
+    al.off()
+    ar.off()
     ab.on()
     motorAll.reverse(100)
 
@@ -45,6 +50,8 @@ def turn_left():
     print("Robot Turning Left ")
     global ab, al, m1, m2, m3, m4
     ab.off()
+    af.off()
+    ar.off()
     al.on()
     m1.stop()
     m2.stop()
@@ -58,6 +65,8 @@ def turn_right():
     print("Robot Turning Right ")
     ar.on()
     al.off()
+    ab.off()
+    af.off()
     m1.forward(100)
     m2.forward(100)
     m3.stop()

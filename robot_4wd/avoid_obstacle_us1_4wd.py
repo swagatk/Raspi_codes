@@ -23,14 +23,15 @@ def avoid_obstacle(dist_threshold=15):
 			if dist < dist_threshold:
 				if left_flag:
 					mc.turn_left()  #turn left
-					time.sleep(2)
+					time.sleep(3)
 					left_flag = False
 				else:
 					mc.turn_right()
-					time.sleep(2)
+					time.sleep(3)
 					left_flag = True
 			else: # no obstacle detected
 				mc.move_forward() # turn right
+				time.sleep(1)
 				
 	except KeyboardInterrupt:
 		print('Stopped by User')
