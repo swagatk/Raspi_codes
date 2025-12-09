@@ -1,9 +1,11 @@
+"""
+It uses the Ultrasonic sensors pin provided on the MotorShield HAT
+"""
+
 import RPi.GPIO as GPIO
 import time
 
 import PiMotor
-
-
 
 TRIG = 29
 ECHO = 31
