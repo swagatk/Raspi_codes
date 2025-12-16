@@ -2,7 +2,8 @@
 # with Python 3.11.9
 
 import cv2
-import mediapipe as mp
+#import mediapipe as mp
+import time
 
 # Open the camera (Index 0 is usually the Pi Camera)
 cap = cv2.VideoCapture(0, cv2.CAP_V4L2)

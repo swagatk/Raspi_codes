@@ -8,66 +8,53 @@ import numpy as np
 import sys
 
 def imgmsg_to_cv2(img_msg):
-    dtype = np.dtype("uint8")
+
+    if img_msg.encoding != "bgr8":
+        rospy.logerr("This node is hardcoded to 'bgr8' encoding.")
+    dtype = np.dtype("uint8")   # hardcode to 8 bits
     dtype = dtype.newbyteorder('>' if img_msg.is_bigendian else '<')
     image_opencv = np.ndarray(shape=(img_msg.height, img_msg.width, 3),
-            dtype=dtype, buffer=img_msg.data)
+            dtype = dtype, buffer=img_msg.data)
+    #if the byte order is different between the message and the system
     if img_msg.is_bigendian == (sys.byteorder == 'little'):
         image_opencv = image_opencv.byteswap().newbyteorder()
     return image_opencv
 
+
 class ImageSubscriber(Node):
     def __init__(self):
         super().__init__('image_subscriber')
-        
-        # USE BEST_EFFORT (Fire and Forget) to prevent network blocking
+        # QoS Must Match Publisher
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             history=HistoryPolicy.KEEP_LAST,
             depth=1
         )
-        
         self.subscription = self.create_subscription(
             Image,
             '/pirobot/camera',
             self.listener_callback,
-            qos_profile)
-        
-        self.current_frame = None
+            qos_profile) 
+            
+        #self.subscription
 
     def listener_callback(self, msg):
-        # Only decode the image here, don't display it yet (keeps callback fast)
-        self.current_frame = imgmsg_to_cv2(msg)
+        #self.get_logger('image_subscriber').info('Received data of size: "%s" bytes' % sys.getsizeof(msg.data))
+        cv2_img = imgmsg_to_cv2(msg)
+        cv2.imshow("Subscriber", cv2_img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            raise SystemExit
 
 def main(args=None):
     rclpy.init(args=args)
     image_subscriber = ImageSubscriber()
-    
-    # MAIN LOOP
-    # Instead of rclpy.spin(), we loop manually to handle OpenCV better
     try:
-        while rclpy.ok():
-            # Process any waiting messages (non-blocking)
-            rclpy.spin_once(image_subscriber, timeout_sec=0.001)
-            
-            # Display the frame if we have one
-            if image_subscriber.current_frame is not None:
-                cv2.imshow("Subscriber", image_subscriber.current_frame)
-                
-                # Clear it so we don't re-display the same frame unnecessarily
-                # (Optional, depends on preference)
-                # image_subscriber.current_frame = None 
-            
-            # Check for Quit
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-                
-    except KeyboardInterrupt:
-        pass
-    finally:
-        image_subscriber.destroy_node()
-        rclpy.shutdown()
+        rclpy.spin(image_subscriber)
+    except SystemExit:
+        rclpy.logging.get_logger('image_subscriber').info('Quitting. Done!')
         cv2.destroyAllWindows()
+    image_subscriber.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

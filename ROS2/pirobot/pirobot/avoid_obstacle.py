@@ -33,40 +33,43 @@ def initialize_sensors():
 left = False 
 
 def measure():
-    #  Average over 5 readings to reduce noise
-    dist = []
-    for i in range(5):
-        #set trigger to False
-        GPIO.output(pinTrigger, False)
-        time.sleep(0.0001)
+	#  Average over 5 readings to reduce noise
+	dist = []
+	for i in range(5):
+		#set trigger to False
+		GPIO.output(pinTrigger, False)
+		time.sleep(0.1)
 
-        # send out a pulse at a freq of 10 micro hertz
-        GPIO.output(pinTrigger, True)
-        time.sleep(0.00001)
-        GPIO.output(pinTrigger, False)
+		# send out a pulse at a freq of 10 micro hertz
+		GPIO.output(pinTrigger, True)
+		time.sleep(0.00001)
+		GPIO.output(pinTrigger, False)
 
-        # start the timer
-        StartTime = time.time()
+		# start the timer
+		StartTime = time.time()
+		StopTime = StartTime
 
-        # start time is reset until the Echo Pin is taken high
-        while GPIO.input(pinEcho) == 0:
-            StartTime = time.time()
-            
-        # stop when echo pin is no longer high - end time
-        while GPIO.input(pinEcho) == 1:
-            StopTime = time.time()
-            interval = StopTime - StartTime
-            if interval >= 0.02:
-                #print('Either you are too close or too far to me to see.')
-                #StopTime = StartTime
-                break
-        # calculate pulse length
-        ElapsedTime = StopTime - StartTime
+		# start time is reset until the Echo Pin is taken high
+		timeout_start = time.time()
+		while GPIO.input(pinEcho) == 0:
+			StartTime = time.time()
+			if StartTime - timeout_start > 0.1:
+				break
 
-        # Distance travelled by the pulse in that time in cm
-        Distance = (ElapsedTime * 34326)/2.0
-        dist.append(Distance)
-    return np.mean(dist) 
+		# stop when echo pin is no longer high - end time
+		while GPIO.input(pinEcho) == 1:
+			StopTime = time.time()
+			interval = StopTime - StartTime
+			if interval >= 0.02:
+				break
+				
+		# calculate pulse length
+		ElapsedTime = StopTime - StartTime
+
+		# Distance travelled by the pulse in that time in cm
+		Distance = (ElapsedTime * 34326)/2.0
+		dist.append(Distance)
+	return np.mean(dist) 
     
 def nearobstacle(localhownear):
     distance = measure()

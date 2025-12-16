@@ -18,8 +18,8 @@ pinMotorBBackward = 7
 
 # PWM parameters
 Frequency = 20
-DutyCycleA = 70
-DutyCycleB = 70
+DutyCycleA = 50
+DutyCycleB = 50
 Stop = 0
 
 
