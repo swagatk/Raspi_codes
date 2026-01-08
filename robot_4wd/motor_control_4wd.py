@@ -53,8 +53,10 @@ def turn_left(power=50):
     af.off()
     ar.off()
     al.on()
-    m1.reverse(power)
-    m2.reverse(power)
+    # m1.reverse(power)
+    # m2.reverse(power)
+    m1.stop()
+    m2.stop()
     m3.forward(power)
     m4.forward(power)
 
@@ -69,8 +71,10 @@ def turn_right(power=50):
     af.off()
     m1.forward(power)
     m2.forward(power)
-    m3.reverse(power)
-    m4.reverse(power)
+    # m3.reverse(power)
+    # m4.reverse(power)
+    m3.stop()
+    m4.stop()
     
 
 # Function to stop
