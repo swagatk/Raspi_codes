@@ -25,52 +25,52 @@ def initialize_motors():
     print('Motors initialized')
 
 # Function to move forward
-def move_forward():
+def move_forward(power=50):
     global motorAll, af
     print("Robot Moving Forward ")
     af.on()
     al.off()
     ar.off()
     ab.off()
-    motorAll.forward(100)
+    motorAll.forward(power)
 
 # Function to move backward
-def move_backward():
+def move_backward(power=50):
     global motorAll, af, ab
     print("Robot Moving Backward ")
     af.off()
     al.off()
     ar.off()
     ab.on()
-    motorAll.reverse(100)
+    motorAll.reverse(power)
 
 
 # Function to turn left
-def turn_left():
+def turn_left(power=50):
     print("Robot Turning Left ")
     global ab, al, m1, m2, m3, m4
     ab.off()
     af.off()
     ar.off()
     al.on()
-    m1.stop()
-    m2.stop()
-    m3.forward(100)
-    m4.forward(100)
+    m1.reverse(power)
+    m2.reverse(power)
+    m3.forward(power)
+    m4.forward(power)
 
 
 # Function to turn right
-def turn_right():
+def turn_right(power=50):
     global ar, al, m1, m2, m3, m4
     print("Robot Turning Right ")
     ar.on()
     al.off()
     ab.off()
     af.off()
-    m1.forward(100)
-    m2.forward(100)
-    m3.stop()
-    m4.stop()
+    m1.forward(power)
+    m2.forward(power)
+    m3.reverse(power)
+    m4.reverse(power)
     
 
 # Function to stop
@@ -109,7 +109,7 @@ if __name__ == '__main__':
             time.sleep(1)
             turn_right()
             time.sleep(1)
-            stop()
+            # stop()
     except KeyboardInterrupt:
         GPIO.cleanup()
 
