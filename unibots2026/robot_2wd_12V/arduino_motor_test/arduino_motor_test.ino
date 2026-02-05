@@ -12,7 +12,7 @@ const int IN3 = 12;
 const int IN4 = 13;
 
 // Variables
-int motorSpeed = 150; // Default speed (0-255)
+int motorSpeed = 255; // Default speed (0-255)
 char command = 'S';   // Current command (S=Stop)
 unsigned long lastCommandTime = 0; // Safety timeout
 
@@ -89,7 +89,7 @@ void loop() {
 
   // 3. READ SENSORS & SEND TO PI (Every 100ms)
   static unsigned long lastSensorTime = 0;
-  if (millis() - lastSensorTime > 500) {
+  if (millis() - lastSensorTime > 100) {
     lastSensorTime = millis();
     int d1 = getDistance(leftTrig, leftEcho);
     int d2 = getDistance(centerTrig, centerEcho);

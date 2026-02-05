@@ -18,8 +18,10 @@ try:
     time.sleep(2) # Wait for Arduino reboot
     
     # Set Speed to LOW (1) for safer autonomous driving
-    ser.write(b'1') 
-    print("Speed set to SLOW")
+    # ser.write(b'1') 
+    # print("Speed set to SLOW")
+    ser.write(b'3') 
+    print("Speed set to FAST")
     
 except Exception as e:
     print(f"Error: {e}")
@@ -107,7 +109,7 @@ try:
             ser.write(b'F')
 
         # 3. LOOP DELAY
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 except KeyboardInterrupt:
     print("\nEmergency Stop!")
