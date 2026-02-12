@@ -6,8 +6,8 @@ from gpiozero import Button
 
 # --- CONFIGURATION ---
 BUTTON_PIN = 25  # The GPIO pin for your button
-STOP_DIST = 25
-SIDE_DIST = 20
+STOP_DIST = 35
+SIDE_DIST = 30
 
 # --- SETUP BUTTON ---
 # bounce_time prevents one press from registering as two
@@ -76,22 +76,45 @@ try:
         if robot_active:
             # === AUTONOMOUS LOGIC ===
             
-            # 1. OBSTACLE AHEAD
+            # CASE A: OBSTACLE DEAD AHEAD
             if latest_C < STOP_DIST:
-                print(f"Blocked ({latest_C}cm)", end="\r")
-                ser.write(b'S')
-                time.sleep(0.1)
+                print(f"Blocked ({latest_C}cm)! Avoiding...")
+                ser.write(b'S') # Stop
+                time.sleep(0.2)
                 
-                # Simple logic: Turn towards the bigger number
+                ser.write(b'B') # Reverse briefly to un-stuck
+                time.sleep(0.3)
+                
+                # Check which way is clearer
                 if latest_L > latest_R:
-                    ser.write(b'L')
+                    print("Turning LEFT (Left side has more space)")
+                    ser.write(b'L') 
                 else:
+                    print("Turning RIGHT (Right side has more space)")
                     ser.write(b'R')
-                time.sleep(0.3) # Spin duration
+                    
+                time.sleep(0.5) # Spin for 0.5 seconds
+                ser.write(b'S') # Stop spinning
+                time.sleep(0.2) # Stabilize
                 
-            # 2. PATH CLEAR -> DRIVE
+            # CASE B: TOO CLOSE TO LEFT WALL
+            elif latest_L < SIDE_DIST:
+                print("Too close to LEFT -> Nudging Right")
+                ser.write(b'R') # Spin Right
+                time.sleep(0.1) # Short nudge
+                ser.write(b'F') # Resume Forward
+                
+            # CASE C: TOO CLOSE TO RIGHT WALL
+            elif latest_R < SIDE_DIST:
+                print("Too close to RIGHT -> Nudging Left")
+                ser.write(b'L') # Spin Left
+                time.sleep(0.1) # Short nudge
+                ser.write(b'F') # Resume Forward
+
+            # CASE D: PATH CLEAR
             else:
-                # Nudge logic can go here (as per previous code)
+                # Only print occasionally to keep console clean
+                # print(f"Clear: L={latest_L} C={latest_C} R={latest_R}")
                 ser.write(b'F')
                 
         else:
