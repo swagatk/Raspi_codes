@@ -130,3 +130,22 @@ python3 avoid_obstacle_with_button.py
 * Robot spins in circles: Swap the motor wires (OUT1 & OUT2) or (OUT3 & OUT4) on the L298N to reverse direction.
 * "Serial Error": Check if your port is /dev/ttyACM0 or /dev/ttyUSB0 using ls /dev/tty*.
 
+
+## Camera Object detection
+
+Create a virtual environment to install yolo related packages. See the documentation inside `~/Raspi_codes/yolo` folder for more details. We are also using 'ncnn' model for faster response. I can get a speed of about 4-5 FPS with ncnn model. You might have to install 'ncnn' package if you have not done so already.
+
+Activate the Yolo virtual environment
+
+```
+source ~/.virtualenvs/yolo8env/bin/activate
+pip3 install ncnn 
+```
+
+Now run the python script on a terminal
+
+```
+cd ~/Raspi_codes/unibots2026/robot_2wd_12V/
+python3 ./robot_master.py
+```
+The objects detected are logged into `camera_log.txt` file. The ultrasonic sensor readings and motions executed are logged into `motion_log.txt` file. 
