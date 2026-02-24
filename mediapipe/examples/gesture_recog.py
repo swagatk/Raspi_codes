@@ -63,6 +63,7 @@ with GestureRecognizer.create_from_options(options) as recognizer:
         
         # Run the detector
         detection_result = recognizer.recognize_for_video(mp_image, frame_timestamp_ms)
+        print(detection_result)
 
         # process the result
         image_copy = np.copy(mp_image.numpy_view())
