@@ -40,7 +40,8 @@ def log_motion_action(action_desc, l, c, r):
 # Movement Thresholds
 STOP_DIST = 35        # cm
 SIDE_DIST = 30        # cm
-CENTER_TOLERANCE = 40 # pixels from center to consider "centered"
+CENTER_TOLERANCE = 80 # pixels from center to consider "centered"
+BOTTOM_TOLERANCE = 210 # If ball_y is greater than this, stop (max is CAPTURE_HEIGHT, e.g., 240)
 
 # Camera Settings
 CAPTURE_WIDTH = 320
@@ -78,23 +79,35 @@ except Exception as e:
 def robot_stop():
     if ser: ser.write(b'S')
 
+def set_speed(level):
+    # level can be 1 (slow), 2 (medium), 3 (fast)
+    if ser: ser.write(str(level).encode())
+
 def robot_forward():
-    if ser: ser.write(b'F')
+    if ser: 
+        set_speed(2) # Normal speed for forward
+        ser.write(b'F')
 
 def robot_backward():
-    if ser: ser.write(b'B')
+    if ser: 
+        set_speed(2)
+        ser.write(b'B')
 
 def robot_left():
-    if ser: ser.write(b'L')
+    if ser: 
+        set_speed(1) # Minimum speed for rotating
+        ser.write(b'L')
 
 def robot_right():
-    if ser: ser.write(b'R')
+    if ser: 
+        set_speed(1) # Minimum speed for rotating
+        ser.write(b'R')
 
 def robot_spin_search():
-    # Spin slowly to find ball. 
-    # Depending on motor controller, 'R' might be spin or turn.
-    # We will assume 'R' is acceptable for searching.
-    if ser: ser.write(b'R')
+    # Spin slowly to find ball.
+    if ser:
+        set_speed(1) # Minimum speed for rotating
+        ser.write(b'R')
 
 # --- BUTTON HANDLER ---
 def toggle_mode():
@@ -285,9 +298,16 @@ def robot_control_loop():
                 error = ball_x - CENTER_X
                 
                 # Debug
-                # print(f"Tracking Ball: x={ball_x:.1f}, error={error:.1f}")
+                # print(f"Tracking Ball: x={ball_x:.1f}, error={error:.1f}, y={ball_y:.1f}")
                 
-                if abs(error) < CENTER_TOLERANCE:
+                if ball_y > BOTTOM_TOLERANCE:
+                    # Ball is very close (near bottom of frame), stop!
+                    print("Ball Reached! Stopping.")
+                    log_motion_action("Ball Reached (Stop)", latest_L, latest_C, latest_R)
+                    robot_stop()
+                    # Wait slightly so we don't rapid-fire commands once arrived
+                    time.sleep(0.5)
+                elif abs(error) < CENTER_TOLERANCE:
                     # Ball is roughly centered, move towards it
                     # log_motion_action("Forward (Track)", latest_L, latest_C, latest_R) # Optional: reduce log spam
                     robot_forward()
@@ -295,10 +315,16 @@ def robot_control_loop():
                     # Ball is to the Left (x < 160)
                     log_motion_action("Turn LEFT (Track)", latest_L, latest_C, latest_R)
                     robot_left()
+                    time.sleep(0.01)  # turn very slightly
+                    robot_stop()
+                    time.sleep(0.3)   # wait for camera to update frame
                 else:
                     # Ball is to the Right (x > 160)
                     log_motion_action("Turn RIGHT (Track)", latest_L, latest_C, latest_R)
                     robot_right()
+                    time.sleep(0.01)  # turn very slightly
+                    robot_stop()
+                    time.sleep(0.3)   # wait for camera to update frame
                 
                 # Short delay to prevent flooding serial
                 time.sleep(0.05)
@@ -312,7 +338,9 @@ def robot_control_loop():
                 # print("Searching...")
                 # log_motion_action("Spin Search", latest_L, latest_C, latest_R) # Optional: reduce log spam
                 robot_spin_search()
-                time.sleep(0.05)
+                time.sleep(0.05)  # pulse spin to rotate slowly
+                robot_stop()
+                time.sleep(0.15)  # give camera time to catch the ball
 
         else:
             # If not active, do nothing

@@ -1,33 +1,24 @@
-2026-02-24 11:02:43 | Action: BLOCKED (7cm) | L:112 C:7 R:100
-2026-02-24 11:02:44 | Action: Turn RIGHT | L:77 C:145 R:94
-2026-02-24 11:02:59 | Action: BLOCKED (30cm) | L:31 C:30 R:59
-2026-02-24 11:03:00 | Action: Turn RIGHT | L:20 C:20 R:95
-2026-02-24 11:03:02 | Action: BLOCKED (31cm) | L:324 C:31 R:134
-2026-02-24 11:03:03 | Action: Turn LEFT | L:999 C:23 R:98
-2026-02-24 11:03:06 | Action: BLOCKED (27cm) | L:999 C:27 R:30
-2026-02-24 11:03:06 | Action: Turn LEFT | L:999 C:11 R:14
-2026-02-24 11:03:17 | Action: BLOCKED (29cm) | L:102 C:29 R:999
-2026-02-24 11:03:18 | Action: Turn RIGHT | L:999 C:18 R:999
-2026-02-24 11:03:23 | Action: BLOCKED (8cm) | L:14 C:8 R:68
-2026-02-24 11:03:24 | Action: Turn RIGHT | L:9 C:10 R:56
-2026-02-24 11:03:33 | Action: BLOCKED (7cm) | L:186 C:7 R:999
-2026-02-24 11:03:34 | Action: Turn RIGHT | L:307 C:6 R:999
-2026-02-24 11:03:35 | Action: BLOCKED (5cm) | L:112 C:5 R:999
-2026-02-24 11:03:36 | Action: Turn RIGHT | L:999 C:999 R:999
-2026-02-24 11:03:43 | Action: BLOCKED (28cm) | L:262 C:28 R:999
-2026-02-24 11:03:44 | Action: Turn RIGHT | L:199 C:999 R:999
-2026-02-24 11:03:46 | Action: Nudge RIGHT | L:19 C:127 R:62
-2026-02-24 11:03:51 | Action: Nudge RIGHT | L:29 C:90 R:92
-2026-02-24 11:03:53 | Action: BLOCKED (33cm) | L:194 C:33 R:215
-2026-02-24 11:03:54 | Action: Turn LEFT | L:999 C:12 R:193
-2026-02-24 11:03:58 | Action: BLOCKED (19cm) | L:86 C:19 R:102
-2026-02-24 11:03:59 | Action: Turn RIGHT | L:82 C:87 R:999
-2026-03-03 10:43:43 | Action: BLOCKED (11cm) | L:999 C:11 R:88
-2026-03-03 10:43:44 | Action: Turn RIGHT (Avoid) | L:104 C:94 R:105
-2026-03-03 10:43:54 | Action: BLOCKED (23cm) | L:104 C:23 R:75
-2026-03-03 10:43:55 | Action: Turn LEFT (Avoid) | L:106 C:100 R:93
-2026-03-03 10:43:56 | Action: BLOCKED (29cm) | L:104 C:29 R:71
-2026-03-03 10:43:57 | Action: Turn RIGHT (Avoid) | L:104 C:100 R:104
-2026-03-03 10:43:59 | Action: Nudge RIGHT | L:23 C:44 R:58
-2026-03-03 10:44:00 | Action: Nudge RIGHT | L:25 C:41 R:59
-2026-03-03 10:44:00 | Action: Nudge RIGHT | L:26 C:41 R:60
+2026-03-03 13:04:55 | Action: Turn LEFT (Track) | L:999 C:999 R:152
+2026-03-03 13:04:55 | Action: Turn LEFT (Track) | L:180 C:999 R:999
+2026-03-03 13:07:01 | Action: Turn RIGHT (Track) | L:999 C:999 R:999
+2026-03-03 13:07:07 | Action: Turn LEFT (Track) | L:999 C:102 R:81
+2026-03-03 13:15:42 | Action: Turn RIGHT (Track) | L:999 C:68 R:999
+2026-03-03 13:15:44 | Action: Turn LEFT (Track) | L:135 C:218 R:999
+2026-03-03 13:17:21 | Action: Turn RIGHT (Track) | L:999 C:999 R:91
+2026-03-03 13:17:21 | Action: Turn RIGHT (Track) | L:999 C:999 R:111
+2026-03-03 13:17:21 | Action: Turn RIGHT (Track) | L:999 C:999 R:97
+2026-03-03 13:17:22 | Action: Turn LEFT (Track) | L:999 C:999 R:110
+2026-03-03 13:17:23 | Action: Turn LEFT (Track) | L:999 C:999 R:999
+2026-03-03 13:17:24 | Action: Turn RIGHT (Track) | L:999 C:999 R:105
+2026-03-03 13:17:25 | Action: Turn RIGHT (Track) | L:196 C:999 R:999
+2026-03-03 13:17:26 | Action: Turn RIGHT (Track) | L:319 C:999 R:999
+2026-03-03 13:17:27 | Action: Turn LEFT (Track) | L:315 C:999 R:98
+2026-03-03 13:17:27 | Action: Turn LEFT (Track) | L:306 C:999 R:90
+2026-03-03 14:00:58 | Action: Ball Reached (Stop) | L:72 C:67 R:95
+2026-03-03 14:04:59 | Action: Turn RIGHT (Track) | L:999 C:999 R:999
+2026-03-03 14:05:00 | Action: Turn RIGHT (Track) | L:999 C:999 R:999
+2026-03-03 14:05:00 | Action: Turn RIGHT (Track) | L:999 C:999 R:999
+2026-03-03 14:05:02 | Action: Turn LEFT (Track) | L:999 C:999 R:188
+2026-03-03 14:05:08 | Action: Turn RIGHT (Track) | L:94 C:107 R:110
+2026-03-03 14:05:16 | Action: Turn LEFT (Track) | L:75 C:999 R:34
+2026-03-03 14:05:23 | Action: Turn LEFT (Track) | L:82 C:90 R:116
