@@ -14,8 +14,8 @@ SERIAL_PORT = '/dev/ttyACM0'  # Adjust if needed
 BUTTON_PIN = 25
 
 # Model Selection
-NCNN_MODEL = "/home/pi/yolo_project/ball_detect_ncnn_model"
-PT_MODEL = "/home/pi/yolo_project/ball_detect.pt"
+NCNN_MODEL = "/home/pi/yolo_project/orange_ball_ncnn_model"
+PT_MODEL = "/home/pi/yolo_project/orange_ball.pt"
 
 if os.path.exists(NCNN_MODEL):
     print(f"Using NCNN model for speed: {NCNN_MODEL}")
@@ -41,12 +41,13 @@ def log_motion_action(action_desc, l, c, r):
 STOP_DIST = 35        # cm
 SIDE_DIST = 30        # cm
 CENTER_TOLERANCE = 80 # pixels from center to consider "centered"
-BOTTOM_TOLERANCE = 210 # If ball_y is greater than this, stop (max is CAPTURE_HEIGHT, e.g., 240)
+BOTTOM_TOLERANCE = 200 # If ball_y is greater than this, stop (max is CAPTURE_HEIGHT, e.g., 240)
 
 # Camera Settings
 CAPTURE_WIDTH = 320
 CAPTURE_HEIGHT = 240
 CENTER_X = CAPTURE_WIDTH // 2
+SKIP_FRAMES = 3  # Run detection 1 out of every N frames (higher = faster FPS)
 
 # --- GLOBAL VARIABLES ---
 # Thread Control
@@ -178,35 +179,40 @@ def camera_yolo_loop():
         return
 
     print("Starting Detection Loop...")
+    prev_time = time.time()
+    frame_counter = 0
+    last_results = None
     
     while running:
         try:
             # Capture
             frame = picam2.capture_array()
             
-            # Predict
-            # Using raw frame (RGB). YOLO can handle it, or convert to BGR for OpenCV display.
-            # OpenCV expects BGR. Ultralytics handles RGB/BGR but consistency is good.
-            # Let's convert to BGR for display purposes later.
-            frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            # PiCamera v3 with libcamera outputs BGR despite "RGB888" format
+            # No conversion needed - frame is already in BGR format for OpenCV
+            frame_bgr = frame
+            frame_counter += 1
             
-            # Run inference
-            results = model.predict(frame_bgr, imgsz=320, verbose=False, conf=0.4)
+            # Run inference only every SKIP_FRAMES frames
+            if frame_counter % SKIP_FRAMES == 0:
+                results = model.predict(frame_bgr, imgsz=320, verbose=False, conf=0.4)
+                last_results = results
             
-            # Process Detections
+            # Process Detections using last_results (allows tracking even on skipped frames)
             # We want to find the largest ball (closest)
             largest_box = None
             max_area = 0
             
-            if len(results) > 0:
-                for r in results:
+            if last_results and len(last_results) > 0:
+                for r in last_results:
                     boxes = r.boxes
                     for box in boxes:
-                        # Log detection
-                        class_id = int(box.cls[0])
-                        confidence = float(box.conf[0])
-                        class_name = model.names[class_id]
-                        log_camera_detection(class_name, confidence)
+                        # Log detection (only on detection frames)
+                        if frame_counter % SKIP_FRAMES == 0:
+                            class_id = int(box.cls[0])
+                            confidence = float(box.conf[0])
+                            class_name = model.names[class_id]
+                            log_camera_detection(class_name, confidence)
 
                         # Check for largest ball tracking
                         # box.xywh returns center_x, center_y, width, height
@@ -223,8 +229,18 @@ def camera_yolo_loop():
             else:
                 ball_visible = False
             
+            # Calculate FPS
+            current_time = time.time()
+            fps = 1 / (current_time - prev_time)
+            prev_time = current_time
+            
             # Visualization
-            annotated_frame = results[0].plot()
+            if last_results:
+                annotated_frame = last_results[0].plot()
+            else:
+                annotated_frame = frame_bgr.copy()
+            cv2.putText(annotated_frame, f"FPS: {int(fps)}", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow("Robot Vision", annotated_frame)
             
             if cv2.waitKey(1) & 0xFF == ord('q'):

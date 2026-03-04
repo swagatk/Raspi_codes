@@ -18,8 +18,8 @@ except ImportError:
 
 # --- CONFIGURATION ---
 SERIAL_PORT = '/dev/ttyACM0'  # Adjust if needed
-YOLO_MODEL_PATH = "/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/ball_detection/best.pt"
-NCNN_MODEL = "/home/pi/yolo_project/ball_detect_ncnn_model"
+YOLO_MODEL_PATH = "/home/pi/yolo_project/orange_ball.pt"
+NCNN_MODEL = "/home/pi/yolo_project/orange_ball_ncnn_model"
 APRILTAG_FAMILY = "tagStandard41h12"
 WIDTH = 320
 HEIGHT = 240
@@ -69,7 +69,7 @@ print("---------------------------------------")
 print("- Make sure the OpenCV Video window is focused.")
 print("- Controls: W (Forward), S (Backward), A (Left), D (Right)")
 print("- SPACE: Stop | 1, 2, 3: Set Speed")
-print("- Toggles: B (Ball Detection) | T (AprilTag Detection)")
+print("- Toggles: B (Ball Detection) | T (AprilTag Detection) | C (Camera Stream)")
 print("- Q: Quit")
 print("---------------------------------------\n")
 
@@ -78,11 +78,21 @@ running = True
 latest_frame = None
 detect_ball = False
 detect_apriltag = False
+stream_camera = True
 
 def camera_processing_thread():
-    global running, latest_frame, detect_ball, detect_apriltag
+    global running, latest_frame, detect_ball, detect_apriltag, stream_camera
     while running:
         try:
+            if not stream_camera and not detect_ball and not detect_apriltag:
+                # Still need a latest_frame to show the paused text, but we stop capturing
+                blank = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
+                cv2.putText(blank, "Stream Paused", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(blank, "Press 'c' to resume", (30, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                latest_frame = blank
+                time.sleep(0.1)
+                continue
+                
             # Capture frame
             frame = picam2.capture_array()
             
@@ -130,7 +140,13 @@ try:
     while True:
         if latest_frame is not None:
              # Show Combined Output
-            cv2.imshow("Robot View - Controls (WASD)", latest_frame)
+            if stream_camera:
+                cv2.imshow("Robot View - Controls (WASD)", latest_frame)
+            else:
+                blank = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
+                cv2.putText(blank, "Stream Paused", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(blank, "Press 'c' to resume", (30, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                cv2.imshow("Robot View - Controls (WASD)", blank)
         
         # Handle Keyboard Inputs (Must have OpenCV window focused)
         # Using a very quick waitKey polling to stay highly responsive
@@ -166,6 +182,9 @@ try:
         elif key == ord('t'):
             detect_apriltag = not detect_apriltag
             print(f"AprilTag Detection: {'ON' if detect_apriltag else 'OFF'}")
+        elif key == ord('c'):
+            stream_camera = not stream_camera
+            print(f"Camera Stream: {'ON' if stream_camera else 'OFF'}")
         elif key == ord('q'):
             send_cmd('S')
             print("Quitting...")

@@ -5,7 +5,7 @@ from libcamera import Transform
 from ultralytics import YOLO
 
 # Load YOLO model
-model = YOLO("/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/ball_detection/best.pt")
+model = YOLO("/home/pi/yolo_project/orange_ball.pt")
 
 # Initialize camera
 picam2 = Picamera2()
@@ -24,8 +24,8 @@ while True:
     # Capture frame
     frame = picam2.capture_array()
 
-    # Convert RGB → BGR (IMPORTANT for OpenCV)
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    # PiCamera v3 with libcamera outputs BGR despite "RGB888" format
+    # No conversion needed - frame is already in BGR format for OpenCV
 
     # Run YOLO
     results = model(frame, verbose=False)
