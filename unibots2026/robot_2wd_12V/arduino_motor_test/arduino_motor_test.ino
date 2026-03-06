@@ -18,7 +18,7 @@ unsigned long lastCommandTime = 0; // Safety timeout
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(115200);
   
   // Sensor Setup
   pinMode(leftTrig, OUTPUT); pinMode(leftEcho, INPUT);
