@@ -16,6 +16,7 @@ except ImportError:
 # Replace with the 4 numbers from your calibration script!
 CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
+SCALE = 3.0
 
 # --- SETUP HARDWARE ---
 # Initialize Picamera2
@@ -51,7 +52,7 @@ while True:
         # Translation vector (X, Y, Z distance from camera in meters)
         x_dist = tag.pose_t[0][0] # Left/Right offset
         y_dist = tag.pose_t[1][0] # Up/Down offset
-        z_dist = tag.pose_t[2][0] # Forward distance to tag
+        z_dist = tag.pose_t[2][0] / SCALE # Forward distance to tag 
         
         # Print for debugging
         print(f"Tag ID: {tag_id} | Distance: {z_dist:.2f}m | X-Offset: {x_dist:.2f}m")

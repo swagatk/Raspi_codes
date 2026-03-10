@@ -13,6 +13,8 @@ const int IN4 = 13;
 
 // Variables
 int motorSpeed = 255; // Default speed (0-255)
+float right_scale = 1.0; //scaledown right wheel
+float left_scale = 0.98; //scaledown left wheel
 char command = 'S';   // Current command (S=Stop)
 unsigned long lastCommandTime = 0; // Safety timeout
 
@@ -70,10 +72,10 @@ void loop() {
     lastCommandTime = millis(); // Reset safety timer
     
     // Interpret Command
-    if (command == 'F') setMotors(motorSpeed, -motorSpeed);        // Forward
-    else if (command == 'B') setMotors(-motorSpeed, motorSpeed); // Backward
-    else if (command == 'L') setMotors(motorSpeed, motorSpeed);  // Left Spin
-    else if (command == 'R') setMotors(-motorSpeed, -motorSpeed);  // Right Spin
+    if (command == 'F') setMotors(int(left_scale * motorSpeed), -int(right_scale * motorSpeed));        // Forward
+    else if (command == 'B') setMotors(-int(left_scale * motorSpeed), int(right_scale * motorSpeed)); // Backward
+    else if (command == 'L') setMotors(int(left_scale * motorSpeed), int(right_scale * motorSpeed));  // Left Spin
+    else if (command == 'R') setMotors(-int(left_scale * motorSpeed), -int(right_scale * motorSpeed));  // Right Spin
     else if (command == 'S') stopMotors();                        // Stop
     // Speed control (1 = Slow, 2 = Medium, 3 = Fast)
     else if (command == '1') motorSpeed = 100;

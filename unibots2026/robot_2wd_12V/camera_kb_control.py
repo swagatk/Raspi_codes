@@ -25,6 +25,7 @@ NCNN_MODEL = "/home/pi/yolo_project/orange_ball_ncnn_model"
 APRILTAG_FAMILY = "tagStandard41h12"
 WIDTH = 640 
 HEIGHT = 480
+SCALE = 3.0 # Scale factor for AprilTag distance estimation - adjust based on your camera setup and testing
 
 # AprilTag Pose Detection Parameters (from camera calibration)
 CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
@@ -106,34 +107,28 @@ print("---------------------------------------\n")
 
 # --- THREADING DEFS ---
 running = True
-latest_frame = None
+raw_frame = None  # Holds the absolute latest frame from the camera sensor
+latest_frame = None  # Holds the annotated frame for UI
 detect_ball = False
 detect_apriltag = False
 detect_pose = False
 stream_camera = True
 frame_lock = threading.Lock()
 
-# Frame queue with size 1 - always keeps only the latest frame
-frame_queue = Queue(maxsize=1)
-
 def camera_capture_thread():
-    """Dedicated thread for frame capture - drops old frames to prevent latency buildup"""
-    global running
+    """ Dedicated thread purely to empty the camera buffer as fast as possible. """
+    global running, raw_frame
     while running:
         try:
+            # Constantly reading prevents libcamera's internal FIFO buffer from filling up
+            # ensuring we always have the freshest possible frame with 0 lag.
             frame = picam2.capture_array()
-            # Drop old frame if queue is full (non-blocking put)
-            if frame_queue.full():
-                try:
-                    frame_queue.get_nowait()
-                except:
-                    pass
-            frame_queue.put(frame)
+            raw_frame = frame
         except Exception as e:
             time.sleep(0.01)
 
 def camera_processing_thread():
-    global running, latest_frame, detect_ball, detect_apriltag, detect_pose, stream_camera
+    global running, latest_frame, raw_frame, detect_ball, detect_apriltag, detect_pose, stream_camera
     while running:
         try:
             if not stream_camera and not detect_ball and not detect_apriltag and not detect_pose:
@@ -146,10 +141,10 @@ def camera_processing_thread():
                 time.sleep(0.1)
                 continue
             
-            # Get latest frame from queue (short timeout for responsiveness)
-            try:
-                frame = frame_queue.get(timeout=0.01)  # 10ms timeout - much faster
-            except:
+            # Get latest frame pulled by capture thread
+            frame = raw_frame
+            if frame is None:
+                time.sleep(0.01)
                 continue
             
             # Convert for display (OpenCV uses BGR)
@@ -195,7 +190,7 @@ def camera_processing_thread():
                     # Translation vector (X, Y, Z distance from camera in meters)
                     x_dist = tag.pose_t[0][0]  # Left/Right offset
                     y_dist = tag.pose_t[1][0]  # Up/Down offset
-                    z_dist = tag.pose_t[2][0]  # Forward distance to tag
+                    z_dist = tag.pose_t[2][0] / SCALE # Forward distance to tag
                     
                     # Print for debugging
                     print(f"Tag ID: {tag_id} | Distance: {z_dist:.2f}m | X-Offset: {x_dist:.2f}m")
@@ -234,21 +229,19 @@ serial_thread.start()
 # Movement state tracking for auto-stop
 last_movement_time = 0
 current_movement = None
-STOP_DELAY = 0.03  # 30ms - faster response on key release
+STOP_DELAY = 0.15  # 150ms - handle keyboard repeat delay to prevent stuttering
 
 # Pre-create blank frame for paused state
 blank_frame = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
 cv2.putText(blank_frame, "Stream Paused", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 cv2.putText(blank_frame, "Press 'c' to resume", (30, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-frame_skip_counter = 0
-FRAME_SKIP = 2  # Only display every Nth frame to prioritize keyboard
+last_frame_displayed = None
 
 try:
     while True:
         # Handle Keyboard FIRST - highest priority for lowest latency
-        # Using 1ms waitKey for fastest response
-        key = cv2.waitKey(1) & 0xFF
+        key = cv2.waitKey(10) & 0xFF
         
         movement_key_pressed = False
         
@@ -319,21 +312,18 @@ try:
                 send_cmd('S')
                 current_movement = None
         
-        # Update display less frequently to prioritize keyboard input
-        frame_skip_counter += 1
-        if frame_skip_counter >= FRAME_SKIP:
-            frame_skip_counter = 0
-            # Thread-safe frame access (non-blocking approach)
-            display_frame = None
-            with frame_lock:
-                if latest_frame is not None:
-                    display_frame = latest_frame
-            
-            if display_frame is not None:
-                if stream_camera:
-                    cv2.imshow("Robot View - Controls (WASD)", display_frame)
-                else:
-                    cv2.imshow("Robot View - Controls (WASD)", blank_frame)
+        # Update display only when a new frame is available or stream is toggled
+        display_frame = None
+        with frame_lock:
+            if latest_frame is not last_frame_displayed:
+                display_frame = latest_frame
+                last_frame_displayed = latest_frame
+        
+        if display_frame is not None:
+            if stream_camera:
+                cv2.imshow("Robot View - Controls (WASD)", display_frame)
+            else:
+                cv2.imshow("Robot View - Controls (WASD)", blank_frame)
 
 except Exception as e:
     print(f"Loop interrupted: {e}")

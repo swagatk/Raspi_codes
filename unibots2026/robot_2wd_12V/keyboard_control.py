@@ -93,8 +93,7 @@ try:
                 ser.write(cmd)
                 current_cmd = cmd
         else:
-            # Timeout reached, stop the robot if we were moving
-            if current_cmd in [b'F', b'B', b'L', b'R']:
+              if current_cmd in [b'F', b'B', b'L', b'R']:
                 ser.write(b'S')
                 current_cmd = b'S'
 
