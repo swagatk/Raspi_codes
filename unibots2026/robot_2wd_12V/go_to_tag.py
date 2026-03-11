@@ -19,12 +19,22 @@ X_OFFSET_TOL = 0.08        # Acceptable horizontal offset from center (meters)
 Z_DIST_TOL = 0.05          # Acceptable distance tolerance (meters)
 FRAME_SKIP = 3  # Only run detection every Nth frame
 
+STOP_DIST = 35             # Front ultrasonic sensor stop distance (cm)
+SIDE_DIST = 30             # Side ultrasonic sensor push away distance (cm)
+ARRIVED_DIST = 20          # Distance at which ultrasonic confirms tag is close enough to stop (cm)
+
 SERIAL_PORT = '/dev/ttyACM0'  
 WIDTH = 640 
 HEIGHT = 480
 CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
 TAG_SIZE = 0.10  # 10 cm tag
 SCALE = 3.0      # Scale factor from previous calibration
+
+# --- GLOBAL VARIABLES FOR SENSORS ---
+latest_L = 999
+latest_C = 999
+latest_R = 999
+running = True
 
 # --- SERIAL SETUP ---
 try:
@@ -48,6 +58,8 @@ def send_cmd(cmd, force=False):
     # Send if command changed, or if 0.3s has passed (to prevent Arduino auto-stop timeout)
     # or if force flag is manually passed to override all optimizations!
     if (force or cmd != current_cmd or (now - last_cmd_time) > 0.3) and ser:
+        ser.reset_output_buffer() # Clear older unsent commands
+        ser.reset_input_buffer()  # Clear any stale incoming data
         ser.write(cmd)
         ser.flush()  # Crucial! Force OS to empty the USB buffer immediately so sleeps are accurate
         current_cmd = cmd
@@ -78,6 +90,26 @@ def camera_capture_thread():
             raw_frame = frame
         except Exception as e:
             time.sleep(0.01)
+
+# --- BACKGROUND THREAD (Sensor Listener) ---
+def update_sensors():
+    global latest_L, latest_C, latest_R
+    while running:
+        if ser and ser.in_waiting > 0:
+            try:
+                line = ser.readline().decode('utf-8').rstrip()
+                if line.startswith("D,"):
+                    parts = line.split(",")
+                    latest_L = int(parts[1])
+                    latest_C = int(parts[2])
+                    latest_R = int(parts[3])
+            except:
+                pass
+        time.sleep(0.01)
+
+t = threading.Thread(target=update_sensors)
+t.daemon = True
+t.start()
 
 capture_thread = threading.Thread(target=camera_capture_thread)
 capture_thread.daemon = True
@@ -129,6 +161,51 @@ try:
                 target_x = tag.pose_t[0][0]  # Left/Right offset
                 target_z = tag.pose_t[2][0] / SCALE # Forward distance
                 break
+
+        # --- SENSOR OVERRIDE / OBSTACLE AVOIDANCE ---
+        OBSTACLE_DETECTED = False
+        if latest_C < STOP_DIST:
+            print(f"Blocked directly ahead ({latest_C}cm)! Avoiding...")
+            send_cmd('S', force=True) # Stop
+            time.sleep(0.2)
+            
+            send_cmd('1', force=True) 
+            send_cmd('B', force=True) # Reverse briefly to un-stuck
+            time.sleep(0.3)
+            
+            # Check which way is clearer
+            if latest_L > latest_R:
+                print("Turning LEFT (Left side has more space)")
+                send_cmd('L', force=True) 
+            else:
+                print("Turning RIGHT (Right side has more space)")
+                send_cmd('R', force=True)
+                
+            time.sleep(0.5) # Spin for 0.5 seconds
+            send_cmd('S', force=True) # Stop spinning
+            time.sleep(0.2) # Stabilize
+            
+            # Record it as lost so it falls into "search mode" naturally 
+            last_seen_time = time.time() - SEARCH_TIMEOUT - 0.1 
+            OBSTACLE_DETECTED = True
+
+        elif latest_L < SIDE_DIST:
+            print("Too close to LEFT -> Nudging Right")
+            send_cmd('1', force=True) 
+            send_cmd('R', force=True) # Spin Right
+            time.sleep(0.1) # Short nudge
+            OBSTACLE_DETECTED = True
+            
+        elif latest_R < SIDE_DIST:
+            print("Too close to RIGHT -> Nudging Left")
+            send_cmd('1', force=True) 
+            send_cmd('L', force=True) # Spin Left
+            time.sleep(0.1) # Short nudge
+            OBSTACLE_DETECTED = True
+
+        if OBSTACLE_DETECTED:
+             # Skip tag processing for this frame to allow obstacle avoidance to finish
+             continue
 
         if target_found:
             last_known_x = target_x
@@ -188,6 +265,13 @@ try:
                 
             # 2. X is aligned, check distance (Z axis)
             else:
+                # If we're getting close to target, use ultrasonic distance!
+                # Note: target_z is in meters, ARRIVED_DIST is in cm
+                if target_z < 0.6 and latest_C < ARRIVED_DIST:
+                    send_cmd('S', force=True)
+                    print(f"-> MISSION ACCOMPLISHED! ARRIVED at Target (Ultrasonic Front: {latest_C}cm, X: {target_x:.2f}m)")
+                    break # Exit the main loop to permanently stop the robot
+
                 if target_z > TARGET_Z_DIST + Z_DIST_TOL:
                     # Too far away, move forward
                     send_cmd('3') # High speed for forward motion!
