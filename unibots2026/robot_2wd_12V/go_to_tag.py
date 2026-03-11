@@ -14,7 +14,7 @@ except ImportError:
 
 # --- CONFIGURATION ---
 TARGET_TAG_ID = 0          # The ID of the AprilTag to search for
-TARGET_Z_DIST = 0.20       # Target distance to stop at (in meters)
+TARGET_Z_DIST = 0.25       # Target distance to stop at (in meters)
 X_OFFSET_TOL = 0.08        # Acceptable horizontal offset from center (meters)
 Z_DIST_TOL = 0.05          # Acceptable distance tolerance (meters)
 FRAME_SKIP = 3  # Only run detection every Nth frame
@@ -22,6 +22,7 @@ FRAME_SKIP = 3  # Only run detection every Nth frame
 STOP_DIST = 35             # Front ultrasonic sensor stop distance (cm)
 SIDE_DIST = 30             # Side ultrasonic sensor push away distance (cm)
 ARRIVED_DIST = 20          # Distance at which ultrasonic confirms tag is close enough to stop (cm)
+SENSOR_SMOOTHING_COUNT = 3 # Number of sensor readings to average to prevent false positives
 
 SERIAL_PORT = '/dev/ttyACM0'  
 WIDTH = 640 
@@ -34,6 +35,11 @@ SCALE = 3.0      # Scale factor from previous calibration
 latest_L = 999
 latest_C = 999
 latest_R = 999
+
+history_L = []
+history_C = []
+history_R = []
+
 running = True
 
 # --- SERIAL SETUP ---
@@ -93,16 +99,35 @@ def camera_capture_thread():
 
 # --- BACKGROUND THREAD (Sensor Listener) ---
 def update_sensors():
-    global latest_L, latest_C, latest_R
+    global latest_L, latest_C, latest_R, history_L, history_C, history_R
     while running:
         if ser and ser.in_waiting > 0:
             try:
                 line = ser.readline().decode('utf-8').rstrip()
                 if line.startswith("D,"):
                     parts = line.split(",")
-                    latest_L = int(parts[1])
-                    latest_C = int(parts[2])
-                    latest_R = int(parts[3])
+                    
+                    # Read new raw values
+                    new_L = int(parts[1])
+                    new_C = int(parts[2])
+                    new_R = int(parts[3])
+                    
+                    # Update histories
+                    history_L.append(new_L)
+                    history_C.append(new_C)
+                    history_R.append(new_R)
+                    
+                    # Keep only the last N readings
+                    if len(history_L) > SENSOR_SMOOTHING_COUNT:
+                        history_L.pop(0)
+                        history_C.pop(0)
+                        history_R.pop(0)
+                        
+                    # Calculate averages
+                    if len(history_L) > 0:
+                        latest_L = sum(history_L) / len(history_L)
+                        latest_C = sum(history_C) / len(history_C)
+                        latest_R = sum(history_R) / len(history_R)
             except:
                 pass
         time.sleep(0.01)
@@ -177,9 +202,11 @@ try:
             if latest_L > latest_R:
                 print("Turning LEFT (Left side has more space)")
                 send_cmd('L', force=True) 
+                last_known_x = 1.0  # Robot turned left, so target is now to our right
             else:
                 print("Turning RIGHT (Right side has more space)")
                 send_cmd('R', force=True)
+                last_known_x = -1.0 # Robot turned right, so target is now to our left
                 
             time.sleep(0.5) # Spin for 0.5 seconds
             send_cmd('S', force=True) # Stop spinning
@@ -193,6 +220,7 @@ try:
             print("Too close to LEFT -> Nudging Right")
             send_cmd('1', force=True) 
             send_cmd('R', force=True) # Spin Right
+            last_known_x = -1.0 # Turned right, target is to the left
             time.sleep(0.1) # Short nudge
             OBSTACLE_DETECTED = True
             
@@ -200,6 +228,7 @@ try:
             print("Too close to RIGHT -> Nudging Left")
             send_cmd('1', force=True) 
             send_cmd('L', force=True) # Spin Left
+            last_known_x = 1.0 # Turned left, target is to the right
             time.sleep(0.1) # Short nudge
             OBSTACLE_DETECTED = True
 
