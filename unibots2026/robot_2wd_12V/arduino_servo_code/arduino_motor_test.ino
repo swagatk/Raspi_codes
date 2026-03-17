@@ -38,8 +38,8 @@ unsigned long lastCommandTime = 0; // Safety timeout
 // Track current servo positions for smooth movement
 int currentShoulderL = 180;  // DOWN position for Left
 int currentShoulderR = 0;    // DOWN position for Right
-int currentElbowL = 60;      // UP position for Elbow Left
-int currentElbowR = 120;     // UP position for Elbow Right
+int currentElbowL = 90;      // UP position for Elbow Left
+int currentElbowR = 90;     // UP position for Elbow Right
 const int SERVO_DELAY = 15;  // ms between steps (higher = slower)
 
 void setup() {
@@ -212,24 +212,24 @@ void loop() {
       moveShoulderSmooth(180, 0);  // Left: 60->180, Right: 120->0
     }
     else if (command == 'E') {  // Elbow UP - smooth movement
-      moveElbowSmooth(60, 120);  // Left: 0->60, Right: 180->120
+      moveElbowSmooth(90, 90);  // Left: 0->90, Right: 180->90
     }
     else if (command == 'e') {  // Elbow DOWN - smooth movement
-      moveElbowSmooth(0, 180);  // Left: 60->0, Right: 120->180
+      moveElbowSmooth(0, 180);  // Left: 90->0, Right: 90->180
     }
-    else if (command == 'A') {  // ARM UP: Shoulder UP + Elbow DOWN (palm stays horizontal)
+    else if (command == 'A') {  // ARM UP: Shoulder UP + Elbow DOWN (horizontal to ground)
       moveArmSmooth(60, 120, 0, 180);  // Shoulder up, Elbow down
     }
     else if (command == 'a') {  // ARM DOWN: Shoulder DOWN + Elbow UP (return to start)
-      moveArmSmooth(180, 0, 60, 120);  // Shoulder down, Elbow up
+      moveArmSmooth(180, 0, 90, 90);  // Shoulder down, Elbow up
     }
     else if (command == 'O') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
-      wrist.write(10);
+      wrist.write(90);
     }    // Gate OPEN
     else if (command == 'C') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
-      wrist.write(90);
+      wrist.write(180);
     }    // Gate CLOSED
     
     // Interpret Individual Servo Angle Commands: 'v' <servoIndex> <angle>
