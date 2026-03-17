@@ -13,10 +13,12 @@ except ImportError:
     sys.exit()
 
 # --- CONFIGURATION ---
-TARGET_TAG_ID = 0          # The ID of the AprilTag to search for
-TARGET_Z_DIST = 0.25       # Target distance to stop at (in meters)
+TARGET_TAG_ID = 21          # The ID of the AprilTag to search for
+TARGET_Z_DIST = 0.10       # Target distance to stop at (in meters)
 X_OFFSET_TOL = 0.08        # Acceptable horizontal offset from center (meters)
 Z_DIST_TOL = 0.05          # Acceptable distance tolerance (meters)
+YAW_TOL = 15.0             # Acceptable yaw angle tolerance (degrees)
+ALIGN_DISTANCE = 0.3       # Distance (in meters) under which yaw alignment occurs
 FRAME_SKIP = 3  # Only run detection every Nth frame
 
 STOP_DIST = 35             # Front ultrasonic sensor stop distance (cm)
@@ -176,6 +178,7 @@ try:
         target_found = False
         target_z = 0.0
         target_x = 0.0
+        target_yaw = 0.0
 
         for tag in tags:
             if tag.tag_id == TARGET_TAG_ID:
@@ -185,6 +188,14 @@ try:
                 # Coordinate frame mapping based on your previous config
                 target_x = tag.pose_t[0][0]  # Left/Right offset
                 target_z = tag.pose_t[2][0] / SCALE # Forward distance
+                
+                # Extract yaw angle from the rotation matrix
+                # Assuming standard camera coordinates, the rotation around the Y axis gives the orientation relative to the tag
+                R = tag.pose_R
+                pitch = np.arctan2(R[2][1], R[2][2])
+                yaw = np.arctan2(-R[2][0], np.sqrt(R[2][1]**2 + R[2][2]**2))
+                roll = np.arctan2(R[1][0], R[0][0])
+                target_yaw = np.degrees(yaw)
                 break
 
         # --- SENSOR OVERRIDE / OBSTACLE AVOIDANCE ---
@@ -248,13 +259,13 @@ try:
 
             # Fast Forward override! If the tag is far away and somewhat centralized, just charge!
             # It will naturally auto-correct its drifting rotation *while* driving forward later.
-            if target_z > 1.0 and abs(target_x) < (target_z * 0.35): # Up to 20 degree error allowed for charging
-                print(f"Tag {TARGET_TAG_ID} found FAR! Skipping alignment, charging FORWARD (Z: {target_z:.2f}m, X: {target_x:.2f}m)")
+            if target_z > ALIGN_DISTANCE and abs(target_x) < (target_z * 0.35): # Up to 20 degree error allowed for charging
+                print(f"Tag {TARGET_TAG_ID} found FAR! Skipping alignment, charging FORWARD (Z: {target_z:.2f}m, X: {target_x:.2f}m, Yaw: {target_yaw:.1f}deg)")
                 send_cmd('3') 
                 send_cmd('F')
                 continue # Skip the rest of the alignment checks for this frame
 
-            print(f"Tag {TARGET_TAG_ID} spotted! Z: {target_z:.2f}m, X: {target_x:.2f}m")
+            print(f"Tag {TARGET_TAG_ID} spotted! Z: {target_z:.2f}m, X: {target_x:.2f}m, Yaw: {target_yaw:.1f}deg")
 
             # 1. First prioritize rotational alignment (X axis)
             if target_x > current_x_tol:
@@ -292,13 +303,56 @@ try:
                 # Force immediate check of next frame
                 frame_skip_counter = FRAME_SKIP
                 
-            # 2. X is aligned, check distance (Z axis)
+            # 2. X is aligned, check Yaw (Orientation) BUT ONLY if we are somewhat close. 
+            # If we're far away, we don't care about yaw alignment, just walk forward.
+            elif target_yaw > YAW_TOL and target_z < ALIGN_DISTANCE:
+                if current_cmd != b'S':
+                    send_cmd('S', force=True)
+                    time.sleep(0.1)
+                
+                # Tag is rotated, we need to adjust our physical position laterally.
+                # To shift position right without moving forward: Turn Left, Backup, Turn Right
+                print(f"-> Orbiting RIGHT to fix yaw (Yaw: {target_yaw:.1f} > {YAW_TOL:.1f})")
+                send_cmd('1', force=True)
+                send_cmd('L', force=True)
+                time.sleep(0.15)
+                send_cmd('B', force=True)
+                time.sleep(0.25)
+                send_cmd('R', force=True)
+                time.sleep(0.15)
+                send_cmd('S', force=True)
+                
+                time.sleep(0.1)
+                
+                frame_skip_counter = FRAME_SKIP
+
+            elif target_yaw < -YAW_TOL and target_z < ALIGN_DISTANCE:
+                if current_cmd != b'S':
+                    send_cmd('S', force=True)
+                    time.sleep(0.1)
+                
+                # To shift position left without moving forward: Turn Right, Backup, Turn Left
+                print(f"-> Orbiting LEFT to fix yaw (Yaw: {target_yaw:.1f} < {-YAW_TOL:.1f})")
+                send_cmd('1', force=True)
+                send_cmd('R', force=True)
+                time.sleep(0.15)
+                send_cmd('B', force=True)
+                time.sleep(0.25)
+                send_cmd('L', force=True)
+                time.sleep(0.15)
+                send_cmd('S', force=True)
+                
+                time.sleep(0.1)
+                
+                frame_skip_counter = FRAME_SKIP
+
+            # 3. X and Yaw are aligned, check distance (Z axis)
             else:
                 # If we're getting close to target, use ultrasonic distance!
                 # Note: target_z is in meters, ARRIVED_DIST is in cm
                 if target_z < 0.6 and latest_C < ARRIVED_DIST:
                     send_cmd('S', force=True)
-                    print(f"-> MISSION ACCOMPLISHED! ARRIVED at Target (Ultrasonic Front: {latest_C}cm, X: {target_x:.2f}m)")
+                    print(f"-> MISSION ACCOMPLISHED! ARRIVED at Target (Ultrasonic Front: {latest_C}cm, X: {target_x:.2f}m, Yaw: {target_yaw:.1f}deg)")
                     break # Exit the main loop to permanently stop the robot
 
                 if target_z > TARGET_Z_DIST + Z_DIST_TOL:
@@ -312,9 +366,9 @@ try:
                     send_cmd('B')
                     print("-> Moving BACKWARD")
                 else:
-                    # Within tolerance for both X and Z
+                    # Within tolerance for both X and Z and Yaw
                     send_cmd('S')
-                    print(f"-> MISSION ACCOMPLISHED! ARRIVED at Target (Z: {target_z:.2f}m, X: {target_x:.2f}m)")
+                    print(f"-> MISSION ACCOMPLISHED! ARRIVED at Target (Z: {target_z:.2f}m, X: {target_x:.2f}m, Yaw: {target_yaw:.1f}deg)")
                     break # Exit the main loop to permanently stop the robot
                     
         else:
