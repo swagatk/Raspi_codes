@@ -193,8 +193,8 @@ void loop() {
     lastCommandTime = millis(); // Reset safety timer
     
     // Interpret Drive Command
-    if (command == 'F') setMotors(int(left_scale * motorSpeed), -int(right_scale * motorSpeed));      
-    else if (command == 'B') setMotors(-int(left_scale * motorSpeed), int(right_scale * motorSpeed)); 
+    if (command == 'F') setMotors(-int(left_scale * motorSpeed), int(right_scale * motorSpeed));      
+    else if (command == 'B') setMotors(int(left_scale * motorSpeed), -int(right_scale * motorSpeed)); 
     else if (command == 'L') setMotors(int(left_scale * motorSpeed), int(right_scale * motorSpeed));  
     else if (command == 'R') setMotors(-int(left_scale * motorSpeed), -int(right_scale * motorSpeed));
     else if (command == 'S') stopMotors();                        

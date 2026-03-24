@@ -17,6 +17,7 @@
             "includePath": [
                 "/home/pi/.arduino15/packages/arduino/hardware/avr/1.8.3/cores/arduino",
                 "/home/pi/.arduino15/packages/arduino/hardware/avr/1.8.3/variants/standard",
+                "/home/pi/Arduino/libraries/Servo/src",
                 "/usr/lib/gcc/avr/5.4.0/include",
                 "/usr/lib/gcc/avr/5.4.0/include-fixed",
                 "/usr/lib/avr/include"
