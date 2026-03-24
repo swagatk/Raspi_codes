@@ -14,9 +14,9 @@ except ImportError:
     exit(1)
 # --- CONFIGURATION ---
 # Replace with the 4 numbers from your calibration script!
-CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
+CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
-SCALE = 3.0
+SCALE = 2.0
 
 # --- SETUP HARDWARE ---
 # Initialize Picamera2

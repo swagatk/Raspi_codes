@@ -20,6 +20,7 @@ objp = np.zeros((CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
 objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 objp *= SQUARE_SIZE
 
+
 objpoints = [] # 3d point in real world space
 imgpoints  = [] # 2d points in image plane.
 images = glob.glob(image_folder)

@@ -43,7 +43,7 @@ ARENA_MAP = {
     16: {"x": xmax - (gap1+gap2*3+gap3), "y": ymax, "wall_base_angle": 180},
     17: {"x": xmax - (gap1+gap2*4+gap3), "y": ymax, "wall_base_angle": 180},
     
-    # Top Wall (X = xmax) - Staring at it means facing North (90 deg)
+    # Top Wall (X = xmax) - Staring at it means facing South (90 deg)
     6: {"x": xmax, "y": gap1, "wall_base_angle": 90},
     7: {"x": xmax, "y": gap1+gap2, "wall_base_angle": 90},
     8: {"x": xmax, "y": gap1+gap2*2, "wall_base_angle": 90},
@@ -59,7 +59,7 @@ ARENA_MAP = {
     4: {"x": gap1+gap2*3+gap3, "y": 0.0, "wall_base_angle": 0},
     5: {"x": gap1+gap2*4+gap3, "y": 0.0, "wall_base_angle": 0},
     
-    # Bottom Wall (X = 0) - Staring at it means facing South (270 deg)
+    # Bottom Wall (X = 0) - Staring at it means facing North (270 deg)
     18: {"x": 0, "y": ymax - gap1, "wall_base_angle": 270},
     19: {"x": 0, "y": ymax - (gap1+gap2), "wall_base_angle": 270},
     20: {"x": 0, "y": ymax - (gap1+gap2*2), "wall_base_angle": 270},
