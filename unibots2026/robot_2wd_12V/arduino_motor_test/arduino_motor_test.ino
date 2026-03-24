@@ -271,7 +271,7 @@ void loop() {
 
   // 3. READ SENSORS & SEND TO PI (Every 100ms)
   // DISABLED FOR SERVO TESTING - uncomment when using with full robot control
-  /*
+  
   static unsigned long lastSensorTime = 0;
   if (millis() - lastSensorTime > 100) {
     lastSensorTime = millis();
@@ -285,5 +285,4 @@ void loop() {
     Serial.print(d2); Serial.print(",");
     Serial.println(d3);
   }
-  */
 }

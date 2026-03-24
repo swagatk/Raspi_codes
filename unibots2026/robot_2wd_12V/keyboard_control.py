@@ -90,10 +90,16 @@ try:
                 cmd = current_cmd
                 
             if cmd != current_cmd:
+                # Debug line to prove Python is reading the key
+                sys.stdout.write(f"\n[KEY PRESSED] Sending: {cmd.decode('utf-8')}\n")
+                sys.stdout.flush()
+                
                 ser.write(cmd)
                 current_cmd = cmd
         else:
               if current_cmd in [b'F', b'B', b'L', b'R']:
+                sys.stdout.write("\n[TIMEOUT OR NO KEY] Sending: S\n")
+                sys.stdout.flush()
                 ser.write(b'S')
                 current_cmd = b'S'
 
