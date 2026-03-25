@@ -18,6 +18,10 @@ TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
 SCALE = 2.0     # Scale factor for Picamera distance calibration
 FRAME_SKIP = 3  # Only run detection every Nth frame
 
+# --- HOME TAGS (Goal Location) ---
+# Specify two adjacent home tags - robot will navigate to the midpoint
+HOME_TAGS = [9, 10]  # Tags on the North wall
+
 # --- ABSOLUTE MAP (The "GPS" Coordinates) ---
 gap1 = 0.15
 gap2 = 0.3
@@ -25,7 +29,7 @@ gap3 = 0.5
 xmax = 2.0 
 ymax = 2.0
 ARENA_MAP = {
-    # Right Wall (Y = ymax) - Staring at it means facing West (180 deg)
+    # Top Wall (Y = ymax) - Staring at it means facing West (180 deg)
     12: {"x": xmax - gap1, "y": ymax, "wall_base_angle": 180},
     13: {"x": xmax - (gap1+gap2), "y": ymax, "wall_base_angle": 180},
     14: {"x": xmax - (gap1+gap2*2), "y": ymax, "wall_base_angle": 180},
@@ -33,7 +37,7 @@ ARENA_MAP = {
     16: {"x": xmax - (gap1+gap2*3+gap3), "y": ymax, "wall_base_angle": 180},
     17: {"x": xmax - (gap1+gap2*4+gap3), "y": ymax, "wall_base_angle": 180},
     
-    # Top Wall (X = xmax) - Staring at it means facing South (90 deg)
+    # Right Wall (X = xmax) - Staring at it means facing North (90 deg)
     6: {"x": xmax, "y": gap1, "wall_base_angle": 90},
     7: {"x": xmax, "y": gap1+gap2, "wall_base_angle": 90},
     8: {"x": xmax, "y": gap1+gap2*2, "wall_base_angle": 90},
@@ -41,7 +45,7 @@ ARENA_MAP = {
     10: {"x": xmax, "y": gap1+gap2*3+gap3, "wall_base_angle": 90},
     11: {"x": xmax, "y": gap1+gap2*4+gap3, "wall_base_angle": 90},
     
-    # Left Wall (Y = 0.0) - Staring at it means facing East (0 deg)
+    # Bottom Wall (Y = 0.0) - Staring at it means facing East (0 deg)
     0: {"x": gap1, "y": 0.0, "wall_base_angle": 0},
     1: {"x": gap1+gap2, "y": 0.0, "wall_base_angle": 0},
     2: {"x": gap1+gap2*2, "y": 0.0, "wall_base_angle": 0},
@@ -49,7 +53,7 @@ ARENA_MAP = {
     4: {"x": gap1+gap2*3+gap3, "y": 0.0, "wall_base_angle": 0},
     5: {"x": gap1+gap2*4+gap3, "y": 0.0, "wall_base_angle": 0},
     
-    # Bottom Wall (X = 0) - Staring at it means facing North (270 deg)
+    # Left Wall (X = 0) - Staring at it means facing South (270) deg)
     18: {"x": 0, "y": ymax - gap1, "wall_base_angle": 270},
     19: {"x": 0, "y": ymax - (gap1+gap2), "wall_base_angle": 270},
     20: {"x": 0, "y": ymax - (gap1+gap2*2), "wall_base_angle": 270},
@@ -57,6 +61,33 @@ ARENA_MAP = {
     22: {"x": 0, "y": ymax - (gap1+gap2*3+gap3), "wall_base_angle": 270},
     23: {"x": 0, "y": ymax - (gap1+gap2*4+gap3), "wall_base_angle": 270}
 }
+
+
+def get_home_position():
+    home_points = [ARENA_MAP[tag_id] for tag_id in HOME_TAGS if tag_id in ARENA_MAP]
+    if not home_points:
+        return 0.0, 0.0
+    home_x = sum(point["x"] for point in home_points) / len(home_points)
+    home_y = sum(point["y"] for point in home_points) / len(home_points)
+    return home_x, home_y
+
+
+def get_wall_axes(tag_id):
+    if 0 <= tag_id <= 5:
+        return (1.0, 0.0), (0.0, 1.0)
+    if 6 <= tag_id <= 11:
+        return (0.0, 1.0), (-1.0, 0.0)
+    if 12 <= tag_id <= 17:
+        return (-1.0, 0.0), (0.0, -1.0)
+    return (0.0, -1.0), (1.0, 0.0)
+
+
+def normalize_rotation(angle_degrees):
+    return (angle_degrees + 180.0) % 360.0 - 180.0
+
+
+def heading_from_vector(vec_x, vec_y):
+    return math.degrees(math.atan2(vec_y, vec_x)) % 360.0
 
 running = True
 
@@ -133,37 +164,67 @@ def video_display_thread():
             ax.set_title("Robot Pose Estimation")
             ax.grid(True)
             
-            # Plot Tags
+            # Add Wall Labels
+            ax.text(1.0, -0.15, "East", ha='center', va='center', weight='bold', color='darkblue')
+            ax.text(-0.15, 1.0, "South", ha='center', va='center', rotation=90, weight='bold', color='darkblue')
+            ax.text(2.15, 1.0, "North", ha='center', va='center', rotation=-90, weight='bold', color='darkblue')
+            ax.text(1.0, 2.15, "West", ha='center', va='center', weight='bold', color='darkblue')
+            
+            # Plot Tags and Home location
+            home_x, home_y = get_home_position()
             for tid, tinfo in ARENA_MAP.items():
                 tx = tinfo["x"]
                 ty = tinfo["y"]
-                c = 'black'
-                
-                label = 'Arena Tag' if tid == 0 else ""
-                
-                if label:
-                    ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None', label=label)
+                if tid in HOME_TAGS:
+                    c = 'green'
+                    ax.plot(tx, ty, marker='s', color=c, markersize=10, linestyle='None')
                 else:
+                    c = 'black'
                     ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None')
                     
                 ax.text(tx, ty, f' {tid}', color=c, fontsize=9, verticalalignment='bottom')
+            
+            # Mark home location
+            ax.plot(home_x, home_y, marker='*', color='green', markersize=15, linestyle='None', label='Home')
                 
             if is_localized:
                 ax.plot(robot_x, robot_y, marker='o', color='red', markersize=12, linestyle='None', label='Robot')
                 
+                # Current heading arrow (red)
                 rad = math.radians(robot_heading)
-                dx_head = 0.2 * math.sin(rad)
-                dy_head = -0.2 * math.cos(rad)
+                # 0°=North(+X), 90°=West(+Y), 180°=South(-X), 270°=East(-Y)
+                dx_head = 0.2 * math.cos(rad)
+                dy_head = 0.2 * math.sin(rad)
                 ax.arrow(robot_x, robot_y, dx_head, dy_head, 
                          head_width=0.04, head_length=0.06, fc='red', ec='red')
+                
+                # Calculate desired heading to home (blue arrow)
+                desired_heading = heading_from_vector(home_x - robot_x, home_y - robot_y)
+                
+                rad_desired = math.radians(desired_heading)
+                dx_desired = 0.25 * math.cos(rad_desired)
+                dy_desired = 0.25 * math.sin(rad_desired)
+                ax.arrow(robot_x, robot_y, dx_desired, dy_desired, 
+                         head_width=0.04, head_length=0.06, fc='blue', ec='blue', alpha=0.7)
+                
+                # Calculate rotation needed (positive=CCW, negative=CW)
+                rotation_needed = normalize_rotation(desired_heading - robot_heading)
+                
+                # Distance to home
+                distance_to_home = math.sqrt((home_x - robot_x)**2 + (home_y - robot_y)**2)
                 
                 info_text = (f"=== TELEMETRY ===\n\n"
                              f"Pos X: {robot_x:.2f} m\n"
                              f"Pos Y: {robot_y:.2f} m\n"
-                             f"Heading: {robot_heading:.1f}*\n")
+                             f"Heading: {robot_heading:.1f}*\n\n"
+                             f"=== NAVIGATION ===\n\n"
+                             f"Home: ({home_x:.2f},{home_y:.2f})\n"
+                             f"Desired: {desired_heading:.1f}*\n"
+                             f"Rotate: {rotation_needed:+.1f}*\n"
+                             f"Distance: {distance_to_home:.2f}m\n")
                 
                 fig.text(0.75, 0.5, info_text, transform=fig.transFigure,
-                         fontsize=12, ha='left', va='center', family='monospace',
+                         fontsize=11, ha='left', va='center', family='monospace',
                          bbox=dict(facecolor='white', alpha=0.9, edgecolor='black', boxstyle='round,pad=1'))
             else:
                info_text = "Status: LOST\nNo Tags Visible"
@@ -210,7 +271,8 @@ try:
         gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         tags = detector.detect(gray, estimate_tag_pose=True, camera_params=CAMERA_PARAMS, tag_size=TAG_SIZE)
         
-        rx_list, ry_list, h_list = [], [], []
+        pose_estimates = []
+        mapped_tag_observations = []
         detected_tag_ids = []
         
         if tags:
@@ -233,65 +295,55 @@ try:
 
             if tag.tag_id in ARENA_MAP:
                 tag_info = ARENA_MAP[tag.tag_id]
-                
                 R = tag.pose_R
-                t = tag.pose_t
-                
-                R_T = np.transpose(R)
-                cam_pos_tag = -np.dot(R_T, t)
-                
-                local_x = cam_pos_tag[0][0] / SCALE     
-                local_z = cam_pos_tag[2][0] / SCALE      
-                
-                wall_angle = tag_info["wall_base_angle"]
-                
-                if wall_angle == 0:     
-                    rx = tag_info["x"] - local_x
-                    ry = tag_info["y"] + local_z
-                elif wall_angle == 90:  
-                    rx = tag_info["x"] + local_z
-                    ry = tag_info["y"] + local_x
-                elif wall_angle == 180: 
-                    rx = tag_info["x"] + local_x
-                    ry = tag_info["y"] - local_z
-                elif wall_angle == 270: 
-                    rx = tag_info["x"] - local_z
-                    ry = tag_info["y"] - local_x
-                else: 
-                    rad = math.radians(wall_angle)
-                    rx = tag_info["x"] + local_z * math.sin(rad) - local_x * math.cos(rad)
-                    ry = tag_info["y"] + local_z * math.cos(rad) + local_x * math.sin(rad)
-                
-                rad2 = math.radians(wall_angle)
-                tag_x_vec = (math.cos(rad2), -math.sin(rad2))
-                tag_z_vec = (-math.sin(rad2), math.cos(rad2))
+                tangent_vec, inward_normal_vec = get_wall_axes(tag.tag_id)
 
-                cam_forward_tag_x = R[2][0]
-                cam_forward_tag_z = R[2][2]
-                
-                global_cam_vec_x = cam_forward_tag_x * tag_x_vec[0] + cam_forward_tag_z * tag_z_vec[0]
-                global_cam_vec_y = cam_forward_tag_x * tag_x_vec[1] + cam_forward_tag_z * tag_z_vec[1]
-                
-                h = math.degrees(math.atan2(global_cam_vec_x, -global_cam_vec_y))
-                
-                rx_list.append(rx)
-                ry_list.append(ry)
-                h_list.append(h)
+                cam_pos_in_tag = -np.dot(R.T, tag.pose_t)
+                local_tangent = -cam_pos_in_tag[0][0] / SCALE
+                local_inward = -cam_pos_in_tag[2][0] / SCALE
+
+                rx = tag_info["x"] + local_tangent * tangent_vec[0] + local_inward * inward_normal_vec[0]
+                ry = tag_info["y"] + local_tangent * tangent_vec[1] + local_inward * inward_normal_vec[1]
+
+                weight = 1.0 / max(z_dist, 0.05)
+                pose_estimates.append((rx, ry, weight))
+                mapped_tag_observations.append((tag.tag_id, weight))
+
+                print(
+                    f"    Tag {tag.tag_id}: local_t={local_tangent:.2f}, "
+                    f"local_n={local_inward:.2f}, pos=({rx:.2f},{ry:.2f})"
+                )
 
         if show_vision:
             display_frame = draw_frame
 
         is_localized = False
         
-        if rx_list:
+        if pose_estimates:
             is_localized = True
-            robot_x = sum(rx_list) / len(rx_list)
-            robot_y = sum(ry_list) / len(ry_list)
+            total_weight = sum(weight for _, _, weight in pose_estimates)
+            robot_x = sum(rx * weight for rx, _, weight in pose_estimates) / total_weight
+            robot_y = sum(ry * weight for _, ry, weight in pose_estimates) / total_weight
             
-            sum_sin = sum(math.sin(math.radians(angle)) for angle in h_list)
-            sum_cos = sum(math.cos(math.radians(angle)) for angle in h_list)
-            r_head = math.degrees(math.atan2(sum_sin, sum_cos))
-            robot_heading = (r_head + 180) % 360 - 180
+            # Ensure position is within arena bounds (always positive)
+            robot_x = max(0.0, min(robot_x, 2.0))
+            robot_y = max(0.0, min(robot_y, 2.0))
+
+            heading_vec_x = 0.0
+            heading_vec_y = 0.0
+            for tag_id, weight in mapped_tag_observations:
+                tag_info = ARENA_MAP[tag_id]
+                vec_x = tag_info["x"] - robot_x
+                vec_y = tag_info["y"] - robot_y
+                vec_norm = math.hypot(vec_x, vec_y)
+                if vec_norm > 1e-6:
+                    heading_vec_x += (vec_x / vec_norm) * weight
+                    heading_vec_y += (vec_y / vec_norm) * weight
+
+            if abs(heading_vec_x) > 1e-6 or abs(heading_vec_y) > 1e-6:
+                robot_heading = heading_from_vector(heading_vec_x, heading_vec_y)
+            else:
+                robot_heading = 0.0
             
             print(f"Current Position -> X:{robot_x:.2f}m, Y:{robot_y:.2f}m, Pose:{robot_heading:.1f}deg")
         else:
