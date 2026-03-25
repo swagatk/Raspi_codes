@@ -15,7 +15,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 
 # --- CONFIGURATION ---
-CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
+CAMERA_PARAMS =  (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
 SCALE = 2.0     # Scale factor for Picamera distance calibration
 
@@ -69,23 +69,87 @@ ARENA_MAP = {
 }
 
 # --- HOME SETTINGS ---
-# Define Home between two Tag IDs
-HOME_TAG_1 = 15
-HOME_TAG_2 = 16
+HOME_TAGS = [14, 15]
+FINAL_ALIGN_DISTANCE_M = 0.5
+FINAL_STOP_DISTANCE_CM = 30
+HEADING_TOL_DEG = 12.0
+FINAL_HEADING_TOL_DEG = 8.0
+HOME_X_TOL_M = 0.08
 
-tag1_info = ARENA_MAP[HOME_TAG_1]
-tag2_info = ARENA_MAP[HOME_TAG_2]
 
-# Calculate midpoint between the two tags
-mid_x = (tag1_info["x"] + tag2_info["x"]) / 2.0
-mid_y = (tag1_info["y"] + tag2_info["y"]) / 2.0
+def get_wall_axes(tag_id):
+    if 0 <= tag_id <= 5:
+        return (1.0, 0.0), (0.0, 1.0)
+    if 6 <= tag_id <= 11:
+        return (0.0, 1.0), (-1.0, 0.0)
+    if 12 <= tag_id <= 17:
+        return (-1.0, 0.0), (0.0, -1.0)
+    return (0.0, -1.0), (1.0, 0.0)
 
-# Calculate 0.1m offset directly away from the wall
-# wall_base_angle points into the wall, so we subtract the components to move away from it
-wall_angle_rad = math.radians(tag1_info["wall_base_angle"])
-# Use the correct trig for our 0=East (-Y), 90=North (+X) mapping
-HOME_X = mid_x - 0.1 * math.sin(wall_angle_rad)
-HOME_Y = mid_y - 0.1 * (-math.cos(wall_angle_rad))
+
+def heading_from_vector(vec_x, vec_y):
+    return math.degrees(math.atan2(vec_y, vec_x)) % 360.0
+
+
+def normalize_rotation(angle_degrees):
+    return (angle_degrees + 180.0) % 360.0 - 180.0
+
+
+def get_home_target():
+    home_points = [ARENA_MAP[tag_id] for tag_id in HOME_TAGS if tag_id in ARENA_MAP]
+    mid_x = sum(point["x"] for point in home_points) / len(home_points)
+    mid_y = sum(point["y"] for point in home_points) / len(home_points)
+    _, inward_normal = get_wall_axes(HOME_TAGS[0])
+    approach_heading = heading_from_vector(-inward_normal[0], -inward_normal[1])
+    return mid_x, mid_y, approach_heading
+
+
+def estimate_robot_pose(tags):
+    pose_estimates = []
+    mapped_tag_observations = []
+
+    for tag in tags:
+        if tag.tag_id not in ARENA_MAP:
+            continue
+
+        tag_info = ARENA_MAP[tag.tag_id]
+        tangent_vec, inward_normal_vec = get_wall_axes(tag.tag_id)
+        cam_pos_in_tag = -np.dot(tag.pose_R.T, tag.pose_t)
+        local_tangent = -cam_pos_in_tag[0][0] / SCALE
+        local_inward = -cam_pos_in_tag[2][0] / SCALE
+
+        rx = tag_info["x"] + local_tangent * tangent_vec[0] + local_inward * inward_normal_vec[0]
+        ry = tag_info["y"] + local_tangent * tangent_vec[1] + local_inward * inward_normal_vec[1]
+        weight = 1.0 / max(tag.pose_t[2][0] / SCALE, 0.05)
+
+        pose_estimates.append((tag.tag_id, rx, ry, local_tangent, local_inward, weight))
+        mapped_tag_observations.append((tag.tag_id, weight))
+
+    if not pose_estimates:
+        return None
+
+    total_weight = sum(weight for _, _, _, _, _, weight in pose_estimates)
+    robot_x = sum(rx * weight for _, rx, _, _, _, weight in pose_estimates) / total_weight
+    robot_y = sum(ry * weight for _, _, ry, _, _, weight in pose_estimates) / total_weight
+    robot_x = max(0.0, min(robot_x, xmax))
+    robot_y = max(0.0, min(robot_y, ymax))
+
+    heading_vec_x = 0.0
+    heading_vec_y = 0.0
+    for tag_id, weight in mapped_tag_observations:
+        tag_info = ARENA_MAP[tag_id]
+        vec_x = tag_info["x"] - robot_x
+        vec_y = tag_info["y"] - robot_y
+        vec_norm = math.hypot(vec_x, vec_y)
+        if vec_norm > 1e-6:
+            heading_vec_x += (vec_x / vec_norm) * weight
+            heading_vec_y += (vec_y / vec_norm) * weight
+
+    robot_heading = heading_from_vector(heading_vec_x, heading_vec_y) if abs(heading_vec_x) > 1e-6 or abs(heading_vec_y) > 1e-6 else 0.0
+    return robot_x, robot_y, robot_heading, pose_estimates
+
+
+HOME_X, HOME_Y, HOME_APPROACH_HEADING = get_home_target()
 
 # --- GLOBAL VARIABLES FOR SENSORS ---
 latest_L = 999
@@ -237,11 +301,11 @@ def video_display_thread():
             for tid, tinfo in ARENA_MAP.items():
                 tx = tinfo["x"]
                 ty = tinfo["y"]
-                is_home = (tid in [HOME_TAG_1, HOME_TAG_2])
+                is_home = (tid in HOME_TAGS)
                 c = 'blue' if is_home else 'black'
                 
                 # Only add labels for the legend once
-                label = 'Home Tag' if (is_home and tid == HOME_TAG_1) else ('Arena Tag' if (not is_home and tid == 0) else "")
+                label = 'Home Tag' if (is_home and tid == HOME_TAGS[0]) else ('Arena Tag' if (not is_home and tid == 0) else "")
                 
                 if label:
                     ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None', label=label)
@@ -257,18 +321,18 @@ def video_display_thread():
                 # Robot Position (Filled Red Circle)
                 ax.plot(robot_x, robot_y, marker='o', color='red', markersize=12, linestyle='None', label='Robot')
                 
-                # Robot Orientation Arrow (heading in degrees: +X is North, -Y is East)
+                # Robot orientation arrow using the same 0deg=+X convention as localization
                 rad = math.radians(robot_heading)
-                dx_head = 0.2 * math.sin(rad)
-                dy_head = -0.2 * math.cos(rad)
+                dx_head = 0.2 * math.cos(rad)
+                dy_head = 0.2 * math.sin(rad)
                 ax.arrow(robot_x, robot_y, dx_head, dy_head, 
                          head_width=0.04, head_length=0.06, fc='red', ec='red')
                 
                 # Distance and Required Angle Arrow (Target vector)
                 dx_t = HOME_X - robot_x
                 dy_t = HOME_Y - robot_y
-                t_angle_raw = math.degrees(math.atan2(dx_t, -dy_t))
-                t_angle = (t_angle_raw + 180) % 360 - 180
+                t_angle = heading_from_vector(dx_t, dy_t)
+                turn_angle = normalize_rotation(t_angle - robot_heading)
                 
                 # Draw dashed arrow pointing precisely toward the destination
                 ax.arrow(robot_x, robot_y, dx_t, dy_t, 
@@ -282,7 +346,8 @@ def video_display_thread():
                              f"Heading: {robot_heading:.1f}*\n\n"
                              f"--- ROUTE ---\n"
                              f"Dist: {dist:.2f} m\n"
-                             f"Angle: {t_angle:.1f}*")
+                             f"Angle: {t_angle:.1f}*\n"
+                             f"Turn: {turn_angle:+.1f}*")
                 
                 # Place info text box completely OUTSIDE the plot on the right
                 fig.text(0.75, 0.5, info_text, transform=fig.transFigure,
@@ -311,354 +376,264 @@ display_t = threading.Thread(target=video_display_thread)
 display_t.daemon = True
 display_t.start()
 
-# --- MAIN NAVIGATION LOOP ---
-state = "HUNTING" 
+def stop_robot():
+    send_cmd('S', force=True)
 
-print("--- MULTI-TAG SLAM SYSTEM ONLINE ---")
+
+def pulse_turn(direction, duration=0.05, speed='1'):
+    send_cmd(speed, force=True)
+    send_cmd(direction, force=True)
+    time.sleep(duration)
+    stop_robot()
+    time.sleep(0.08)
+
+
+def drive_forward(speed='2'):
+    send_cmd(speed)
+    send_cmd('F')
+
+
+def drive_backward(speed='1', duration=0.2):
+    send_cmd(speed, force=True)
+    send_cmd('B', force=True)
+    time.sleep(duration)
+    stop_robot()
+
+
+def get_average_home_tag_measurement(tags):
+    visible_home_tags = [tag for tag in tags if tag.tag_id in HOME_TAGS]
+    if not visible_home_tags:
+        return None
+    avg_x = sum(tag.pose_t[0][0] / SCALE for tag in visible_home_tags) / len(visible_home_tags)
+    avg_z = sum(tag.pose_t[2][0] / SCALE for tag in visible_home_tags) / len(visible_home_tags)
+    return avg_x, avg_z, [tag.tag_id for tag in visible_home_tags]
+
+
+def handle_obstacle(last_known_side):
+    if latest_C < STOP_DIST:
+        print(f"Blocked directly ahead ({latest_C:.0f}cm)! Avoiding...")
+        stop_robot()
+        time.sleep(0.15)
+        drive_backward(duration=0.25)
+
+        if latest_L > latest_R:
+            print("Turning LEFT to avoid obstacle")
+            pulse_turn('L', duration=0.28)
+            return True, 1.0
+
+        print("Turning RIGHT to avoid obstacle")
+        pulse_turn('R', duration=0.28)
+        return True, -1.0
+
+    if latest_L < SIDE_DIST:
+        print("Too close to LEFT -> Nudging Right")
+        pulse_turn('R', duration=0.08)
+        return True, -1.0
+
+    if latest_R < SIDE_DIST:
+        print("Too close to RIGHT -> Nudging Left")
+        pulse_turn('L', duration=0.08)
+        return True, 1.0
+
+    return False, last_known_side
+
+
+# --- MAIN NAVIGATION LOOP ---
+state = "HUNTING"
+
+print("--- GO TO HOME SYSTEM ONLINE ---")
 
 last_seen_time = time.time()
-last_known_side = 1.0 # 1.0 for right, -1.0 for left
+last_known_side = 1.0
 frame_skip_counter = 0
 
-send_cmd('1') # Set a basic low speed just in case
+send_cmd('1')
 
 try:
-    while True:
+    while running:
         frame = raw_frame
         if frame is None:
             time.sleep(0.01)
             continue
-            
+
         frame_skip_counter += 1
         if frame_skip_counter < FRAME_SKIP:
             time.sleep(0.01)
             continue
-            
+
         frame_skip_counter = 0
-        
+
         gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         tags = detector.detect(gray, estimate_tag_pose=True, camera_params=CAMERA_PARAMS, tag_size=TAG_SIZE)
-        
-        rx_list, ry_list, h_list = [], [], []
-        detected_tag_ids = []
-        
-        # 1. MULTI-TAG TRIANGULATION
-        if tags:
-            print(f"\n--- Frame Data ---")
-            
         draw_frame = frame.copy() if show_vision else None
+        detected_tag_ids = []
+
+        if tags:
+            print("\n--- Frame Data ---")
 
         for tag in tags:
             detected_tag_ids.append(tag.tag_id)
-            
-            # Print raw tag pose directly from detector
             x_dist = tag.pose_t[0][0] / SCALE
             y_dist = tag.pose_t[1][0] / SCALE
             z_dist = tag.pose_t[2][0] / SCALE
-            print(f"  > Tag {tag.tag_id}: X-Offset: {x_dist:.2f}m, Y-Offset: {y_dist:.2f}m, Z-Dist: {z_dist:.2f}m")
-            
+            print(f"  > Tag {tag.tag_id}: X:{x_dist:.2f}m, Y:{y_dist:.2f}m, Z:{z_dist:.2f}m")
+
+            if x_dist > 0:
+                last_known_side = 1.0
+            elif x_dist < 0:
+                last_known_side = -1.0
+
             if show_vision:
                 cv2.polylines(draw_frame, [tag.corners.astype(int)], True, (0, 255, 0), 2)
-                cv2.putText(draw_frame, str(tag.tag_id), (int(tag.center[0]), int(tag.center[1])),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-            if tag.tag_id in ARENA_MAP:
-                tag_info = ARENA_MAP[tag.tag_id]
-                
-                # R and t from tag detection directly
-                R = tag.pose_R
-                t = tag.pose_t
-                
-                # To know which way to spin if we lose sight, store the side of the last seen valid tag
-                tx = t[0][0] / SCALE
-                last_known_side = 1.0 if tx > 0 else -1.0
-                
-                # 1. Robot position leveraging Tag's pure Local Coordinate Frame
-                # Calculate camera's offset inside the tag's 3D frame: P_cam = -R^T * t
-                R_T = np.transpose(R)
-                cam_pos_tag = -np.dot(R_T, t)
-                
-                local_x = cam_pos_tag[0][0] / SCALE      # Lateral shift scaling along wall
-                local_z = cam_pos_tag[2][0] / SCALE      # Distance directly away from wall
-                
-                # Based on the custom coordinate system:
-                # 0=East (+Y axis), 90=North (+X axis), 180=West (-Y axis), 270=South (-X axis)
-                
-                wall_angle = tag_info["wall_base_angle"]
-                
-                if wall_angle == 0:     # Facing East (+Y direction - wait, 0 is East, but map X=North, Y=West?)
-                    # Wait, let's verify map:
-                    # Top Wall (X=2.0) - facing West (180 deg)
-                    # Right Wall (Y=2.0) - facing North (90 deg)
-                    # Left Wall (Y=0.0) - facing East (0 deg)
-                    # Bottom Wall (X=0.0) - facing South (270 deg)
-                    rx = tag_info["x"] - local_x
-                    ry = tag_info["y"] + local_z
-                elif wall_angle == 90:  # Facing North (looking at Right Wall Y=2.0)
-                    rx = tag_info["x"] + local_z
-                    ry = tag_info["y"] + local_x
-                elif wall_angle == 180: # Facing West (looking at Top Wall X=2.0)
-                    rx = tag_info["x"] + local_x
-                    ry = tag_info["y"] - local_z
-                elif wall_angle == 270: # Facing South (looking at Bottom Wall X=0.0)
-                    rx = tag_info["x"] - local_z
-                    ry = tag_info["y"] - local_x
-                else: 
-                    # generic fallback
-                    rad = math.radians(wall_angle)
-                    rx = tag_info["x"] + local_z * math.sin(rad) - local_x * math.cos(rad)
-                    ry = tag_info["y"] + local_z * math.cos(rad) + local_x * math.sin(rad)
-                
-                # 2. Robot heading derived from mapping Camera Forward Vector (+Z) back to Global
-                
-                # Retrieve standard fallback angles
-                rad2 = math.radians(wall_angle)
-                tag_x_vec = (math.cos(rad2), -math.sin(rad2))
-                tag_z_vec = (-math.sin(rad2), math.cos(rad2))
-
-                cam_forward_tag_x = R[2][0]
-                cam_forward_tag_z = R[2][2]
-                
-                global_cam_vec_x = cam_forward_tag_x * tag_x_vec[0] + cam_forward_tag_z * tag_z_vec[0]
-                global_cam_vec_y = cam_forward_tag_x * tag_x_vec[1] + cam_forward_tag_z * tag_z_vec[1]
-                
-                # Custom map axes: 0=East (-Y), 90=North (+X), etc.
-                h = math.degrees(math.atan2(global_cam_vec_x, -global_cam_vec_y))
-                
-                rx_list.append(rx)
-                ry_list.append(ry)
-                h_list.append(h)
+                cv2.putText(
+                    draw_frame,
+                    str(tag.tag_id),
+                    (int(tag.center[0]), int(tag.center[1])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 0, 255),
+                    2,
+                )
 
         if show_vision:
             display_frame = draw_frame
 
-        # We will assume we aren't localized this frame unless rx_list proves otherwise
-        is_localized = False
-        
-        # 2. SENSOR FUSION
-        if rx_list:
-            is_localized = True
+        pose_result = estimate_robot_pose(tags)
+        is_localized = pose_result is not None
+        home_measurement = get_average_home_tag_measurement(tags)
+
+        if is_localized:
+            robot_x, robot_y, robot_heading, pose_estimates = pose_result
             last_seen_time = time.time()
-            robot_x = sum(rx_list) / len(rx_list)
-            robot_y = sum(ry_list) / len(ry_list)
-            
-            sum_sin = sum(math.sin(math.radians(angle)) for angle in h_list)
-            sum_cos = sum(math.cos(math.radians(angle)) for angle in h_list)
-            # Make sure heading is strictly between -180 and +180
-            r_head = math.degrees(math.atan2(sum_sin, sum_cos))
-            robot_heading = (r_head + 180) % 360 - 180
-            
-            dx = HOME_X - robot_x
-            dy = HOME_Y - robot_y
-            est_distance = math.sqrt(dx**2 + dy**2)
-            # Correct map calculation: Vector (dx, dy) mapping to custom heading angle
-            e_head = math.degrees(math.atan2(dx, -dy))
-            est_heading = (e_head + 180) % 360 - 180
-            
-            # Shortest turn angle required (-180 to 180 directly)
-            angle_diff = (est_heading - robot_heading + 180) % 360 - 180
-            
-            print(f"\nTags Detected: {detected_tag_ids}")
+            for tag_id, rx, ry, local_tangent, local_inward, _ in pose_estimates:
+                print(
+                    f"    Tag {tag_id}: local_t={local_tangent:.2f}, local_n={local_inward:.2f}, "
+                    f"pos=({rx:.2f},{ry:.2f})"
+                )
+
+            distance_to_home = math.hypot(HOME_X - robot_x, HOME_Y - robot_y)
+            desired_heading = heading_from_vector(HOME_X - robot_x, HOME_Y - robot_y)
+            route_turn = normalize_rotation(desired_heading - robot_heading)
+            final_turn = normalize_rotation(HOME_APPROACH_HEADING - robot_heading)
+
+            print(f"Tags Detected: {detected_tag_ids}")
             print(f"Current Position -> X:{robot_x:.2f}m, Y:{robot_y:.2f}m, Pose:{robot_heading:.1f}deg")
-            print(f"To Reach Home    -> Move: {est_distance:.2f}m | Turn: {angle_diff:.1f}deg (Target:{est_heading:.1f}deg)\n")
+            print(
+                f"Route -> Dist:{distance_to_home:.2f}m | Desired:{desired_heading:.1f}deg | "
+                f"Turn:{route_turn:+.1f}deg | Final:{HOME_APPROACH_HEADING:.1f}deg ({final_turn:+.1f})"
+            )
         else:
+            distance_to_home = None
+            desired_heading = None
+            route_turn = None
+            final_turn = None
             print(f"Tags Detected: {detected_tag_ids} | Localized: False")
 
-        # --- SENSOR OVERRIDE / OBSTACLE AVOIDANCE ---
-        OBSTACLE_DETECTED = False
-        if latest_C < STOP_DIST:
-            print(f"Blocked directly ahead ({latest_C}cm)! Avoiding...")
-            send_cmd('S', force=True) 
-            time.sleep(0.2)
-            
-            send_cmd('1', force=True) 
-            send_cmd('B', force=True) 
-            time.sleep(0.3)
-            
-            if latest_L > latest_R:
-                print("Turning LEFT (Left side has more space)")
-                send_cmd('L', force=True) 
-                last_known_side = 1.0  
-            else:
-                print("Turning RIGHT (Right side has more space)")
-                send_cmd('R', force=True)
-                last_known_side = -1.0 
-                
-            time.sleep(0.5) 
-            send_cmd('S', force=True) 
-            time.sleep(0.2) 
-            
-            last_seen_time = time.time() - SEARCH_TIMEOUT - 0.1 
-            OBSTACLE_DETECTED = True
+        obstacle_detected, last_known_side = handle_obstacle(last_known_side)
+        if obstacle_detected:
+            continue
 
-        elif latest_L < SIDE_DIST:
-            print("Too close to LEFT -> Nudging Right")
-            send_cmd('1', force=True) 
-            send_cmd('R', force=True) 
-            last_known_side = -1.0 
-            time.sleep(0.1) 
-            OBSTACLE_DETECTED = True
-            
-        elif latest_R < SIDE_DIST:
-            print("Too close to RIGHT -> Nudging Left")
-            send_cmd('1', force=True) 
-            send_cmd('L', force=True) 
-            last_known_side = 1.0 
-            time.sleep(0.1) 
-            OBSTACLE_DETECTED = True
-
-        if OBSTACLE_DETECTED:
-             continue
-
-        # --- NAVIGATION STATE MACHINE ---
         if state == "HUNTING":
             if is_localized:
-                send_cmd('S', force=True)
-                if state != "WAIT_FOR_START":
-                    print("\n>>> PRESS 'S' IN VIDEO WINDOW OR 'Enter' IN TERMINAL TO START MVOING <<<")
-                    state = "WAIT_FOR_START"
-            else:
-                # If no tag is seen on boot, spin slowly to find one
-                time_since_last_seen = time.time() - last_seen_time
-                if time_since_last_seen > SEARCH_TIMEOUT:
-                    send_cmd('1', force=True) 
-                    send_cmd('R', force=True)
-                    time.sleep(0.08) 
-                    send_cmd('S', force=True)
-                    time.sleep(0.2)  
-                    frame_skip_counter = FRAME_SKIP 
+                stop_robot()
+                print("\n>>> PRESS 'S' IN VIDEO WINDOW OR ENTER IN TERMINAL TO START <<<")
+                state = "WAIT_FOR_START"
+            elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
             time.sleep(0.01)
             continue
 
-        elif state == "WAIT_FOR_START":
-            # Non-blocking check for user hitting Enter in the terminal
+        if state == "WAIT_FOR_START":
             dr, dw, de = select.select([sys.stdin], [], [], 0.0)
             if dr:
                 sys.stdin.readline()
                 start_motion = True
-            
+
             if start_motion:
-                state = "RETURNING_HOME"
-                print("\n>>> Moving to home... <<<\n")
-            
+                state = "NAVIGATING"
+                print("\n>>> Navigating toward home target <<<\n")
+
             time.sleep(0.01)
             continue
 
-        elif state == "RETURNING_HOME":
-            # Direct tracking override if home tags are visible and far away (>0.5m)
-            home_tag = None
-            if len(tags) > 0:
-                for tag in tags:
-                    if tag.tag_id in [HOME_TAG_1, HOME_TAG_2]:
-                        home_tag = tag
-                        break
-            
-            if home_tag and (home_tag.pose_t[2][0] / SCALE) > 0.5:
-                # We see a home tag and it's further than 0.5m -> Direct approach like go_to_tag
-                z_dist = home_tag.pose_t[2][0] / SCALE
-                x_offset = home_tag.pose_t[0][0] / SCALE
-                print(f"Direct Tracking HOME Tag {home_tag.tag_id} | Z={z_dist:.2f}m, X={x_offset:.2f}m")
-
-                # Angle calculation based on camera offset
-                angle_offset = math.degrees(math.atan2(x_offset, z_dist))
-                print(f"Angle to Home Tag offset: {angle_offset:.2f} deg")
-
-                if x_offset > 0.1:  # Tag is to the right
-                    send_cmd('1') 
-                    send_cmd('R')
-                    print("Correction: Right")
-                elif x_offset < -0.1: # Tag is to the left
-                    send_cmd('1') 
-                    send_cmd('L')
-                    print("Correction: Left")
-                else: 
-                    # Tag is centered, move forward towards it
-                    diff = abs(x_offset)
-                    if diff < 0.05:
-                        send_cmd('3') # High speed if very centered
-                    elif diff < 0.08:
-                        send_cmd('2') # Medium speed if slightly off
-                    else:
-                        send_cmd('1') # Slow speed if more off
-                        
-                    send_cmd('F')
-                    print("Centered: Moving Forward")
-                
-                # Keep SLAM state updated to avoid losing localization immediately after
-                last_seen_time = time.time()
-                continue # Skip global calculation this loop
-
-            # If we lose sight of ALL arena tags, we don't know our global position.
-            # We spin to find ANY tag to re-localize. 
+        if state == "NAVIGATING":
             if not is_localized:
-                time_since_last_seen = time.time() - last_seen_time
-                if time_since_last_seen > SEARCH_TIMEOUT:
+                if (time.time() - last_seen_time) > SEARCH_TIMEOUT:
                     search_dir = 'R' if last_known_side > 0 else 'L'
-                    dir_name = 'RIGHT' if search_dir == 'R' else 'LEFT'
-                    print(f"Lost ALL localization tags... Spinning {dir_name} to find any arena tag...")
-                    
-                    send_cmd('1', force=True) 
-                    send_cmd(search_dir, force=True)
-                    time.sleep(0.08) 
-                    
-                    send_cmd('S', force=True)
-                    time.sleep(0.2)  
-                    
-                    frame_skip_counter = FRAME_SKIP 
-                else:
-                    # We briefly lost sight of tags, but rely on our last known location
-                    # and allow the momentum/last command to carry us forward.
-                    pass
-            else:
-                # We know exactly where we are using ANY visible map tag!
-                # Automatically calculat distance and angle to Home Coordinates
-                dx = HOME_X - robot_x
-                dy = HOME_Y - robot_y
-                distance_to_home = math.sqrt(dx**2 + dy**2)
-                
-                if distance_to_home < 0.10: # Arrived within 10cm!
-                    print(f"ARRIVED HOME! Distance to home: {distance_to_home:.2f}m")
-                    send_cmd('S', force=True)
-                    state = "DONE"
-                else:
-                    t_head = math.degrees(math.atan2(dx, -dy))
-                    target_heading = (t_head + 180) % 360 - 180
-                    angle_diff = (target_heading - robot_heading + 180) % 360 - 180
-                    
-                    print(f"Dist to Home: {distance_to_home:.2f}m | Target Head: {target_heading:.1f}* | Turn required: {angle_diff:.1f}*")
-                    
-                    # Steer the robot toward the target heading in discrete steps
-                    if angle_diff > 15:
-                        print(f"-> Turning LEFT to align ({angle_diff:.1f}deg)")
-                        send_cmd('1', force=True)
-                        send_cmd('L', force=True)
-                        time.sleep(0.04) # Back to 40ms to overcome static friction 
-                        send_cmd('S', force=True)
-                        time.sleep(0.1)  # 100ms OFF (let robot settle)
-                        frame_skip_counter = FRAME_SKIP
-                    elif angle_diff < -15:
-                        print(f"-> Turning RIGHT to align ({angle_diff:.1f}deg)")
-                        send_cmd('1', force=True)
-                        send_cmd('R', force=True)
-                        time.sleep(0.04) # Back to 40ms to overcome static friction 
-                        send_cmd('S', force=True)
-                        time.sleep(0.1)  # 100ms OFF (let robot settle)
-                        frame_skip_counter = FRAME_SKIP
-                    else:
-                        print("-> Aligned! Moving FORWARD to Home")
-                        send_cmd('3') # High speed straight forward
-                        send_cmd('F')
+                    print(f"Localization lost. Searching {search_dir}...")
+                    pulse_turn(search_dir, duration=0.08)
+                continue
 
-        elif state == "DONE":
+            if distance_to_home <= FINAL_ALIGN_DISTANCE_M:
+                stop_robot()
+                state = "FINAL_ALIGN"
+                print("Within final alignment distance. Switching to FINAL_ALIGN.")
+                continue
+
+            if abs(route_turn) > HEADING_TOL_DEG:
+                print(f"Rotating {'LEFT' if route_turn > 0 else 'RIGHT'} to route heading ({route_turn:+.1f}deg)")
+                pulse_turn('L' if route_turn > 0 else 'R', duration=0.05)
+            else:
+                print("Aligned to route. Driving forward.")
+                drive_forward('3' if distance_to_home > 1.0 else '2')
+
+            continue
+
+        if state == "FINAL_ALIGN":
+            if not is_localized:
+                stop_robot()
+                if (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                    pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
+                continue
+
+            if abs(final_turn) > FINAL_HEADING_TOL_DEG:
+                print(f"Final wall-normal alignment {'LEFT' if final_turn > 0 else 'RIGHT'} ({final_turn:+.1f}deg)")
+                pulse_turn('L' if final_turn > 0 else 'R', duration=0.05)
+                continue
+
+            stop_robot()
+            state = "FINAL_APPROACH"
+            print("Final heading aligned. Switching to FINAL_APPROACH.")
+            continue
+
+        if state == "FINAL_APPROACH":
+            if latest_C <= FINAL_STOP_DISTANCE_CM:
+                stop_robot()
+                print(f"HOME REACHED: stopping at proximity distance {latest_C:.0f}cm")
+                state = "DONE"
+                continue
+
+            if home_measurement is not None:
+                avg_home_x, avg_home_z, home_ids = home_measurement
+                print(f"Final approach using home tags {home_ids}: X={avg_home_x:.2f}m, Z={avg_home_z:.2f}m")
+
+                if avg_home_x > HOME_X_TOL_M:
+                    pulse_turn('R', duration=0.04)
+                elif avg_home_x < -HOME_X_TOL_M:
+                    pulse_turn('L', duration=0.04)
+                else:
+                    drive_forward('1' if latest_C < (FINAL_STOP_DISTANCE_CM + 15) else '2')
+                continue
+
+            if is_localized:
+                if abs(final_turn) > FINAL_HEADING_TOL_DEG:
+                    pulse_turn('L' if final_turn > 0 else 'R', duration=0.05)
+                else:
+                    drive_forward('1')
+            elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
+            continue
+
+        if state == "DONE":
             break
-            
+
         time.sleep(0.01)
 
 except KeyboardInterrupt:
     print("\nEmergency Stop Triggered.")
 finally:
     running = False
-    send_cmd('S')
+    stop_robot()
     time.sleep(0.1)
     picam2.stop()
     print("Clean exit.")
