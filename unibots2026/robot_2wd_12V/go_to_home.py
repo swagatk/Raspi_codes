@@ -24,6 +24,7 @@ SIDE_DIST = 20             # Side ultrasonic sensor push away distance (cm)
 SENSOR_SMOOTHING_COUNT = 3 # Number of sensor readings to average to prevent false positives
 SEARCH_TIMEOUT = 0.7       # If tag unseen for 0.7 seconds, start scanning for it
 FRAME_SKIP = 3             # Only run detection every Nth frame
+AUTO_START_ON_LOCALIZATION = True
 
 # --- ABSOLUTE MAP (The "GPS" Coordinates) ---
 # 'wall_base_angle' is the compass heading the robot would have if it 
@@ -72,7 +73,15 @@ ARENA_MAP = {
 HOME_TAGS = [14, 15]
 FINAL_ALIGN_DISTANCE_M = 0.5
 FINAL_STOP_DISTANCE_CM = 30
-HEADING_TOL_DEG = 12.0
+ROUTE_HEADING_TOL_DEG = 20.0
+ROUTE_COARSE_TURN_THRESHOLD_DEG = 40.0
+ROUTE_COARSE_TURN_DURATION_S = 0.14
+ROUTE_FINE_TURN_DURATION_S = 0.05
+ROUTE_COARSE_COMMIT_TIME_S = 0.6
+ROUTE_DIRECTION_HOLD_TIME_S = 1.5
+SMOOTH_APPROACH_DISTANCE_M = 0.75
+SMOOTH_APPROACH_HEADING_TOL_DEG = 30.0
+SMOOTH_APPROACH_SPEED = '1'
 FINAL_HEADING_TOL_DEG = 8.0
 HOME_X_TOL_M = 0.08
 
@@ -93,6 +102,31 @@ def heading_from_vector(vec_x, vec_y):
 
 def normalize_rotation(angle_degrees):
     return (angle_degrees + 180.0) % 360.0 - 180.0
+
+
+def blend_heading_degrees(start_heading_deg, end_heading_deg, blend_ratio):
+    blend_ratio = max(0.0, min(1.0, blend_ratio))
+    start_rad = math.radians(start_heading_deg)
+    end_rad = math.radians(end_heading_deg)
+    vec_x = (1.0 - blend_ratio) * math.cos(start_rad) + blend_ratio * math.cos(end_rad)
+    vec_y = (1.0 - blend_ratio) * math.sin(start_rad) + blend_ratio * math.sin(end_rad)
+    return heading_from_vector(vec_x, vec_y)
+
+
+def get_navigation_guidance(distance_to_home, route_heading, final_heading, robot_heading):
+    if distance_to_home <= SMOOTH_APPROACH_DISTANCE_M:
+        blend_span = max(SMOOTH_APPROACH_DISTANCE_M - FINAL_ALIGN_DISTANCE_M, 1e-6)
+        blend_ratio = (SMOOTH_APPROACH_DISTANCE_M - distance_to_home) / blend_span
+        nav_heading = blend_heading_degrees(route_heading, final_heading, blend_ratio)
+        nav_tol = SMOOTH_APPROACH_HEADING_TOL_DEG
+        nav_mode = "SMOOTH_APPROACH"
+    else:
+        nav_heading = route_heading
+        nav_tol = ROUTE_HEADING_TOL_DEG
+        nav_mode = "ROUTE"
+
+    nav_turn = normalize_rotation(nav_heading - robot_heading)
+    return nav_heading, nav_turn, nav_tol, nav_mode
 
 
 def get_home_target():
@@ -388,6 +422,16 @@ def pulse_turn(direction, duration=0.05, speed='1'):
     time.sleep(0.08)
 
 
+def get_route_turn_duration(turn_error_deg):
+    if abs(turn_error_deg) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
+        return ROUTE_COARSE_TURN_DURATION_S
+    return ROUTE_FINE_TURN_DURATION_S
+
+
+def get_turn_direction_from_error(turn_error_deg):
+    return 'L' if turn_error_deg > 0 else 'R'
+
+
 def drive_forward(speed='2'):
     send_cmd(speed)
     send_cmd('F')
@@ -446,6 +490,10 @@ print("--- GO TO HOME SYSTEM ONLINE ---")
 last_seen_time = time.time()
 last_known_side = 1.0
 frame_skip_counter = 0
+committed_turn_direction = None
+committed_turn_until = 0.0
+preferred_turn_direction = None
+preferred_turn_until = 0.0
 
 send_cmd('1')
 
@@ -536,8 +584,17 @@ try:
         if state == "HUNTING":
             if is_localized:
                 stop_robot()
-                print("\n>>> PRESS 'S' IN VIDEO WINDOW OR ENTER IN TERMINAL TO START <<<")
-                state = "WAIT_FOR_START"
+                committed_turn_direction = None
+                committed_turn_until = 0.0
+                preferred_turn_direction = None
+                preferred_turn_until = 0.0
+                if AUTO_START_ON_LOCALIZATION:
+                    start_motion = True
+                    state = "NAVIGATING"
+                    print("\n>>> Localized. Auto-starting navigation toward home target <<<\n")
+                else:
+                    print("\n>>> PRESS 'S' IN VIDEO WINDOW OR ENTER IN TERMINAL TO START <<<")
+                    state = "WAIT_FOR_START"
             elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
                 pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
             time.sleep(0.01)
@@ -550,6 +607,10 @@ try:
                 start_motion = True
 
             if start_motion:
+                committed_turn_direction = None
+                committed_turn_until = 0.0
+                preferred_turn_direction = None
+                preferred_turn_until = 0.0
                 state = "NAVIGATING"
                 print("\n>>> Navigating toward home target <<<\n")
 
@@ -557,8 +618,24 @@ try:
             continue
 
         if state == "NAVIGATING":
+            now = time.time()
+            coarse_turn_committed = committed_turn_direction is not None and now < committed_turn_until
+            preferred_turn_active = preferred_turn_direction is not None and now < preferred_turn_until
+
             if not is_localized:
-                if (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                if coarse_turn_committed:
+                    print(
+                        f"Localization intermittent. Continuing committed coarse turn {committed_turn_direction} "
+                        f"for {committed_turn_until - now:.2f}s"
+                    )
+                    pulse_turn(committed_turn_direction, duration=ROUTE_COARSE_TURN_DURATION_S)
+                elif preferred_turn_active:
+                    print(
+                        f"Localization lost. Holding navigation turn {preferred_turn_direction} "
+                        f"for {preferred_turn_until - now:.2f}s"
+                    )
+                    pulse_turn(preferred_turn_direction, duration=ROUTE_COARSE_TURN_DURATION_S)
+                elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
                     search_dir = 'R' if last_known_side > 0 else 'L'
                     print(f"Localization lost. Searching {search_dir}...")
                     pulse_turn(search_dir, duration=0.08)
@@ -566,20 +643,63 @@ try:
 
             if distance_to_home <= FINAL_ALIGN_DISTANCE_M:
                 stop_robot()
+                committed_turn_direction = None
+                committed_turn_until = 0.0
+                preferred_turn_direction = None
+                preferred_turn_until = 0.0
                 state = "FINAL_ALIGN"
                 print("Within final alignment distance. Switching to FINAL_ALIGN.")
                 continue
 
-            if abs(route_turn) > HEADING_TOL_DEG:
-                print(f"Rotating {'LEFT' if route_turn > 0 else 'RIGHT'} to route heading ({route_turn:+.1f}deg)")
-                pulse_turn('L' if route_turn > 0 else 'R', duration=0.05)
+            nav_heading, nav_turn, nav_tol, nav_mode = get_navigation_guidance(
+                distance_to_home,
+                desired_heading,
+                HOME_APPROACH_HEADING,
+                robot_heading,
+            )
+
+            if abs(nav_turn) > nav_tol:
+                turn_duration = get_route_turn_duration(nav_turn)
+                turn_direction = get_turn_direction_from_error(nav_turn)
+                if abs(nav_turn) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
+                    if not coarse_turn_committed:
+                        committed_turn_direction = turn_direction
+                        committed_turn_until = now + ROUTE_COARSE_COMMIT_TIME_S
+                    turn_direction = committed_turn_direction
+                    turn_mode = "COARSE"
+                else:
+                    committed_turn_direction = None
+                    committed_turn_until = 0.0
+                    turn_mode = "FINE" if nav_mode == "ROUTE" else "SMOOTH"
+                print(
+                    f"{turn_mode} rotating {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
+                    f"{nav_heading:.1f}deg ({nav_turn:+.1f}deg, tol={nav_tol:.1f}deg, pulse={turn_duration:.2f}s)"
+                )
+                preferred_turn_direction = turn_direction
+                preferred_turn_until = now + ROUTE_DIRECTION_HOLD_TIME_S
+                pulse_turn(turn_direction, duration=turn_duration)
             else:
-                print("Aligned to route. Driving forward.")
-                drive_forward('3' if distance_to_home > 1.0 else '2')
+                committed_turn_direction = None
+                committed_turn_until = 0.0
+                preferred_turn_direction = None
+                preferred_turn_until = 0.0
+                if nav_mode == "SMOOTH_APPROACH":
+                    print(
+                        f"Smooth approach within tolerance ({nav_tol:.1f}deg). "
+                        f"Driving forward slowly toward {HOME_APPROACH_HEADING:.1f}deg."
+                    )
+                    drive_forward(SMOOTH_APPROACH_SPEED)
+                else:
+                    print(f"Within route heading tolerance ({nav_tol:.1f}deg). Driving forward.")
+                    drive_forward('3' if distance_to_home > 1.0 else '2')
 
             continue
 
         if state == "FINAL_ALIGN":
+            committed_turn_direction = None
+            committed_turn_until = 0.0
+            preferred_turn_direction = None
+            preferred_turn_until = 0.0
             if not is_localized:
                 stop_robot()
                 if (time.time() - last_seen_time) > SEARCH_TIMEOUT:
@@ -597,6 +717,10 @@ try:
             continue
 
         if state == "FINAL_APPROACH":
+            committed_turn_direction = None
+            committed_turn_until = 0.0
+            preferred_turn_direction = None
+            preferred_turn_until = 0.0
             if latest_C <= FINAL_STOP_DISTANCE_CM:
                 stop_robot()
                 print(f"HOME REACHED: stopping at proximity distance {latest_C:.0f}cm")
