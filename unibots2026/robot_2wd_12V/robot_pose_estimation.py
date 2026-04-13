@@ -20,7 +20,7 @@ FRAME_SKIP = 3  # Only run detection every Nth frame
 
 # --- HOME TAGS (Goal Location) ---
 # Specify two adjacent home tags - robot will navigate to the midpoint
-HOME_TAGS = [9, 10]  # Tags on the North wall
+HOME_TAGS = [14, 15]  # Tags on the North wall
 
 # --- ABSOLUTE MAP (The "GPS" Coordinates) ---
 gap1 = 0.15

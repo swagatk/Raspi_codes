@@ -72,7 +72,10 @@ ARENA_MAP = {
 # --- HOME SETTINGS ---
 HOME_TAGS = [14, 15]
 FINAL_ALIGN_DISTANCE_M = 0.5
-FINAL_STOP_DISTANCE_CM = 30
+FINAL_STOP_DISTANCE_CM = 50
+TAG_REACQUIRE_BACKUP_DISTANCE_CM = 80
+TAG_REACQUIRE_BACKUP_DURATION_S = 0.15 #0.35
+TAG_REACQUIRE_BACKUP_COOLDOWN_S = 0.8
 ROUTE_HEADING_TOL_DEG = 20.0
 ROUTE_COARSE_TURN_THRESHOLD_DEG = 40.0
 ROUTE_COARSE_TURN_DURATION_S = 0.14
@@ -82,7 +85,7 @@ ROUTE_DIRECTION_HOLD_TIME_S = 1.5
 SMOOTH_APPROACH_DISTANCE_M = 0.75
 SMOOTH_APPROACH_HEADING_TOL_DEG = 30.0
 SMOOTH_APPROACH_SPEED = '1'
-FINAL_HEADING_TOL_DEG = 8.0
+FINAL_HEADING_TOL_DEG = 15.0
 HOME_X_TOL_M = 0.08
 
 
@@ -444,6 +447,31 @@ def drive_backward(speed='1', duration=0.2):
     stop_robot()
 
 
+def get_nearest_wall_distance_cm():
+    valid_distances = [dist for dist in (latest_L, latest_C, latest_R) if 0 < dist < 300]
+    if not valid_distances:
+        return 999.0
+    return min(valid_distances)
+
+
+def should_back_up_for_tag_reacquire():
+    return get_nearest_wall_distance_cm() < TAG_REACQUIRE_BACKUP_DISTANCE_CM
+
+
+def get_ultrasonic_status():
+    return f"L:{latest_L:.0f}cm C:{latest_C:.0f}cm R:{latest_R:.0f}cm"
+
+
+def back_up_for_tag_reacquire():
+    print(
+        f"Too close to wall for reliable tag view ({get_ultrasonic_status()}, "
+        f"nearest={get_nearest_wall_distance_cm():.0f}cm). "
+        f"Backing up for {TAG_REACQUIRE_BACKUP_DURATION_S:.2f}s..."
+    )
+    drive_backward(duration=TAG_REACQUIRE_BACKUP_DURATION_S)
+    time.sleep(0.1)
+
+
 def get_average_home_tag_measurement(tags):
     visible_home_tags = [tag for tag in tags if tag.tag_id in HOME_TAGS]
     if not visible_home_tags:
@@ -453,7 +481,7 @@ def get_average_home_tag_measurement(tags):
     return avg_x, avg_z, [tag.tag_id for tag in visible_home_tags]
 
 
-def handle_obstacle(last_known_side):
+def handle_obstacle(last_known_side, allow_side_nudges=True):
     if latest_C < STOP_DIST:
         print(f"Blocked directly ahead ({latest_C:.0f}cm)! Avoiding...")
         stop_robot()
@@ -468,6 +496,9 @@ def handle_obstacle(last_known_side):
         print("Turning RIGHT to avoid obstacle")
         pulse_turn('R', duration=0.28)
         return True, -1.0
+
+    if not allow_side_nudges:
+        return False, last_known_side
 
     if latest_L < SIDE_DIST:
         print("Too close to LEFT -> Nudging Right")
@@ -494,6 +525,7 @@ committed_turn_direction = None
 committed_turn_until = 0.0
 preferred_turn_direction = None
 preferred_turn_until = 0.0
+last_tag_reacquire_backup_time = 0.0
 
 send_cmd('1')
 
@@ -577,7 +609,19 @@ try:
             final_turn = None
             print(f"Tags Detected: {detected_tag_ids} | Localized: False")
 
-        obstacle_detected, last_known_side = handle_obstacle(last_known_side)
+        search_mode = not is_localized
+
+        if search_mode and should_back_up_for_tag_reacquire():
+            now = time.time()
+            if (now - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S:
+                back_up_for_tag_reacquire()
+                last_tag_reacquire_backup_time = time.time()
+                continue
+
+        obstacle_detected, last_known_side = handle_obstacle(
+            last_known_side,
+            allow_side_nudges=not search_mode,
+        )
         if obstacle_detected:
             continue
 
@@ -596,6 +640,17 @@ try:
                     print("\n>>> PRESS 'S' IN VIDEO WINDOW OR ENTER IN TERMINAL TO START <<<")
                     state = "WAIT_FOR_START"
             elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                if (
+                    should_back_up_for_tag_reacquire()
+                    and (time.time() - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
+                ):
+                    back_up_for_tag_reacquire()
+                    last_tag_reacquire_backup_time = time.time()
+                    continue
+                print(
+                    f"Searching for tags ({get_ultrasonic_status()}) -> "
+                    f"turning {'RIGHT' if last_known_side > 0 else 'LEFT'}"
+                )
                 pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
             time.sleep(0.01)
             continue
@@ -623,21 +678,29 @@ try:
             preferred_turn_active = preferred_turn_direction is not None and now < preferred_turn_until
 
             if not is_localized:
-                if coarse_turn_committed:
+                if (
+                    should_back_up_for_tag_reacquire()
+                    and (now - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
+                ):
+                    back_up_for_tag_reacquire()
+                    last_tag_reacquire_backup_time = time.time()
+                elif coarse_turn_committed:
                     print(
-                        f"Localization intermittent. Continuing committed coarse turn {committed_turn_direction} "
+                        f"Localization intermittent ({get_ultrasonic_status()}). "
+                        f"Continuing committed coarse turn {committed_turn_direction} "
                         f"for {committed_turn_until - now:.2f}s"
                     )
                     pulse_turn(committed_turn_direction, duration=ROUTE_COARSE_TURN_DURATION_S)
                 elif preferred_turn_active:
                     print(
-                        f"Localization lost. Holding navigation turn {preferred_turn_direction} "
+                        f"Localization lost ({get_ultrasonic_status()}). "
+                        f"Holding navigation turn {preferred_turn_direction} "
                         f"for {preferred_turn_until - now:.2f}s"
                     )
                     pulse_turn(preferred_turn_direction, duration=ROUTE_COARSE_TURN_DURATION_S)
                 elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
                     search_dir = 'R' if last_known_side > 0 else 'L'
-                    print(f"Localization lost. Searching {search_dir}...")
+                    print(f"Localization lost. Searching {search_dir} ({get_ultrasonic_status()})...")
                     pulse_turn(search_dir, duration=0.08)
                 continue
 
@@ -702,7 +765,17 @@ try:
             preferred_turn_until = 0.0
             if not is_localized:
                 stop_robot()
-                if (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                if (
+                    should_back_up_for_tag_reacquire()
+                    and (time.time() - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
+                ):
+                    back_up_for_tag_reacquire()
+                    last_tag_reacquire_backup_time = time.time()
+                elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                    print(
+                        f"Final alignment lost tag view ({get_ultrasonic_status()}) -> "
+                        f"searching {'RIGHT' if last_known_side > 0 else 'LEFT'}"
+                    )
                     pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
                 continue
 
@@ -744,7 +817,17 @@ try:
                     pulse_turn('L' if final_turn > 0 else 'R', duration=0.05)
                 else:
                     drive_forward('1')
+            elif (
+                should_back_up_for_tag_reacquire()
+                and (time.time() - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
+            ):
+                back_up_for_tag_reacquire()
+                last_tag_reacquire_backup_time = time.time()
             elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                print(
+                    f"Final approach lost tags ({get_ultrasonic_status()}) -> "
+                    f"searching {'RIGHT' if last_known_side > 0 else 'LEFT'}"
+                )
                 pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
             continue
 

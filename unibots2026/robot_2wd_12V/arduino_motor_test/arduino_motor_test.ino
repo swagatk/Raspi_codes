@@ -31,7 +31,7 @@ Servo wrist;
 
 int motorSpeed = 255; // Default speed (0-255)
 float right_scale = 1.0; //scaledown right wheel
-float left_scale = 0.98; //scaledown left wheel
+float left_scale = 1.0; //scaledown left wheel
 char command = 'S';   // Current command (S=Stop)
 unsigned long lastCommandTime = 0; // Safety timeout
 
