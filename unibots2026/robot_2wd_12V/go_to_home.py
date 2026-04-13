@@ -72,18 +72,23 @@ ARENA_MAP = {
 # --- HOME SETTINGS ---
 HOME_TAGS = [14, 15]
 FINAL_ALIGN_DISTANCE_M = 0.5
+FINAL_APPROACH_TRIGGER_DISTANCE_M = 0.85
 FINAL_STOP_DISTANCE_CM = 50
 TAG_REACQUIRE_BACKUP_DISTANCE_CM = 80
 TAG_REACQUIRE_BACKUP_DURATION_S = 0.15 #0.35
 TAG_REACQUIRE_BACKUP_COOLDOWN_S = 0.8
-ROUTE_HEADING_TOL_DEG = 20.0
+ROUTE_HEADING_TOL_DEG = 10.0
 ROUTE_COARSE_TURN_THRESHOLD_DEG = 40.0
 ROUTE_COARSE_TURN_DURATION_S = 0.14
 ROUTE_FINE_TURN_DURATION_S = 0.05
 ROUTE_COARSE_COMMIT_TIME_S = 0.6
 ROUTE_DIRECTION_HOLD_TIME_S = 1.5
+ROUTE_COARSE_TURN_SPEED = '1'
+ROUTE_FINE_TURN_SPEED = '1'
+ROUTE_CONTINUOUS_TURN_HANDOFF_DEG = 25.0
+ROUTE_TRIM_TURN_DURATION_S = 0.04
 SMOOTH_APPROACH_DISTANCE_M = 0.75
-SMOOTH_APPROACH_HEADING_TOL_DEG = 30.0
+SMOOTH_APPROACH_HEADING_TOL_DEG = 12.0
 SMOOTH_APPROACH_SPEED = '1'
 FINAL_HEADING_TOL_DEG = 15.0
 HOME_X_TOL_M = 0.08
@@ -435,6 +440,19 @@ def get_turn_direction_from_error(turn_error_deg):
     return 'L' if turn_error_deg > 0 else 'R'
 
 
+def get_turn_speed(turn_error_deg, nav_mode):
+    if nav_mode == "SMOOTH_APPROACH":
+        return ROUTE_FINE_TURN_SPEED
+    if abs(turn_error_deg) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
+        return ROUTE_COARSE_TURN_SPEED
+    return ROUTE_FINE_TURN_SPEED
+
+
+def drive_turn(direction, speed='1'):
+    send_cmd(speed)
+    send_cmd(direction)
+
+
 def drive_forward(speed='2'):
     send_cmd(speed)
     send_cmd('F')
@@ -514,18 +532,15 @@ def handle_obstacle(last_known_side, allow_side_nudges=True):
 
 
 # --- MAIN NAVIGATION LOOP ---
-state = "HUNTING"
+state = "SEARCHING"
 
 print("--- GO TO HOME SYSTEM ONLINE ---")
 
 last_seen_time = time.time()
 last_known_side = 1.0
 frame_skip_counter = 0
-committed_turn_direction = None
-committed_turn_until = 0.0
-preferred_turn_direction = None
-preferred_turn_until = 0.0
 last_tag_reacquire_backup_time = 0.0
+last_nav_motion = None
 
 send_cmd('1')
 
@@ -609,226 +624,121 @@ try:
             final_turn = None
             print(f"Tags Detected: {detected_tag_ids} | Localized: False")
 
-        search_mode = not is_localized
+        now = time.time()
 
-        if search_mode and should_back_up_for_tag_reacquire():
-            now = time.time()
-            if (now - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S:
+        if state == "SEARCHING":
+            last_nav_motion = None
+            if is_localized:
+                stop_robot()
+                state = "NAVIGATING"
+                print("\n>>> Tags visible. Navigating toward home target <<<\n")
+                continue
+
+            if (
+                should_back_up_for_tag_reacquire()
+                and (now - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
+            ):
                 back_up_for_tag_reacquire()
                 last_tag_reacquire_backup_time = time.time()
                 continue
 
-        obstacle_detected, last_known_side = handle_obstacle(
-            last_known_side,
-            allow_side_nudges=not search_mode,
-        )
-        if obstacle_detected:
-            continue
-
-        if state == "HUNTING":
-            if is_localized:
-                stop_robot()
-                committed_turn_direction = None
-                committed_turn_until = 0.0
-                preferred_turn_direction = None
-                preferred_turn_until = 0.0
-                if AUTO_START_ON_LOCALIZATION:
-                    start_motion = True
-                    state = "NAVIGATING"
-                    print("\n>>> Localized. Auto-starting navigation toward home target <<<\n")
-                else:
-                    print("\n>>> PRESS 'S' IN VIDEO WINDOW OR ENTER IN TERMINAL TO START <<<")
-                    state = "WAIT_FOR_START"
-            elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
-                if (
-                    should_back_up_for_tag_reacquire()
-                    and (time.time() - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
-                ):
-                    back_up_for_tag_reacquire()
-                    last_tag_reacquire_backup_time = time.time()
-                    continue
-                print(
-                    f"Searching for tags ({get_ultrasonic_status()}) -> "
-                    f"turning {'RIGHT' if last_known_side > 0 else 'LEFT'}"
-                )
-                pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
-            time.sleep(0.01)
-            continue
-
-        if state == "WAIT_FOR_START":
-            dr, dw, de = select.select([sys.stdin], [], [], 0.0)
-            if dr:
-                sys.stdin.readline()
-                start_motion = True
-
-            if start_motion:
-                committed_turn_direction = None
-                committed_turn_until = 0.0
-                preferred_turn_direction = None
-                preferred_turn_until = 0.0
-                state = "NAVIGATING"
-                print("\n>>> Navigating toward home target <<<\n")
-
-            time.sleep(0.01)
+            if (now - last_seen_time) > SEARCH_TIMEOUT:
+                search_dir = 'R' if last_known_side > 0 else 'L'
+                print(f"Searching for tags ({get_ultrasonic_status()}) -> turning {search_dir}")
+                pulse_turn(search_dir, duration=0.08, speed='1')
             continue
 
         if state == "NAVIGATING":
-            now = time.time()
-            coarse_turn_committed = committed_turn_direction is not None and now < committed_turn_until
-            preferred_turn_active = preferred_turn_direction is not None and now < preferred_turn_until
-
             if not is_localized:
-                if (
-                    should_back_up_for_tag_reacquire()
-                    and (now - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
-                ):
-                    back_up_for_tag_reacquire()
-                    last_tag_reacquire_backup_time = time.time()
-                elif coarse_turn_committed:
-                    print(
-                        f"Localization intermittent ({get_ultrasonic_status()}). "
-                        f"Continuing committed coarse turn {committed_turn_direction} "
-                        f"for {committed_turn_until - now:.2f}s"
-                    )
-                    pulse_turn(committed_turn_direction, duration=ROUTE_COARSE_TURN_DURATION_S)
-                elif preferred_turn_active:
-                    print(
-                        f"Localization lost ({get_ultrasonic_status()}). "
-                        f"Holding navigation turn {preferred_turn_direction} "
-                        f"for {preferred_turn_until - now:.2f}s"
-                    )
-                    pulse_turn(preferred_turn_direction, duration=ROUTE_COARSE_TURN_DURATION_S)
-                elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
-                    search_dir = 'R' if last_known_side > 0 else 'L'
-                    print(f"Localization lost. Searching {search_dir} ({get_ultrasonic_status()})...")
-                    pulse_turn(search_dir, duration=0.08)
-                continue
-
-            if distance_to_home <= FINAL_ALIGN_DISTANCE_M:
                 stop_robot()
-                committed_turn_direction = None
-                committed_turn_until = 0.0
-                preferred_turn_direction = None
-                preferred_turn_until = 0.0
-                state = "FINAL_ALIGN"
-                print("Within final alignment distance. Switching to FINAL_ALIGN.")
+                last_nav_motion = None
+                state = "SEARCHING"
+                print("Tags lost. Switching to SEARCHING.")
                 continue
 
-            nav_heading, nav_turn, nav_tol, nav_mode = get_navigation_guidance(
-                distance_to_home,
-                desired_heading,
-                HOME_APPROACH_HEADING,
-                robot_heading,
-            )
-
-            if abs(nav_turn) > nav_tol:
-                turn_duration = get_route_turn_duration(nav_turn)
-                turn_direction = get_turn_direction_from_error(nav_turn)
-                if abs(nav_turn) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
-                    if not coarse_turn_committed:
-                        committed_turn_direction = turn_direction
-                        committed_turn_until = now + ROUTE_COARSE_COMMIT_TIME_S
-                    turn_direction = committed_turn_direction
-                    turn_mode = "COARSE"
-                else:
-                    committed_turn_direction = None
-                    committed_turn_until = 0.0
-                    turn_mode = "FINE" if nav_mode == "ROUTE" else "SMOOTH"
+            if (
+                distance_to_home <= FINAL_APPROACH_TRIGGER_DISTANCE_M
+                or (home_measurement is not None and home_measurement[1] <= FINAL_APPROACH_TRIGGER_DISTANCE_M)
+            ):
+                stop_robot()
+                last_nav_motion = None
+                state = "FINAL_APPROACH"
+                trigger_distance = home_measurement[1] if home_measurement is not None else distance_to_home
                 print(
-                    f"{turn_mode} rotating {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
-                    f"{nav_heading:.1f}deg ({nav_turn:+.1f}deg, tol={nav_tol:.1f}deg, pulse={turn_duration:.2f}s)"
+                    f"Within final approach range ({trigger_distance:.2f}m). "
+                    f"Switching to FINAL_APPROACH."
                 )
-                preferred_turn_direction = turn_direction
-                preferred_turn_until = now + ROUTE_DIRECTION_HOLD_TIME_S
-                pulse_turn(turn_direction, duration=turn_duration)
-            else:
-                committed_turn_direction = None
-                committed_turn_until = 0.0
-                preferred_turn_direction = None
-                preferred_turn_until = 0.0
-                if nav_mode == "SMOOTH_APPROACH":
-                    print(
-                        f"Smooth approach within tolerance ({nav_tol:.1f}deg). "
-                        f"Driving forward slowly toward {HOME_APPROACH_HEADING:.1f}deg."
-                    )
-                    drive_forward(SMOOTH_APPROACH_SPEED)
-                else:
-                    print(f"Within route heading tolerance ({nav_tol:.1f}deg). Driving forward.")
-                    drive_forward('3' if distance_to_home > 1.0 else '2')
+                continue
 
-            continue
-
-        if state == "FINAL_ALIGN":
-            committed_turn_direction = None
-            committed_turn_until = 0.0
-            preferred_turn_direction = None
-            preferred_turn_until = 0.0
-            if not is_localized:
+            if latest_C < STOP_DIST:
                 stop_robot()
-                if (
-                    should_back_up_for_tag_reacquire()
-                    and (time.time() - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
-                ):
-                    back_up_for_tag_reacquire()
-                    last_tag_reacquire_backup_time = time.time()
-                elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
+                back_up_for_tag_reacquire()
+                last_tag_reacquire_backup_time = time.time()
+                state = "SEARCHING"
+                continue
+
+            if abs(route_turn) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
+                turn_direction = get_turn_direction_from_error(route_turn)
+                motion_signature = ("TURN", turn_direction, ROUTE_COARSE_TURN_SPEED)
+                if last_nav_motion != motion_signature:
                     print(
-                        f"Final alignment lost tag view ({get_ultrasonic_status()}) -> "
-                        f"searching {'RIGHT' if last_known_side > 0 else 'LEFT'}"
+                        f"Rotating {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
+                        f"{desired_heading:.1f}deg ({route_turn:+.1f}deg, speed={ROUTE_COARSE_TURN_SPEED})"
                     )
-                    pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
+                    last_nav_motion = motion_signature
+                drive_turn(turn_direction, speed=ROUTE_COARSE_TURN_SPEED)
                 continue
 
-            if abs(final_turn) > FINAL_HEADING_TOL_DEG:
-                print(f"Final wall-normal alignment {'LEFT' if final_turn > 0 else 'RIGHT'} ({final_turn:+.1f}deg)")
-                pulse_turn('L' if final_turn > 0 else 'R', duration=0.05)
+            if abs(route_turn) > ROUTE_HEADING_TOL_DEG:
+                turn_direction = get_turn_direction_from_error(route_turn)
+                print(
+                    f"Trimming {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
+                    f"{desired_heading:.1f}deg ({route_turn:+.1f}deg, tol={ROUTE_HEADING_TOL_DEG:.1f}deg)"
+                )
+                last_nav_motion = None
+                pulse_turn(turn_direction, duration=ROUTE_FINE_TURN_DURATION_S, speed=ROUTE_FINE_TURN_SPEED)
                 continue
 
-            stop_robot()
-            state = "FINAL_APPROACH"
-            print("Final heading aligned. Switching to FINAL_APPROACH.")
+            forward_speed = '3' if distance_to_home > 1.0 else '2'
+            motion_signature = ("FORWARD", forward_speed)
+            if last_nav_motion != motion_signature:
+                print(
+                    f"Heading aligned within tolerance ({ROUTE_HEADING_TOL_DEG:.1f}deg). "
+                    f"Driving forward at speed {forward_speed}."
+                )
+                last_nav_motion = motion_signature
+            drive_forward(forward_speed)
             continue
 
         if state == "FINAL_APPROACH":
-            committed_turn_direction = None
-            committed_turn_until = 0.0
-            preferred_turn_direction = None
-            preferred_turn_until = 0.0
             if latest_C <= FINAL_STOP_DISTANCE_CM:
                 stop_robot()
                 print(f"HOME REACHED: stopping at proximity distance {latest_C:.0f}cm")
                 state = "DONE"
                 continue
 
+            if not is_localized and home_measurement is None:
+                stop_robot()
+                state = "SEARCHING"
+                print("Final approach lost tags. Switching to SEARCHING.")
+                continue
+
             if home_measurement is not None:
                 avg_home_x, avg_home_z, home_ids = home_measurement
                 print(f"Final approach using home tags {home_ids}: X={avg_home_x:.2f}m, Z={avg_home_z:.2f}m")
-
                 if avg_home_x > HOME_X_TOL_M:
-                    pulse_turn('R', duration=0.04)
+                    pulse_turn('R', duration=0.04, speed='1')
                 elif avg_home_x < -HOME_X_TOL_M:
-                    pulse_turn('L', duration=0.04)
-                else:
-                    drive_forward('1' if latest_C < (FINAL_STOP_DISTANCE_CM + 15) else '2')
-                continue
-
-            if is_localized:
-                if abs(final_turn) > FINAL_HEADING_TOL_DEG:
-                    pulse_turn('L' if final_turn > 0 else 'R', duration=0.05)
+                    pulse_turn('L', duration=0.04, speed='1')
                 else:
                     drive_forward('1')
-            elif (
-                should_back_up_for_tag_reacquire()
-                and (time.time() - last_tag_reacquire_backup_time) > TAG_REACQUIRE_BACKUP_COOLDOWN_S
-            ):
-                back_up_for_tag_reacquire()
-                last_tag_reacquire_backup_time = time.time()
-            elif (time.time() - last_seen_time) > SEARCH_TIMEOUT:
-                print(
-                    f"Final approach lost tags ({get_ultrasonic_status()}) -> "
-                    f"searching {'RIGHT' if last_known_side > 0 else 'LEFT'}"
-                )
-                pulse_turn('R' if last_known_side > 0 else 'L', duration=0.08)
+                continue
+
+            if abs(final_turn) > FINAL_HEADING_TOL_DEG:
+                print(f"Final heading trim {'LEFT' if final_turn > 0 else 'RIGHT'} ({final_turn:+.1f}deg)")
+                pulse_turn('L' if final_turn > 0 else 'R', duration=0.04, speed='1')
+            else:
+                drive_forward('1')
             continue
 
         if state == "DONE":
