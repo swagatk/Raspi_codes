@@ -37,7 +37,7 @@ unsigned long lastCommandTime = 0; // Safety timeout
 
 // Track current servo positions for smooth movement
 int currentShoulderL = 180;  // DOWN position for Left
-int currentShoulderR = 0;    // DOWN position for Right
+int currentShoulderR = 130;  // Home position for Right shoulder
 int currentElbowL = 90;      // UP position for Elbow Left
 int currentElbowR = 90;     // UP position for Elbow Right
 const int SERVO_DELAY = 15;  // ms between steps (higher = slower)
@@ -75,31 +75,25 @@ void setup() {
 }
 
 // --- HELPER FUNCTIONS FOR ARM ---
-// Smooth shoulder movement - moves both servos gradually to target positions
-void moveShoulderSmooth(int targetL, int targetR) {
-  if (!shoulderLeft.attached()) shoulderLeft.attach(PIN_SHOULDER_L);
+// Smooth shoulder movement - only the right shoulder is installed
+void moveShoulderSmooth(int targetR) {
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
   
   // Move in 1-degree increments
-  while (currentShoulderL != targetL || currentShoulderR != targetR) {
-    if (currentShoulderL < targetL) currentShoulderL++;
-    else if (currentShoulderL > targetL) currentShoulderL--;
-    
+  while (currentShoulderR != targetR) {
     if (currentShoulderR < targetR) currentShoulderR++;
     else if (currentShoulderR > targetR) currentShoulderR--;
     
-    shoulderLeft.write(currentShoulderL);
     shoulderRight.write(currentShoulderR);
     delay(SERVO_DELAY);
   }
 }
 
-// Mirrored math ensures parallel servos don't fight each other
+// Direct shoulder movement for the installed right shoulder servo
 void moveShoulder(int angle) {
-  if (!shoulderLeft.attached()) shoulderLeft.attach(PIN_SHOULDER_L);
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
-  shoulderLeft.write(angle);
-  shoulderRight.write(180 - angle);
+  currentShoulderR = angle;
+  shoulderRight.write(currentShoulderR);
 }
 
 void moveElbow(int angle) {
@@ -130,26 +124,30 @@ void moveElbowSmooth(int targetL, int targetR) {
 
 // Combined shoulder + elbow smooth movement (all 4 servos simultaneously)
 void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER) {
-  if (!shoulderLeft.attached()) shoulderLeft.attach(PIN_SHOULDER_L);
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
   if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L);
   if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R);
   
-  // Move all 4 servos in 1-degree increments
-  while (currentShoulderL != targetSL || currentShoulderR != targetSR ||
-         currentElbowL != targetEL || currentElbowR != targetER) {
-    // Shoulder
-    if (currentShoulderL < targetSL) currentShoulderL++;
-    else if (currentShoulderL > targetSL) currentShoulderL--;
-    if (currentShoulderR < targetSR) currentShoulderR++;
-    else if (currentShoulderR > targetSR) currentShoulderR--;
-    // Elbow
-    if (currentElbowL < targetEL) currentElbowL++;
-    else if (currentElbowL > targetEL) currentElbowL--;
-    if (currentElbowR < targetER) currentElbowR++;
-    else if (currentElbowR > targetER) currentElbowR--;
-    
-    shoulderLeft.write(currentShoulderL);
+  int startShoulderR = currentShoulderR;
+  int startElbowL = currentElbowL;
+  int startElbowR = currentElbowR;
+  int shoulderSteps = abs(targetSR - startShoulderR);
+  int elbowLeftSteps = abs(targetEL - startElbowL);
+  int elbowRightSteps = abs(targetER - startElbowR);
+  int totalSteps = max(shoulderSteps, max(elbowLeftSteps, elbowRightSteps));
+
+  currentShoulderL = targetSL;
+
+  if (totalSteps == 0) {
+    return;
+  }
+
+  // Interpolate all arm joints across the same timeline so they finish together.
+  for (int step = 1; step <= totalSteps; step++) {
+    currentShoulderR = startShoulderR + ((targetSR - startShoulderR) * step) / totalSteps;
+    currentElbowL = startElbowL + ((targetEL - startElbowL) * step) / totalSteps;
+    currentElbowR = startElbowR + ((targetER - startElbowR) * step) / totalSteps;
+
     shoulderRight.write(currentShoulderR);
     elbowLeft.write(currentElbowL);
     elbowRight.write(currentElbowR);
@@ -206,22 +204,22 @@ void loop() {
     
     // Interpret Arm Commands
     else if (command == 'U') {  // Shoulder UP - smooth movement
-      moveShoulderSmooth(60, 120);  // Left: 180->60, Right: 0->120
+      moveShoulderSmooth(0);  // Right: 130->0
     }
     else if (command == 'D') {  // Shoulder DOWN - smooth movement
-      moveShoulderSmooth(180, 0);  // Left: 60->180, Right: 120->0
+      moveShoulderSmooth(130);  // Right: 0->130
     }
     else if (command == 'E') {  // Elbow UP - smooth movement
-      moveElbowSmooth(90, 90);  // Left: 0->90, Right: 180->90
-    }
-    else if (command == 'e') {  // Elbow DOWN - smooth movement
       moveElbowSmooth(0, 180);  // Left: 90->0, Right: 90->180
     }
+    else if (command == 'e') {  // Elbow DOWN - smooth movement
+      moveElbowSmooth(90, 90);  // Left: 0->90, Right: 180->90
+    }
     else if (command == 'A') {  // ARM UP: Shoulder UP + Elbow DOWN (horizontal to ground)
-      moveArmSmooth(60, 120, 0, 180);  // Shoulder up, Elbow down
+      moveArmSmooth(currentShoulderL, 0, 90, 90);  // Right shoulder up, Elbow down
     }
     else if (command == 'a') {  // ARM DOWN: Shoulder DOWN + Elbow UP (return to start)
-      moveArmSmooth(180, 0, 90, 90);  // Shoulder down, Elbow up
+      moveArmSmooth(currentShoulderL, 130, 0, 180);  // Right shoulder home, Elbow up
     }
     else if (command == 'O') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
