@@ -223,11 +223,11 @@ void loop() {
     }
     else if (command == 'O') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
-      wrist.write(90);
+      wrist.write(0);
     }    // Gate OPEN
     else if (command == 'C') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
-      wrist.write(180);
+      wrist.write(90);
     }    // Gate CLOSED
     
     // Interpret Individual Servo Angle Commands: 'v' <servoIndex> <angle>
