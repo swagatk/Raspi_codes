@@ -30,6 +30,7 @@ print("  E : Elbow UP (Left: 90 -> 0, Right: 90 -> 180)")
 print("  e : Elbow DOWN (Left: 0 -> 90, Right: 180 -> 90)")
 print("  A : ARM UP (Shoulder Right UP + Elbow DOWN, palm stays horizontal)")
 print("  a : ARM DOWN (Shoulder Right home + Elbow UP, return to start)")
+print("  H : ARM VERTICAL (Shoulder Right UP + Elbow UP)")
 print("  O : Gate/Wrist OPEN (90 -> 0)")
 print("  C : Gate/Wrist CLOSED (0 -> 90)")
 print("  v <id> <angle> : Move specific servo to angle (e.g. 'v 0 90')")
@@ -51,7 +52,9 @@ try:
             break
             
         # Send valid servo commands to the Arduino
-        if cmd in ['U', 'D', 'E', 'e', 'O', 'C', 'A', 'a']:
+        if cmd in ['U', 'D', 'E', 'e', 'O', 'C', 'A', 'a', 'H', 'h']:
+            if cmd == 'h': cmd = 'H' # Map lowercase 'h' to 'H'
+            
             # Clear any accumulated sensor data to prevent buffer overflow
             ser.reset_input_buffer()
             # Make sure it resets watchdog quickly by appending a newline
@@ -80,7 +83,7 @@ try:
             except ValueError:
                 print("Invalid numbers! Use: v <id> <angle>")
         else:
-            print("Invalid command! Please use U, D, E, e, O, C, 'v <id> <angle>', or Q.")
+            print("Invalid command! Please use U, D, E, e, O, C, A, a, H, h, 'v <id> <angle>', or Q.")
             
 except KeyboardInterrupt:
     print("\nTest interrupted by user. Stopping and exiting...")

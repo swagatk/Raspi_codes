@@ -221,6 +221,9 @@ void loop() {
     else if (command == 'a') {  // ARM DOWN: Shoulder DOWN + Elbow UP (return to start)
       moveArmSmooth(currentShoulderL, 130, 0, 180);  // Right shoulder home, Elbow up
     }
+    else if (command == 'H') {  // ARM VERTICAL: Shoulder UP + Elbow UP
+      moveArmSmooth(currentShoulderL, 0, 0, 180);  // Right shoulder up, Elbow up
+    }
     else if (command == 'O') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
       wrist.write(0);

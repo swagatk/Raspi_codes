@@ -5,10 +5,12 @@ import termios
 import tty
 import threading
 import select
+import subprocessw
 
 # --- GLOBAL VARIABLES ---
 # We use this to stop the background thread when we quit
 running = True 
+camera_process = None # Tracks the video stream process
 
 # --- CONNECT TO ARDUINO ---
 try:
@@ -55,6 +57,9 @@ def get_key(timeout=0.1):
 # --- MAIN PROGRAM ---
 print("\n--- CONTROLS ---")
 print("WASD: Move | SPACE: Stop | 1-3: Speed")
+print("U: Arm UP | J: Arm DOWN | H: Arm VERTICAL")
+print("O: Gripper OPEN | C: Gripper CLOSE")
+print("V: Toggle Live Video")
 print("Q: Quit")
 print("----------------")
 
@@ -81,9 +86,29 @@ try:
             elif key == '1': cmd = b'1'
             elif key == '2': cmd = b'2'
             elif key == '3': cmd = b'3'
+            elif key == 'u': cmd = b'A'
+            elif key == 'j': cmd = b'a'
+            elif key == 'h': cmd = b'H'
+            elif key == 'o': cmd = b'O'
+            elif key == 'c': cmd = b'C'
+            elif key == 'v': 
+                cmd = current_cmd # Don't send anything new to Arduino
+                if camera_process is None or camera_process.poll() is not None:
+                    # Start camera script as a separate background process
+                    # Use sys.executable to ensure we use the same Python environment (YOLO env)
+                    camera_process = subprocess.Popen([sys.executable, '/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/arduino_motor_test/picamera_test.py'])
+                    print("\n[CAMERA] Started Live Video!")
+                else:
+                    # Terminate if it's already running
+                    camera_process.terminate()
+                    camera_process.wait() # Wait for it to close cleanly
+                    camera_process = None
+                    print("\n[CAMERA] Stopped Live Video!")
             elif key == 'q': 
                 ser.write(b'S')
                 running = False # Stop the background thread
+                if camera_process and camera_process.poll() is None:
+                    camera_process.terminate()
                 print("\nQuitting...")
                 break
             else:
@@ -107,3 +132,5 @@ except KeyboardInterrupt:
     print("\nEmergency Stop")
     ser.write(b'S')
     running = False
+    if camera_process and camera_process.poll() is None:
+        camera_process.terminate()

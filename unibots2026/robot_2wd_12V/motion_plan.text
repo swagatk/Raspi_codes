@@ -1,0 +1,9 @@
+Create a new script to  do the following: 
+(1) There will be two buttons. One will be used to start the whole operation. Another button will be used as an emergency stop button that will stop the motors instantly.
+(2) Once the start button is pressed, the following activities should take place:
+Step 1: Lift the arm UP. Start the camera and take the picture of two tags infront of the robot and save them as Home tag location.
+Step 2: Rotate by 180 degrees and scan for orange balls. Rotate slowly left and right until balls are found (see 'ball_detection.py').
+step 3: Once balls are detected, move towards the balls while avoiding obstacles. Move along the direction having largest density of balls (more number of bounding boxes). If the balls are lost due to obstacle avoidance manouevre, it should slowly rotate to look for balls again. 
+Step 4. Once it reaches the ball (see 'go_to_ball.py'), Perform 'ball capture manouevre' which involves Lowering the arm and move forward slowly while opening and closing the gripper at regular intervals (~ 3 sec) for about 2-3 times. 
+Step 5. Close the gripper one last time and move the arm UP. 
+Step 6. Look for home tag and move towards the home tag location (see 'go_to_home.py')
