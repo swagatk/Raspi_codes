@@ -5,7 +5,7 @@ import termios
 import tty
 import threading
 import select
-import subprocessw
+import subprocess
 
 # --- GLOBAL VARIABLES ---
 # We use this to stop the background thread when we quit
@@ -59,6 +59,8 @@ print("\n--- CONTROLS ---")
 print("WASD: Move | SPACE: Stop | 1-3: Speed")
 print("U: Arm UP | J: Arm DOWN | H: Arm VERTICAL")
 print("O: Gripper OPEN | C: Gripper CLOSE")
+print("F: Elbow DROP | G: ARM DROP (+ OPEN)")
+print("B: Ball Catch Manoeuvre")
 print("V: Toggle Live Video")
 print("Q: Quit")
 print("----------------")
@@ -89,6 +91,37 @@ try:
             elif key == 'u': cmd = b'A'
             elif key == 'j': cmd = b'a'
             elif key == 'h': cmd = b'H'
+            elif key == 'f': cmd = b'f'
+            elif key == 'g': cmd = b'g'
+            elif key == 'b': 
+                print("\n[BALL CATCH] Executing Manoeuvre...")
+                ser.write(b'S') # Ensure stopped first
+                time.sleep(0.1)
+                ser.write(b'a') # Arm DOWN
+                time.sleep(2.0)
+                ser.write(b'O') # Gripper OPEN
+                time.sleep(1.0)
+                
+                ser.write(b'F') # Move forward
+                time.sleep(1.5) # Short interval
+                ser.write(b'C') # Close gripper
+                time.sleep(1.0) # Wait for close
+                ser.write(b'S') # Stop
+                time.sleep(0.5)
+                
+                for _ in range(3):
+                    ser.write(b'F') # Move forwards
+                    time.sleep(1.0)
+                    ser.write(b'S') # Stop to scoop
+                    time.sleep(0.2)
+                    ser.write(b'O') # Open gripper
+                    time.sleep(1.0)
+                    ser.write(b'C') # Close gripper
+                    time.sleep(1.0)
+                    
+                cmd = b'S'
+                current_cmd = b'S'
+                
             elif key == 'o': cmd = b'O'
             elif key == 'c': cmd = b'C'
             elif key == 'v': 
@@ -106,6 +139,12 @@ try:
                     print("\n[CAMERA] Stopped Live Video!")
             elif key == 'q': 
                 ser.write(b'S')
+                print("\nExecuting ARM DOWN (a) and Gripper OPEN (O)...")
+                ser.write(b'a')
+                time.sleep(2.0)
+                ser.write(b'O')
+                time.sleep(1.0)
+                
                 running = False # Stop the background thread
                 if camera_process and camera_process.poll() is None:
                     camera_process.terminate()
@@ -131,6 +170,13 @@ try:
 except KeyboardInterrupt:
     print("\nEmergency Stop")
     ser.write(b'S')
+    
+    print("Executing ARM DOWN (a) and Gripper OPEN (O)...")
+    ser.write(b'a')
+    time.sleep(2.0)
+    ser.write(b'O')
+    time.sleep(1.0)
+    
     running = False
     if camera_process and camera_process.poll() is None:
         camera_process.terminate()

@@ -123,7 +123,7 @@ void moveElbowSmooth(int targetL, int targetR) {
 }
 
 // Combined shoulder + elbow smooth movement (all 4 servos simultaneously)
-void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER) {
+void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER, int delayMs = SERVO_DELAY) {
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
   if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L);
   if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R);
@@ -151,7 +151,7 @@ void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER) {
     shoulderRight.write(currentShoulderR);
     elbowLeft.write(currentElbowL);
     elbowRight.write(currentElbowR);
-    delay(SERVO_DELAY);
+    delay(delayMs);
   }
 }
 
@@ -214,6 +214,20 @@ void loop() {
     }
     else if (command == 'e') {  // Elbow DOWN - smooth movement
       moveElbowSmooth(90, 90);  // Left: 0->90, Right: 180->90
+    }
+    else if (command == 'f') {  // Elbow DROP - smooth movement
+      moveElbowSmooth(120, 60); // Left: 90->120, Right: 90->60
+    }
+    else if (command == 'g') {  // ARM DROP pose - smooth movement
+      // Pass a custom delay of 45ms (3x slower than default 15ms) for a softer landing
+      moveArmSmooth(currentShoulderL, 30, 120, 60, 45); 
+      // Ensure the arm has settled completely to avoid mechanical overlap
+      delay(200); 
+      
+      // The code waits above until movement gets to the target before executing the next line 
+      // ensuring wrist opens ONLY after ARM has fully reached the drop position
+      if (!wrist.attached()) wrist.attach(PIN_WRIST);
+      wrist.write(0); // Then open the wrist gate
     }
     else if (command == 'A') {  // ARM UP: Shoulder UP + Elbow DOWN (horizontal to ground)
       moveArmSmooth(currentShoulderL, 0, 90, 90);  // Right shoulder up, Elbow down

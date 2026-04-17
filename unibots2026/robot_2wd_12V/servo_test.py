@@ -28,6 +28,8 @@ print("  U : Shoulder Right UP (130 -> 0)")
 print("  D : Shoulder Right DOWN (0 -> 130)")
 print("  E : Elbow UP (Left: 90 -> 0, Right: 90 -> 180)")
 print("  e : Elbow DOWN (Left: 0 -> 90, Right: 180 -> 90)")
+print("  F : Elbow DROP (Left: 90 -> 120, Right: 90 -> 60)")
+print("  G : ARM DROP pose (Shoulder R to 30 + Elbow DROP + Open Wrist)")
 print("  A : ARM UP (Shoulder Right UP + Elbow DOWN, palm stays horizontal)")
 print("  a : ARM DOWN (Shoulder Right home + Elbow UP, return to start)")
 print("  H : ARM VERTICAL (Shoulder Right UP + Elbow UP)")
@@ -45,6 +47,12 @@ try:
         
         # Check for quit command
         if cmd.upper() == 'Q':
+            print("Executing ARM DOWN (a) and Gripper OPEN (O)...")
+            ser.write(b'a\n')
+            time.sleep(2.0)
+            ser.write(b'O\n')
+            time.sleep(1.0)
+            
             print("Stopping motors and exiting...")
             ser.write(b'S') # Send stop signal for both DC and safety
             ser.write(b'x') # Send detach signal specifically to kill servos power
@@ -52,8 +60,10 @@ try:
             break
             
         # Send valid servo commands to the Arduino
-        if cmd in ['U', 'D', 'E', 'e', 'O', 'C', 'A', 'a', 'H', 'h']:
+        if cmd in ['U', 'D', 'E', 'e', 'O', 'C', 'A', 'a', 'H', 'h', 'F', 'f', 'G', 'g']:
             if cmd == 'h': cmd = 'H' # Map lowercase 'h' to 'H'
+            if cmd == 'F': cmd = 'f' # Map 'F' to 'f' (Elbow Drop, to avoid conflict with Forward)
+            if cmd == 'G': cmd = 'g' # Map 'G' to 'g' (ARM Drop)
             
             # Clear any accumulated sensor data to prevent buffer overflow
             ser.reset_input_buffer()
@@ -83,11 +93,17 @@ try:
             except ValueError:
                 print("Invalid numbers! Use: v <id> <angle>")
         else:
-            print("Invalid command! Please use U, D, E, e, O, C, A, a, H, h, 'v <id> <angle>', or Q.")
+            print("Invalid command! Please use U, D, E, e, F, G, O, C, A, a, H, h, 'v <id> <angle>', or Q.")
             
 except KeyboardInterrupt:
     print("\nTest interrupted by user. Stopping and exiting...")
     if 'ser' in locals() and ser.is_open:
+        print("Executing ARM DOWN (a) and Gripper OPEN (O)...")
+        ser.write(b'a\n')
+        time.sleep(2.0)
+        ser.write(b'O\n')
+        time.sleep(1.0)
+        
         ser.write(b'S') # Ensure safety stop gets sent
         ser.write(b'x') # Kill servos explicitly
         time.sleep(0.1)
