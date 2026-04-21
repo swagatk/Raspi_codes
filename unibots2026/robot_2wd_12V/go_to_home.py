@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from pupil_apriltags import Detector
 import serial
+import serial.tools.list_ports
 import time
 import math
 import sys
@@ -70,7 +71,7 @@ ARENA_MAP = {
 }
 
 # --- HOME SETTINGS ---
-HOME_TAGS = [2, 3]
+HOME_TAGS = [8, 9 ]
 FINAL_ALIGN_DISTANCE_M = 0.5
 FINAL_APPROACH_TRIGGER_DISTANCE_M = 0.85
 FINAL_STOP_DISTANCE_CM = 50
@@ -87,12 +88,8 @@ ROUTE_COARSE_TURN_SPEED = '1'
 ROUTE_FINE_TURN_SPEED = '1'
 ROUTE_CONTINUOUS_TURN_HANDOFF_DEG = 25.0
 ROUTE_TRIM_TURN_DURATION_S = 0.04
-SMOOTH_APPROACH_DISTANCE_M = 0.75
-SMOOTH_APPROACH_HEADING_TOL_DEG = 12.0
-SMOOTH_APPROACH_SPEED = '1'
-FINAL_HEADING_TOL_DEG = 15.0
 HOME_X_TOL_M = 0.08
-
+FINAL_STOP_DISTANCE_CM = 50 # User requested stop distance
 
 def get_wall_axes(tag_id):
     if 0 <= tag_id <= 5:
@@ -112,31 +109,6 @@ def normalize_rotation(angle_degrees):
     return (angle_degrees + 180.0) % 360.0 - 180.0
 
 
-def blend_heading_degrees(start_heading_deg, end_heading_deg, blend_ratio):
-    blend_ratio = max(0.0, min(1.0, blend_ratio))
-    start_rad = math.radians(start_heading_deg)
-    end_rad = math.radians(end_heading_deg)
-    vec_x = (1.0 - blend_ratio) * math.cos(start_rad) + blend_ratio * math.cos(end_rad)
-    vec_y = (1.0 - blend_ratio) * math.sin(start_rad) + blend_ratio * math.sin(end_rad)
-    return heading_from_vector(vec_x, vec_y)
-
-
-def get_navigation_guidance(distance_to_home, route_heading, final_heading, robot_heading):
-    if distance_to_home <= SMOOTH_APPROACH_DISTANCE_M:
-        blend_span = max(SMOOTH_APPROACH_DISTANCE_M - FINAL_ALIGN_DISTANCE_M, 1e-6)
-        blend_ratio = (SMOOTH_APPROACH_DISTANCE_M - distance_to_home) / blend_span
-        nav_heading = blend_heading_degrees(route_heading, final_heading, blend_ratio)
-        nav_tol = SMOOTH_APPROACH_HEADING_TOL_DEG
-        nav_mode = "SMOOTH_APPROACH"
-    else:
-        nav_heading = route_heading
-        nav_tol = ROUTE_HEADING_TOL_DEG
-        nav_mode = "ROUTE"
-
-    nav_turn = normalize_rotation(nav_heading - robot_heading)
-    return nav_heading, nav_turn, nav_tol, nav_mode
-
-
 def get_home_target():
     home_points = [ARENA_MAP[tag_id] for tag_id in HOME_TAGS if tag_id in ARENA_MAP]
     mid_x = sum(point["x"] for point in home_points) / len(home_points)
@@ -150,12 +122,25 @@ def estimate_robot_pose(tags):
     pose_estimates = []
     mapped_tag_observations = []
 
+    # If we only see one home tag but we are very close to it, we might be getting
+    # bad parallax depth estimation. But we still want to count it as localized
+    # so we can keep driving forward to hit the wall.
+    # The pupil_apriltags library returns unstable results sometimes at steep angles with only one tag,
+    # but we can filter it based on z_dist being positive
+    
     for tag in tags:
         if tag.tag_id not in ARENA_MAP:
             continue
 
+        # Reject tags that solve to be "behind" the camera due to ambiguity
+        if tag.pose_t[2][0] <= 0:
+            continue
+
         tag_info = ARENA_MAP[tag.tag_id]
         tangent_vec, inward_normal_vec = get_wall_axes(tag.tag_id)
+        
+        # We need to invert the transform properly
+        # R * x + t = 0 => x = -R^T * t
         cam_pos_in_tag = -np.dot(tag.pose_R.T, tag.pose_t)
         local_tangent = -cam_pos_in_tag[0][0] / SCALE
         local_inward = -cam_pos_in_tag[2][0] / SCALE
@@ -170,22 +155,40 @@ def estimate_robot_pose(tags):
     if not pose_estimates:
         return None
 
-    total_weight = sum(weight for _, _, _, _, _, weight in pose_estimates)
-    robot_x = sum(rx * weight for _, rx, _, _, _, weight in pose_estimates) / total_weight
-    robot_y = sum(ry * weight for _, _, ry, _, _, weight in pose_estimates) / total_weight
+    # Use only the closest tag to avoid bad averaging with tiny far-away tags
+    best_tag = max(pose_estimates, key=lambda x: x[5])
+    _, robot_x, robot_y, _, _, _ = best_tag
+
+    # Or keep the weighted average, which is fine, but your heading logic was what needed fixing
     robot_x = max(0.0, min(robot_x, xmax))
     robot_y = max(0.0, min(robot_y, ymax))
 
     heading_vec_x = 0.0
     heading_vec_y = 0.0
-    for tag_id, weight in mapped_tag_observations:
-        tag_info = ARENA_MAP[tag_id]
+
+    for tag in tags:
+        if tag.tag_id not in ARENA_MAP or tag.pose_t[2][0] <= 0:
+            continue
+        
+        tag_info = ARENA_MAP[tag.tag_id]
+        weight = 1.0 / max(tag.pose_t[2][0] / SCALE, 0.05)
+        
+        # Vector from robot to tag in world frame
         vec_x = tag_info["x"] - robot_x
         vec_y = tag_info["y"] - robot_y
-        vec_norm = math.hypot(vec_x, vec_y)
-        if vec_norm > 1e-6:
-            heading_vec_x += (vec_x / vec_norm) * weight
-            heading_vec_y += (vec_y / vec_norm) * weight
+        
+        # Angle from robot to tag in the world
+        angle_to_tag_world = math.degrees(math.atan2(vec_y, vec_x))
+        
+        # Angle of tag in the camera view (X is right, Z is forward). 
+        # Positive if tag is to the right. 
+        # So true heading = angle_to_tag_world + angle_in_cam
+        angle_in_cam = math.degrees(math.atan2(tag.pose_t[0][0], tag.pose_t[2][0]))
+        
+        true_heading = angle_to_tag_world + angle_in_cam
+        
+        heading_vec_x += math.cos(math.radians(true_heading)) * weight
+        heading_vec_y += math.sin(math.radians(true_heading)) * weight
 
     robot_heading = heading_from_vector(heading_vec_x, heading_vec_y) if abs(heading_vec_x) > 1e-6 or abs(heading_vec_y) > 1e-6 else 0.0
     return robot_x, robot_y, robot_heading, pose_estimates
@@ -203,7 +206,7 @@ history_R = []
 running = True
 
 # --- SERIAL SETUP ---
-SERIAL_PORT = '/dev/ttyACM0'  
+SERIAL_PORT = '/dev/ttyACM1'  
 try:
     ser = serial.Serial(SERIAL_PORT, 115200, timeout=0)
     print(f"Connected to Arduino on {SERIAL_PORT}!")
@@ -228,6 +231,12 @@ def send_cmd(cmd, force=False):
         ser.flush()
         current_cmd = cmd
         last_cmd_time = now
+
+# Tell the robot to raise the arm at the start of the script
+print("Sending ARM UP command...")
+send_cmd(b'A\n', force=True)
+time.sleep(1) # Give the arm a moment to start moving
+
 
 # --- CAMERA SETUP & THREADING ---
 print("Starting Camera...")
@@ -440,9 +449,7 @@ def get_turn_direction_from_error(turn_error_deg):
     return 'L' if turn_error_deg > 0 else 'R'
 
 
-def get_turn_speed(turn_error_deg, nav_mode):
-    if nav_mode == "SMOOTH_APPROACH":
-        return ROUTE_FINE_TURN_SPEED
+def get_turn_speed(turn_error_deg):
     if abs(turn_error_deg) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
         return ROUTE_COARSE_TURN_SPEED
     return ROUTE_FINE_TURN_SPEED
@@ -541,6 +548,8 @@ last_known_side = 1.0
 frame_skip_counter = 0
 last_tag_reacquire_backup_time = 0.0
 last_nav_motion = None
+consecutive_detections = 0
+ONE_SHOT_DISTANCE_THRESHOLD = 0.85
 
 send_cmd('1')
 
@@ -629,10 +638,16 @@ try:
         if state == "SEARCHING":
             last_nav_motion = None
             if is_localized:
-                stop_robot()
-                state = "NAVIGATING"
-                print("\n>>> Tags visible. Navigating toward home target <<<\n")
+                consecutive_detections += 1
+                if consecutive_detections >= 3:
+                    stop_robot()
+                    state = "NAVIGATING"
+                    print("\n>>> Target confirmed! Aligning and driving. <<<\n")
+                else:
+                    print(f"Waiting for tag confirmation... ({consecutive_detections}/3)")
                 continue
+            else:
+                consecutive_detections = 0 # reset counter if we lose it
 
             if (
                 should_back_up_for_tag_reacquire()
@@ -649,33 +664,35 @@ try:
             continue
 
         if state == "NAVIGATING":
+            # Check stopping distance first (only if we are close to home AND a sensor is < 30cm)
+            # This prevents us from stopping when passing an obstacle while far away
+            if distance_to_home is not None and distance_to_home <= ONE_SHOT_DISTANCE_THRESHOLD:
+                if latest_C < FINAL_STOP_DISTANCE_CM or latest_L < FINAL_STOP_DISTANCE_CM or latest_R < FINAL_STOP_DISTANCE_CM:
+                    stop_robot()
+                    print(f"HOME REACHED: Wall detected within {FINAL_STOP_DISTANCE_CM}cm (L:{latest_L} C:{latest_C} R:{latest_R})")
+                    state = "DONE"
+                    continue
+            
+            # Obstacle avoidance if not near home:
+            elif latest_C < STOP_DIST:
+                stop_robot()
+                print(f"Obstacle in the way: {latest_C}cm. Rerouting...")
+                state = "SEARCHING"
+                continue
+
+            # Fallback if we lose tags for a fraction of a second but know we are close to home
             if not is_localized:
-                stop_robot()
-                last_nav_motion = None
-                state = "SEARCHING"
-                print("Tags lost. Switching to SEARCHING.")
-                continue
-
-            if (
-                distance_to_home <= FINAL_APPROACH_TRIGGER_DISTANCE_M
-                or (home_measurement is not None and home_measurement[1] <= FINAL_APPROACH_TRIGGER_DISTANCE_M)
-            ):
-                stop_robot()
-                last_nav_motion = None
-                state = "FINAL_APPROACH"
-                trigger_distance = home_measurement[1] if home_measurement is not None else distance_to_home
-                print(
-                    f"Within final approach range ({trigger_distance:.2f}m). "
-                    f"Switching to FINAL_APPROACH."
-                )
-                continue
-
-            if latest_C < STOP_DIST:
-                stop_robot()
-                back_up_for_tag_reacquire()
-                last_tag_reacquire_backup_time = time.time()
-                state = "SEARCHING"
-                continue
+                if last_nav_motion and last_nav_motion[0] == "FORWARD" and distance_to_home is not None and distance_to_home < ONE_SHOT_DISTANCE_THRESHOLD:
+                    print("Lost tags, but close to home. Continuing blindly forward to wall.")
+                    drive_forward('1')  # Keep moving slowly
+                    continue
+                else:    
+                    stop_robot()
+                    last_nav_motion = None
+                    consecutive_detections = 0
+                    state = "SEARCHING"
+                    print("Tags lost. Switching to SEARCHING.")
+                    continue
 
             if abs(route_turn) > ROUTE_COARSE_TURN_THRESHOLD_DEG:
                 turn_direction = get_turn_direction_from_error(route_turn)
@@ -699,7 +716,8 @@ try:
                 pulse_turn(turn_direction, duration=ROUTE_FINE_TURN_DURATION_S, speed=ROUTE_FINE_TURN_SPEED)
                 continue
 
-            forward_speed = '3' if distance_to_home > 1.0 else '2'
+            # If already fairly aligned OR within the 0.85m threshold, just drive forward
+            forward_speed = '3' if distance_to_home > ONE_SHOT_DISTANCE_THRESHOLD else '2'
             motion_signature = ("FORWARD", forward_speed)
             if last_nav_motion != motion_signature:
                 print(
@@ -708,37 +726,6 @@ try:
                 )
                 last_nav_motion = motion_signature
             drive_forward(forward_speed)
-            continue
-
-        if state == "FINAL_APPROACH":
-            if latest_C <= FINAL_STOP_DISTANCE_CM:
-                stop_robot()
-                print(f"HOME REACHED: stopping at proximity distance {latest_C:.0f}cm")
-                state = "DONE"
-                continue
-
-            if not is_localized and home_measurement is None:
-                stop_robot()
-                state = "SEARCHING"
-                print("Final approach lost tags. Switching to SEARCHING.")
-                continue
-
-            if home_measurement is not None:
-                avg_home_x, avg_home_z, home_ids = home_measurement
-                print(f"Final approach using home tags {home_ids}: X={avg_home_x:.2f}m, Z={avg_home_z:.2f}m")
-                if avg_home_x > HOME_X_TOL_M:
-                    pulse_turn('R', duration=0.04, speed='1')
-                elif avg_home_x < -HOME_X_TOL_M:
-                    pulse_turn('L', duration=0.04, speed='1')
-                else:
-                    drive_forward('1')
-                continue
-
-            if abs(final_turn) > FINAL_HEADING_TOL_DEG:
-                print(f"Final heading trim {'LEFT' if final_turn > 0 else 'RIGHT'} ({final_turn:+.1f}deg)")
-                pulse_turn('L' if final_turn > 0 else 'R', duration=0.04, speed='1')
-            else:
-                drive_forward('1')
             continue
 
         if state == "DONE":
@@ -750,6 +737,12 @@ except KeyboardInterrupt:
     print("\nEmergency Stop Triggered.")
 finally:
     running = False
+    
+    # Tell the robot to lower the arm when shutting down
+    print("Sending ARM DOWN command...")
+    send_cmd(b'a\n', force=True)
+    time.sleep(1) # Give the arm a moment to start moving
+    
     stop_robot()
     time.sleep(0.1)
     picam2.stop()
