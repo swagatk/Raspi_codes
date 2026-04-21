@@ -1,4 +1,5 @@
 import serial
+import serial.tools.list_ports
 import time
 import sys
 import termios
@@ -13,11 +14,25 @@ running = True
 camera_process = None # Tracks the video stream process
 
 # --- CONNECT TO ARDUINO ---
+def find_arduino_port():
+    print("Scanning for available serial ports...")
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if 'ttyACM' in port.device or 'ttyUSB' in port.device:
+            return port.device
+    return None
+
 try:
-    # Double check your port: /dev/ttyACM0 or /dev/ttyUSB0
-    ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+    # Auto-detect your port: /dev/ttyACM* or /dev/ttyUSB*
+    port = find_arduino_port()
+    if not port:
+        print("Error: Could not find any connected Arduino (checked ttyACM* and ttyUSB*).")
+        print("Please check the USB connection.")
+        sys.exit(1)
+        
+    ser = serial.Serial(port, 115200, timeout=1)
     ser.reset_input_buffer()
-    print("Connected to Robot!")
+    print(f"Connected to Robot on {port}!")
     time.sleep(2) # Wait for Arduino reboot
 except Exception as e:
     print(f"Error: {e}")
@@ -90,7 +105,7 @@ try:
             elif key == '2': cmd = b'2\n'
             elif key == '3': cmd = b'3\n'
             elif key == 'u': cmd = b'A\n'
-            elif key == 'j': cmd = b'J\n'  # Now mapped to the new staggered 'J' command
+            elif key == 'j': cmd = b'a\n'  # Now mapped to the new staggered 'J' command
             elif key == 'h': cmd = b'H\n'
             elif key == 'f': cmd = b'f\n'
             elif key == 'g': cmd = b'g\n'

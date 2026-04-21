@@ -1,10 +1,25 @@
 import serial
+import serial.tools.list_ports
 import time
 import sys
 
-# Configure the serial port (adjust '/dev/ttyACM0' if your Arduino is on a different port like USB0)
-SERIAL_PORT = '/dev/ttyACM1'
+# Configure the baud rate
 BAUD_RATE = 115200
+
+def find_arduino_port():
+    print("Scanning for available serial ports...")
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if 'ttyACM' in port.device or 'ttyUSB' in port.device:
+            return port.device
+    return None
+
+SERIAL_PORT = find_arduino_port()
+
+if not SERIAL_PORT:
+    print("Error: Could not find any connected Arduino (checked ttyACM* and ttyUSB*).")
+    print("Please check the USB connection.")
+    sys.exit(1)
 
 try:
     print(f"Connecting to Arduino on {SERIAL_PORT} at {BAUD_RATE} baud...")
