@@ -21,7 +21,10 @@ def main():
         while True:
             # Capture the latest frame as a numpy array directly in BGR format
             # Using create_video_configuration with BGR888 avoids costly color conversion
-            frame_bgr = picam2.capture_array()
+            frame_raw = picam2.capture_array()
+            
+            # Rotate frame by 180 degrees (flip horizontally AND vertically)
+            frame_bgr = cv2.flip(frame_raw, -1)
             
             # Display the video frame
             cv2.imshow("Live Video", frame_bgr)
