@@ -3,7 +3,7 @@ import time
 import sys
 
 # Configure the serial port (adjust '/dev/ttyACM0' if your Arduino is on a different port like USB0)
-SERIAL_PORT = '/dev/ttyACM0'
+SERIAL_PORT = '/dev/ttyACM1'
 BAUD_RATE = 115200
 
 try:
@@ -32,6 +32,7 @@ print("  F : Elbow DROP (Left: 90 -> 120, Right: 90 -> 60)")
 print("  G : ARM DROP pose (Shoulder R to 30 + Elbow DROP + Open Wrist)")
 print("  A : ARM UP (Shoulder Right UP + Elbow DOWN, palm stays horizontal)")
 print("  a : ARM DOWN (Shoulder Right home + Elbow UP, return to start)")
+print("  J : ARM DOWN SLOW STAGGERED (Shoulder 60 -> Elbow Horizontal -> Shoulder 130)")
 print("  H : ARM VERTICAL (Shoulder Right UP + Elbow UP)")
 print("  O : Gate/Wrist OPEN (90 -> 0)")
 print("  C : Gate/Wrist CLOSED (0 -> 90)")
@@ -60,8 +61,9 @@ try:
             break
             
         # Send valid servo commands to the Arduino
-        if cmd in ['U', 'D', 'E', 'e', 'O', 'C', 'A', 'a', 'H', 'h', 'F', 'f', 'G', 'g']:
+        if cmd in ['U', 'D', 'E', 'e', 'O', 'C', 'A', 'a', 'H', 'h', 'F', 'f', 'G', 'g', 'J', 'j']:
             if cmd == 'h': cmd = 'H' # Map lowercase 'h' to 'H'
+            if cmd == 'j': cmd = 'J' # Map lowercase 'j' to 'J'
             if cmd == 'F': cmd = 'f' # Map 'F' to 'f' (Elbow Drop, to avoid conflict with Forward)
             if cmd == 'G': cmd = 'g' # Map 'G' to 'g' (ARM Drop)
             
@@ -93,7 +95,7 @@ try:
             except ValueError:
                 print("Invalid numbers! Use: v <id> <angle>")
         else:
-            print("Invalid command! Please use U, D, E, e, F, G, O, C, A, a, H, h, 'v <id> <angle>', or Q.")
+            print("Invalid command! Please use U, D, E, e, F, G, O, C, A, a, H, h, J, j, 'v <id> <angle>', or Q.")
             
 except KeyboardInterrupt:
     print("\nTest interrupted by user. Stopping and exiting...")

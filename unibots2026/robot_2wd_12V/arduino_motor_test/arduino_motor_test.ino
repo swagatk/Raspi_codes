@@ -1,3 +1,4 @@
+#include <math.h>
 #include <Servo.h>
 
 // --- PIN DEFINITIONS ---
@@ -76,7 +77,7 @@ void setup() {
 
 // --- HELPER FUNCTIONS FOR ARM ---
 // Smooth shoulder movement - only the right shoulder is installed
-void moveShoulderSmooth(int targetR) {
+void moveShoulderSmooth(int targetR, int delayMs = SERVO_DELAY) {
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
   
   // Move in 1-degree increments
@@ -85,7 +86,7 @@ void moveShoulderSmooth(int targetR) {
     else if (currentShoulderR > targetR) currentShoulderR--;
     
     shoulderRight.write(currentShoulderR);
-    delay(SERVO_DELAY);
+    delay(delayMs);
   }
 }
 
@@ -99,6 +100,8 @@ void moveShoulder(int angle) {
 void moveElbow(int angle) {
   if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L);
   if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R);
+  currentElbowL = angle;
+  currentElbowR = 180 - angle;
   elbowLeft.write(angle);
   elbowRight.write(180 - angle);
 }
@@ -134,7 +137,9 @@ void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER, int d
   int shoulderSteps = abs(targetSR - startShoulderR);
   int elbowLeftSteps = abs(targetEL - startElbowL);
   int elbowRightSteps = abs(targetER - startElbowR);
-  int totalSteps = max(shoulderSteps, max(elbowLeftSteps, elbowRightSteps));
+  int totalSteps = shoulderSteps;
+  if (elbowLeftSteps > totalSteps) totalSteps = elbowLeftSteps;
+  if (elbowRightSteps > totalSteps) totalSteps = elbowRightSteps;
 
   currentShoulderL = targetSL;
 
@@ -143,10 +148,62 @@ void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER, int d
   }
 
   // Interpolate all arm joints across the same timeline so they finish together.
+  // Use floating-point progress to ensure perfectly smooth, simultaneous tracking
   for (int step = 1; step <= totalSteps; step++) {
-    currentShoulderR = startShoulderR + ((targetSR - startShoulderR) * step) / totalSteps;
-    currentElbowL = startElbowL + ((targetEL - startElbowL) * step) / totalSteps;
-    currentElbowR = startElbowR + ((targetER - startElbowR) * step) / totalSteps;
+    float progress = (float)step / (float)totalSteps;
+    currentShoulderR = startShoulderR + ((targetSR - startShoulderR) * progress);
+    currentElbowL = startElbowL + ((targetEL - startElbowL) * progress);
+    currentElbowR = startElbowR + ((targetER - startElbowR) * progress);
+
+    shoulderRight.write(currentShoulderR);
+    elbowLeft.write(currentElbowL);
+    elbowRight.write(currentElbowR);
+    delay(delayMs);
+  }
+}
+
+// Arm-down: keep the elbow in the safe 90->0 / 90->180 corridor and let it lead the shoulder.
+void moveArmDownLevel(int targetSL, int targetSR, int targetEL, int targetER, int delayMs = SERVO_DELAY) {
+  if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
+  if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L);
+  if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R);
+
+  int startShoulderR = currentShoulderR;
+  int startElbowL = currentElbowL;
+  int startElbowR = currentElbowR;
+  
+  // Total steps based on the largest movement to ensure smooth interpolation
+  int shoulderSteps = abs(targetSR - startShoulderR);
+  int elbowLeftSteps = abs(targetEL - startElbowL);
+  int elbowRightSteps = abs(targetER - startElbowR);
+  
+  int totalSteps = shoulderSteps;
+  if (elbowLeftSteps > totalSteps) totalSteps = elbowLeftSteps;
+  if (elbowRightSteps > totalSteps) totalSteps = elbowRightSteps;
+
+  currentShoulderL = targetSL;
+
+  if (totalSteps == 0) {
+    return;
+  }
+
+  // Pure linear interpolation for all joints exactly synchronized to the same timeline.
+  // We clamp the elbow values tightly so they can never exceed their intended start/end bounds.
+  // Left elbow should go 90 -> 0. We constrain it to never go above 90.
+  // Right elbow should go 90 -> 180. We constrain it to never go below 90.
+  for (int step = 1; step <= totalSteps; step++) {
+    float progress = (float)step / (float)totalSteps;
+    
+    currentShoulderR = startShoulderR + (int)round((targetSR - startShoulderR) * progress);
+    currentElbowL = startElbowL + (int)round((targetEL - startElbowL) * progress);
+    currentElbowR = startElbowR + (int)round((targetER - startElbowR) * progress);
+
+    // Hard mechanical safety clamp for 'a' (Arm Down) trajectory
+    if (currentElbowL > 90) currentElbowL = 90;
+    if (currentElbowL < 0) currentElbowL = 0;
+    
+    if (currentElbowR < 90) currentElbowR = 90;
+    if (currentElbowR > 180) currentElbowR = 180;
 
     shoulderRight.write(currentShoulderR);
     elbowLeft.write(currentElbowL);
@@ -204,7 +261,7 @@ void loop() {
     
     // Interpret Arm Commands
     else if (command == 'U') {  // Shoulder UP - smooth movement
-      moveShoulderSmooth(0);  // Right: 130->0
+      moveShoulderSmooth(0, 30);  // Slower lift for better stability
     }
     else if (command == 'D') {  // Shoulder DOWN - smooth movement
       moveShoulderSmooth(130);  // Right: 0->130
@@ -230,10 +287,16 @@ void loop() {
       wrist.write(0); // Then open the wrist gate
     }
     else if (command == 'A') {  // ARM UP: Shoulder UP + Elbow DOWN (horizontal to ground)
-      moveArmSmooth(currentShoulderL, 0, 90, 90);  // Right shoulder up, Elbow down
+      moveArmSmooth(currentShoulderL, 0, 90, 90, 20);  // Right shoulder up, Elbow down
     }
     else if (command == 'a') {  // ARM DOWN: Shoulder DOWN + Elbow UP (return to start)
-      moveArmSmooth(currentShoulderL, 130, 0, 180);  // Right shoulder home, Elbow up
+      moveArmSmooth(currentShoulderL, 130, 0, 180, 20);  // Use identical smooth tracking algorithm as 'g'
+    }
+    else if (command == 'J') {  // Custom Slow Staggered Down
+      moveShoulderSmooth(60, 30);  // Step 1: Shoulder goes 0->60
+      //moveArmSmooth(currentShoulderL, 60, 0, 180, 30); // Step 2: Elbow goes 90->0/180
+      moveElbowSmooth(0, 180); // Ensure elbow finishes its movement before the shoulder continues down
+      moveShoulderSmooth(130, 30); // Step 3: Shoulder continues 60->130
     }
     else if (command == 'H') {  // ARM VERTICAL: Shoulder UP + Elbow UP
       moveArmSmooth(currentShoulderL, 0, 0, 180);  // Right shoulder up, Elbow up
@@ -253,10 +316,10 @@ void loop() {
     else if (command == 'v') {
       int servoIdx = Serial.parseInt();
       int angle = Serial.parseInt();
-      if (servoIdx == 0) { if (!shoulderLeft.attached()) shoulderLeft.attach(PIN_SHOULDER_L); shoulderLeft.write(angle); }
-      else if (servoIdx == 1) { if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R); shoulderRight.write(angle); }
-      else if (servoIdx == 2) { if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L); elbowLeft.write(angle); }
-      else if (servoIdx == 3) { if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R); elbowRight.write(angle); }
+      if (servoIdx == 0) { if (!shoulderLeft.attached()) shoulderLeft.attach(PIN_SHOULDER_L); shoulderLeft.write(angle); currentShoulderL = angle; }
+      else if (servoIdx == 1) { if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R); shoulderRight.write(angle); currentShoulderR = angle; }
+      else if (servoIdx == 2) { if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L); elbowLeft.write(angle); currentElbowL = angle; }
+      else if (servoIdx == 3) { if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R); elbowRight.write(angle); currentElbowR = angle; }
       else if (servoIdx == 4) { if (!wrist.attached()) wrist.attach(PIN_WRIST); wrist.write(angle); }
       
       // Update command time to prevent auto-kill right after parsing

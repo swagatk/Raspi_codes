@@ -71,59 +71,60 @@ sensor_thread.daemon = True # Kills thread if program crashes
 sensor_thread.start()
 
 # 2. Start the Main Keyboard Loop
-current_cmd = b'S'
+current_cmd = b'S\n'
 try:
     while True:
         # Increase timeout to 0.55s to bridge the OS keyboard auto-repeat delay
         # This prevents the robot from stopping internally while the key is held down
         key = get_key(0.55)
+        cmd = None
         
         if key:
             key = key.lower()
-            if key == 'w': cmd = b'F'
-            elif key == 's': cmd = b'B'
-            elif key == 'a': cmd = b'L'
-            elif key == 'd': cmd = b'R'
-            elif key == ' ': cmd = b'S'
-            elif key == '1': cmd = b'1'
-            elif key == '2': cmd = b'2'
-            elif key == '3': cmd = b'3'
-            elif key == 'u': cmd = b'A'
-            elif key == 'j': cmd = b'a'
-            elif key == 'h': cmd = b'H'
-            elif key == 'f': cmd = b'f'
-            elif key == 'g': cmd = b'g'
+            if key == 'w': cmd = b'F\n'
+            elif key == 's': cmd = b'B\n'
+            elif key == 'a': cmd = b'L\n'
+            elif key == 'd': cmd = b'R\n'
+            elif key == ' ': cmd = b'S\n'
+            elif key == '1': cmd = b'1\n'
+            elif key == '2': cmd = b'2\n'
+            elif key == '3': cmd = b'3\n'
+            elif key == 'u': cmd = b'A\n'
+            elif key == 'j': cmd = b'J\n'  # Now mapped to the new staggered 'J' command
+            elif key == 'h': cmd = b'H\n'
+            elif key == 'f': cmd = b'f\n'
+            elif key == 'g': cmd = b'g\n'
             elif key == 'b': 
                 print("\n[BALL CATCH] Executing Manoeuvre...")
-                ser.write(b'S') # Ensure stopped first
+                ser.write(b'S\n') # Ensure stopped first
                 time.sleep(0.1)
-                ser.write(b'a') # Arm DOWN
+                ser.write(b'a\n') # Arm DOWN
                 time.sleep(2.0)
-                ser.write(b'O') # Gripper OPEN
+                ser.write(b'O\n') # Gripper OPEN
                 time.sleep(1.0)
                 
-                ser.write(b'F') # Move forward
+                ser.write(b'F\n') # Move forward
                 time.sleep(1.5) # Short interval
-                ser.write(b'C') # Close gripper
+                ser.write(b'C\n') # Close gripper
                 time.sleep(1.0) # Wait for close
-                ser.write(b'S') # Stop
+                ser.write(b'S\n') # Stop
                 time.sleep(0.5)
                 
                 for _ in range(3):
-                    ser.write(b'F') # Move forwards
+                    ser.write(b'F\n') # Move forwards
                     time.sleep(1.0)
-                    ser.write(b'S') # Stop to scoop
+                    ser.write(b'S\n') # Stop to scoop
                     time.sleep(0.2)
-                    ser.write(b'O') # Open gripper
+                    ser.write(b'O\n') # Open gripper
                     time.sleep(1.0)
-                    ser.write(b'C') # Close gripper
+                    ser.write(b'C\n') # Close gripper
                     time.sleep(1.0)
                     
-                cmd = b'S'
-                current_cmd = b'S'
+                cmd = b'S\n'
+                current_cmd = b'S\n'
                 
-            elif key == 'o': cmd = b'O'
-            elif key == 'c': cmd = b'C'
+            elif key == 'o': cmd = b'O\n'
+            elif key == 'c': cmd = b'C\n'
             elif key == 'v': 
                 cmd = current_cmd # Don't send anything new to Arduino
                 if camera_process is None or camera_process.poll() is not None:
@@ -138,45 +139,50 @@ try:
                     camera_process = None
                     print("\n[CAMERA] Stopped Live Video!")
             elif key == 'q': 
-                ser.write(b'S')
+                ser.write(b'S\n')
                 print("\nExecuting ARM DOWN (a) and Gripper OPEN (O)...")
-                ser.write(b'a')
+                ser.write(b'a\n')
                 time.sleep(2.0)
-                ser.write(b'O')
+                ser.write(b'O\n')
                 time.sleep(1.0)
                 
                 running = False # Stop the background thread
                 if camera_process and camera_process.poll() is None:
                     camera_process.terminate()
-                print("\nQuitting...")
-                break
-            else:
-                cmd = current_cmd
-                
+                break # Exit the while loop
+        
+        # If a valid command was generated, send it and update current_cmd
+        if key and cmd is not None:
             if cmd != current_cmd:
                 # Debug line to prove Python is reading the key
-                sys.stdout.write(f"\n[KEY PRESSED] Sending: {cmd.decode('utf-8')}\n")
+                sys.stdout.write(f"\n[KEY PRESSED] Sending: {cmd.decode('utf-8').strip()}\n")
                 sys.stdout.flush()
-                
                 ser.write(cmd)
                 current_cmd = cmd
-        else:
-              if current_cmd in [b'F', b'B', b'L', b'R']:
+        elif not key:
+            # If no key was pressed (timeout reached), stop the robot
+            if current_cmd in [b'F\n', b'B\n', b'L\n', b'R\n']:
                 sys.stdout.write("\n[TIMEOUT OR NO KEY] Sending: S\n")
                 sys.stdout.flush()
-                ser.write(b'S')
-                current_cmd = b'S'
+                ser.write(b'S\n')
+                current_cmd = b'S\n'
 
 except KeyboardInterrupt:
     print("\nEmergency Stop")
-    ser.write(b'S')
+    ser.write(b'S\n')
     
     print("Executing ARM DOWN (a) and Gripper OPEN (O)...")
-    ser.write(b'a')
+    ser.write(b'a\n')
     time.sleep(2.0)
-    ser.write(b'O')
+    ser.write(b'O\n')
     time.sleep(1.0)
     
     running = False
     if camera_process and camera_process.poll() is None:
         camera_process.terminate()
+
+finally:
+    ser.write(b'S\n')
+    time.sleep(0.1)
+    ser.close()
+    print("Serial port closed. Exiting.")
