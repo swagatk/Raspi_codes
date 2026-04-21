@@ -13,7 +13,7 @@ picam2 = Picamera2()
 # Configure preview stream
 picam2.preview_configuration.main.size = (320, 240)
 picam2.preview_configuration.main.format = "RGB888"
-picam2.preview_configuration.transform = Transform(hflip=1, vflip=0)
+picam2.preview_configuration.transform = Transform(hflip=1, vflip=1)
 
 picam2.configure("preview")
 picam2.start()

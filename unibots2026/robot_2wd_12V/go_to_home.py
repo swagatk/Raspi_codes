@@ -71,7 +71,7 @@ ARENA_MAP = {
 }
 
 # --- HOME SETTINGS ---
-HOME_TAGS = [8, 9 ]
+HOME_TAGS = [14, 15 ]
 FINAL_ALIGN_DISTANCE_M = 0.5
 FINAL_APPROACH_TRIGGER_DISTANCE_M = 0.85
 FINAL_STOP_DISTANCE_CM = 50
@@ -239,11 +239,14 @@ time.sleep(1) # Give the arm a moment to start moving
 
 
 # --- CAMERA SETUP & THREADING ---
+from libcamera import Transform
+
 print("Starting Camera...")
 picam2 = Picamera2()
 config = picam2.create_video_configuration(
     main={"size": (640, 480), "format": "RGB888"},
     controls={"FrameRate": 30},
+    transform=Transform(hflip=1, vflip=1),
     buffer_count=2
 )
 picam2.configure(config)
