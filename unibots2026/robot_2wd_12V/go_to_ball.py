@@ -1,6 +1,7 @@
 import cv2
 import time
 import serial
+import serial.tools.list_ports
 import threading
 import datetime
 import os
@@ -10,7 +11,14 @@ from libcamera import Transform
 from ultralytics import YOLO
 
 # --- CONFIGURATION ---
-SERIAL_PORT = '/dev/ttyACM0'  # Adjust if needed
+def find_arduino_port():
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if 'ttyACM' in port.device or 'ttyUSB' in port.device:
+            return port.device
+    return None
+
+SERIAL_PORT = find_arduino_port()
 BUTTON_PIN = 25
 
 # Model Selection
@@ -41,18 +49,27 @@ def log_motion_action(action_desc, l, c, r):
 STOP_DIST = 35        # cm
 SIDE_DIST = 30        # cm
 CENTER_TOLERANCE = 80 # pixels from center to consider "centered"
-BOTTOM_TOLERANCE = 200 # If ball_y is greater than this, stop (max is CAPTURE_HEIGHT, e.g., 240)
 
-# Camera Settings
+# Camera Settings & Distance Calculation
 CAPTURE_WIDTH = 320
 CAPTURE_HEIGHT = 240
 CENTER_X = CAPTURE_WIDTH // 2
 SKIP_FRAMES = 3  # Run detection 1 out of every N frames (higher = faster FPS)
 
+# Camera Calibration Parameters (from go_to_home.py, tuned for 640x480)
+CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+ORIGINAL_CALIB_WIDTH = 640
+
+# Scale the focal length (fx) to match the current capture resolution (320x240)
+FOCAL_LENGTH_X = CAMERA_PARAMS[0] * (CAPTURE_WIDTH / ORIGINAL_CALIB_WIDTH)
+BALL_DIAMETER_CM = 4.0 # Standard ping-pong ball size (~4.0 cm). Adjust if needed.
+TARGET_REACHED_CM = 30.0 # Distance to stop in front of the ball
+
+
 # --- GLOBAL VARIABLES ---
 # Thread Control
 running = True
-robot_active = False
+robot_active = True
 
 # Sensor Readings (Shared)
 latest_L = 999
@@ -65,13 +82,18 @@ ball_x = 0
 ball_y = 0
 ball_w = 0
 ball_h = 0
+ball_distance_cm = 999.0 # Store calculated distance
 
 # Serial Connection
 try:
-    ser = serial.Serial(SERIAL_PORT, 9600, timeout=1)
-    ser.reset_input_buffer()
-    print(f"Connected to Serial: {SERIAL_PORT}")
-    time.sleep(2) # Allow Arduino to reset
+    if SERIAL_PORT:
+        ser = serial.Serial(SERIAL_PORT, 9600, timeout=1)
+        ser.reset_input_buffer()
+        print(f"Connected to Serial: {SERIAL_PORT}")
+        time.sleep(2) # Allow Arduino to reset
+    else:
+        print("No Arduino port found (ttyACM/ttyUSB).")
+        ser = None
 except Exception as e:
     print(f"Error connecting to Serial: {e}")
     ser = None
@@ -145,7 +167,7 @@ def update_sensors():
 
 # --- THREAD 2: CAMERA & YOLO ---
 def camera_yolo_loop():
-    global running, ball_visible, ball_x, ball_y, ball_w, ball_h
+    global running, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm
     
     # 1. Initialize Camera
     try:
@@ -226,8 +248,11 @@ def camera_yolo_loop():
             if largest_box:
                 ball_visible = True
                 ball_x, ball_y, ball_w, ball_h = largest_box
+                # Calculate distance using pinhole camera model: Distance = (Real_Size * Focal_Length) / Pixel_Size
+                ball_distance_cm = (BALL_DIAMETER_CM * FOCAL_LENGTH_X) / ball_w
             else:
                 ball_visible = False
+                ball_distance_cm = 999.0
             
             # Calculate FPS
             current_time = time.time()
@@ -239,8 +264,8 @@ def camera_yolo_loop():
                 annotated_frame = last_results[0].plot()
             else:
                 annotated_frame = frame_bgr.copy()
-            cv2.putText(annotated_frame, f"FPS: {int(fps)}", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(annotated_frame, f"FPS: {int(fps)} | Dist: {ball_distance_cm:.1f}cm", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.imshow("Robot Vision", annotated_frame)
             
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -259,7 +284,7 @@ def camera_yolo_loop():
 def robot_control_loop():
     global running, robot_active
     global latest_L, latest_C, latest_R
-    global ball_visible, ball_x
+    global ball_visible, ball_x, ball_distance_cm
     
     print("Robot Control Loop Started.")
     
@@ -313,19 +338,17 @@ def robot_control_loop():
                 # ball_x is 0..320. Center is 160.
                 error = ball_x - CENTER_X
                 
-                # Debug
-                # print(f"Tracking Ball: x={ball_x:.1f}, error={error:.1f}, y={ball_y:.1f}")
+                # print(f"Tracking Ball: x={ball_x:.1f}, dist={ball_distance_cm:.1f}cm")
                 
-                if ball_y > BOTTOM_TOLERANCE:
-                    # Ball is very close (near bottom of frame), stop!
-                    print("Ball Reached! Stopping.")
-                    log_motion_action("Ball Reached (Stop)", latest_L, latest_C, latest_R)
+                if ball_distance_cm <= TARGET_REACHED_CM:
+                    # Ball is very close, stop!
+                    print(f"Ball Reached! Distance: {ball_distance_cm:.1f}cm. Stopping.")
+                    log_motion_action(f"Ball Reached ({ball_distance_cm:.1f}cm)", latest_L, latest_C, latest_R)
                     robot_stop()
                     # Wait slightly so we don't rapid-fire commands once arrived
                     time.sleep(0.5)
                 elif abs(error) < CENTER_TOLERANCE:
                     # Ball is roughly centered, move towards it
-                    # log_motion_action("Forward (Track)", latest_L, latest_C, latest_R) # Optional: reduce log spam
                     robot_forward()
                 elif error < 0:
                     # Ball is to the Left (x < 160)

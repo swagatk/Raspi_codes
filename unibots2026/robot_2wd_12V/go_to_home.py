@@ -20,8 +20,8 @@ CAMERA_PARAMS =  (907.462397724348, 908.550833315007, 358.40056240558073, 246.47
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
 SCALE = 2.0     # Scale factor for Picamera distance calibration
 
-STOP_DIST = 20             # Front ultrasonic sensor stop distance (cm)
-SIDE_DIST = 20             # Side ultrasonic sensor push away distance (cm)
+STOP_DIST = 40             # Front ultrasonic sensor stop distance (cm)
+SIDE_DIST = 40             # Side ultrasonic sensor push away distance (cm)
 SENSOR_SMOOTHING_COUNT = 3 # Number of sensor readings to average to prevent false positives
 SEARCH_TIMEOUT = 0.7       # If tag unseen for 0.7 seconds, start scanning for it
 FRAME_SKIP = 3             # Only run detection every Nth frame
@@ -72,24 +72,16 @@ ARENA_MAP = {
 
 # --- HOME SETTINGS ---
 HOME_TAGS = [14, 15 ]
-FINAL_ALIGN_DISTANCE_M = 0.5
-FINAL_APPROACH_TRIGGER_DISTANCE_M = 0.85
 FINAL_STOP_DISTANCE_CM = 50
 TAG_REACQUIRE_BACKUP_DISTANCE_CM = 80
-TAG_REACQUIRE_BACKUP_DURATION_S = 0.15 #0.35
+TAG_REACQUIRE_BACKUP_DURATION_S = 0.15
 TAG_REACQUIRE_BACKUP_COOLDOWN_S = 0.8
 ROUTE_HEADING_TOL_DEG = 10.0
 ROUTE_COARSE_TURN_THRESHOLD_DEG = 40.0
 ROUTE_COARSE_TURN_DURATION_S = 0.14
 ROUTE_FINE_TURN_DURATION_S = 0.05
-ROUTE_COARSE_COMMIT_TIME_S = 0.6
-ROUTE_DIRECTION_HOLD_TIME_S = 1.5
 ROUTE_COARSE_TURN_SPEED = '1'
 ROUTE_FINE_TURN_SPEED = '1'
-ROUTE_CONTINUOUS_TURN_HANDOFF_DEG = 25.0
-ROUTE_TRIM_TURN_DURATION_S = 0.04
-HOME_X_TOL_M = 0.08
-FINAL_STOP_DISTANCE_CM = 50 # User requested stop distance
 
 def get_wall_axes(tag_id):
     if 0 <= tag_id <= 5:
@@ -206,11 +198,23 @@ history_R = []
 running = True
 
 # --- SERIAL SETUP ---
-SERIAL_PORT = '/dev/ttyACM1'  
+def find_arduino_port():
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if 'ttyACM' in port.device or 'ttyUSB' in port.device:
+            return port.device
+    return None
+
+SERIAL_PORT = find_arduino_port()
+
 try:
-    ser = serial.Serial(SERIAL_PORT, 115200, timeout=0)
-    print(f"Connected to Arduino on {SERIAL_PORT}!")
-    time.sleep(2)
+    if SERIAL_PORT:
+        ser = serial.Serial(SERIAL_PORT, 115200, timeout=0)
+        print(f"Connected to Arduino on {SERIAL_PORT}!")
+        time.sleep(2)
+    else:
+        print("No Arduino port found (ttyACM/ttyUSB).")
+        ser = None
 except Exception as e:
     print(f"Serial Error: {e}")
     ser = None
@@ -553,6 +557,7 @@ last_tag_reacquire_backup_time = 0.0
 last_nav_motion = None
 consecutive_detections = 0
 ONE_SHOT_DISTANCE_THRESHOLD = 0.85
+final_turn_attempts = 0
 
 send_cmd('1')
 
@@ -641,13 +646,9 @@ try:
         if state == "SEARCHING":
             last_nav_motion = None
             if is_localized:
-                consecutive_detections += 1
-                if consecutive_detections >= 3:
-                    stop_robot()
-                    state = "NAVIGATING"
-                    print("\n>>> Target confirmed! Aligning and driving. <<<\n")
-                else:
-                    print(f"Waiting for tag confirmation... ({consecutive_detections}/3)")
+                stop_robot()
+                state = "NAVIGATING"
+                print("\n>>> Target confirmed! Aligning and driving. <<<\n")
                 continue
             else:
                 consecutive_detections = 0 # reset counter if we lose it
@@ -666,15 +667,27 @@ try:
                 pulse_turn(search_dir, duration=0.08, speed='1')
             continue
 
+        if state == "BLIND_FORWARD":
+            if latest_C < STOP_DIST or latest_L < SIDE_DIST or latest_R < SIDE_DIST:
+                stop_robot()
+                print(f"HOME REACHED (BLIND): Obstacle detected at L:{latest_L} C:{latest_C} R:{latest_R}")
+                state = "DONE"
+                continue
+            drive_forward('1')  # Move blindly
+            continue
+
         if state == "NAVIGATING":
-            # Check stopping distance first (only if we are close to home AND a sensor is < 30cm)
-            # This prevents us from stopping when passing an obstacle while far away
-            if distance_to_home is not None and distance_to_home <= ONE_SHOT_DISTANCE_THRESHOLD:
-                if latest_C < FINAL_STOP_DISTANCE_CM or latest_L < FINAL_STOP_DISTANCE_CM or latest_R < FINAL_STOP_DISTANCE_CM:
-                    stop_robot()
-                    print(f"HOME REACHED: Wall detected within {FINAL_STOP_DISTANCE_CM}cm (L:{latest_L} C:{latest_C} R:{latest_R})")
-                    state = "DONE"
-                    continue
+            camera_z_cm = (home_measurement[1] * 100) if home_measurement else 999
+
+            # Check stopping distance first (camera explicitly sees we are close, or ultrasonics detect a close wall when near home)
+            if camera_z_cm < FINAL_STOP_DISTANCE_CM or (
+                distance_to_home is not None and distance_to_home <= ONE_SHOT_DISTANCE_THRESHOLD and
+                (latest_C < FINAL_STOP_DISTANCE_CM or latest_L < FINAL_STOP_DISTANCE_CM or latest_R < FINAL_STOP_DISTANCE_CM)
+            ):
+                stop_robot()
+                print(f"HOME REACHED: Wall detected within {FINAL_STOP_DISTANCE_CM}cm (L:{latest_L} C:{latest_C} R:{latest_R} Z:{camera_z_cm:.1f})")
+                state = "DONE"
+                continue
             
             # Obstacle avoidance if not near home:
             elif latest_C < STOP_DIST:
@@ -701,9 +714,15 @@ try:
                 turn_direction = get_turn_direction_from_error(route_turn)
                 motion_signature = ("TURN", turn_direction, ROUTE_COARSE_TURN_SPEED)
                 if last_nav_motion != motion_signature:
+                    if distance_to_home is not None and distance_to_home <= ONE_SHOT_DISTANCE_THRESHOLD:
+                        final_turn_attempts += 1
+                        if final_turn_attempts > 3:
+                            print(f"Max turn attempts (3) exceeded in final leg. Switching to BLIND_FORWARD.")
+                            state = "BLIND_FORWARD"
+                            continue
                     print(
                         f"Rotating {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
-                        f"{desired_heading:.1f}deg ({route_turn:+.1f}deg, speed={ROUTE_COARSE_TURN_SPEED})"
+                        f"{desired_heading:.1f}deg ({route_turn:+.1f}deg, speed={ROUTE_COARSE_TURN_SPEED}) [Attempt {final_turn_attempts}/3]"
                     )
                     last_nav_motion = motion_signature
                 drive_turn(turn_direction, speed=ROUTE_COARSE_TURN_SPEED)
@@ -711,11 +730,19 @@ try:
 
             if abs(route_turn) > ROUTE_HEADING_TOL_DEG:
                 turn_direction = get_turn_direction_from_error(route_turn)
-                print(
-                    f"Trimming {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
-                    f"{desired_heading:.1f}deg ({route_turn:+.1f}deg, tol={ROUTE_HEADING_TOL_DEG:.1f}deg)"
-                )
-                last_nav_motion = None
+                motion_signature = ("PULSE_TURN", turn_direction, ROUTE_FINE_TURN_SPEED)
+                if last_nav_motion != motion_signature:
+                    if distance_to_home is not None and distance_to_home <= ONE_SHOT_DISTANCE_THRESHOLD:
+                        final_turn_attempts += 1
+                        if final_turn_attempts > 3:
+                            print(f"Max turn attempts (3) exceeded in final leg. Switching to BLIND_FORWARD.")
+                            state = "BLIND_FORWARD"
+                            continue
+                    print(
+                        f"Trimming {'LEFT' if turn_direction == 'L' else 'RIGHT'} toward "
+                        f"{desired_heading:.1f}deg ({route_turn:+.1f}deg, tol={ROUTE_HEADING_TOL_DEG:.1f}deg) [Attempt {final_turn_attempts}/3]"
+                    )
+                    last_nav_motion = motion_signature
                 pulse_turn(turn_direction, duration=ROUTE_FINE_TURN_DURATION_S, speed=ROUTE_FINE_TURN_SPEED)
                 continue
 
