@@ -2,6 +2,7 @@ import time
 import os
 import cv2
 import numpy as np
+from libcamera import Transform
 
 try:
     from picamera2 import Picamera2
@@ -19,7 +20,10 @@ def test_camera():
 
         # Configure the camera for video capture
         # We need BGR format for OpenCV
-        config = picam2.create_video_configuration(main={"size": (640, 480), "format": "BGR888"})
+        config = picam2.create_video_configuration(
+            main={"size": (640, 480), "format": "RGB888"},
+            transform=Transform(hflip=1, vflip=1)
+        )
         picam2.configure(config)
 
         # Start the camera system

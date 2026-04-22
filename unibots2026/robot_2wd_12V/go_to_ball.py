@@ -5,7 +5,6 @@ import serial.tools.list_ports
 import threading
 import datetime
 import os
-from gpiozero import Button
 from picamera2 import Picamera2
 from libcamera import Transform
 from ultralytics import YOLO
@@ -19,7 +18,6 @@ def find_arduino_port():
     return None
 
 SERIAL_PORT = find_arduino_port()
-BUTTON_PIN = 25
 
 # Model Selection
 NCNN_MODEL = "/home/pi/yolo_project/orange_ball_ncnn_model"
@@ -63,13 +61,13 @@ ORIGINAL_CALIB_WIDTH = 640
 # Scale the focal length (fx) to match the current capture resolution (320x240)
 FOCAL_LENGTH_X = CAMERA_PARAMS[0] * (CAPTURE_WIDTH / ORIGINAL_CALIB_WIDTH)
 BALL_DIAMETER_CM = 4.0 # Standard ping-pong ball size (~4.0 cm). Adjust if needed.
-TARGET_REACHED_CM = 30.0 # Distance to stop in front of the ball
+TARGET_REACHED_CM = 60.0 # Distance to stop in front of the ball
 
 
 # --- GLOBAL VARIABLES ---
 # Thread Control
 running = True
-robot_active = True
+robot_active = False # Start paused, wait for button press
 
 # Sensor Readings (Shared)
 latest_L = 999
@@ -87,7 +85,7 @@ ball_distance_cm = 999.0 # Store calculated distance
 # Serial Connection
 try:
     if SERIAL_PORT:
-        ser = serial.Serial(SERIAL_PORT, 9600, timeout=1)
+        ser = serial.Serial(SERIAL_PORT, 115200, timeout=0)
         ser.reset_input_buffer()
         print(f"Connected to Serial: {SERIAL_PORT}")
         time.sleep(2) # Allow Arduino to reset
@@ -100,51 +98,37 @@ except Exception as e:
 
 # --- SERIAL HELPERS ---
 def robot_stop():
-    if ser: ser.write(b'S')
+    if ser: ser.write(b'S\n')
 
 def set_speed(level):
     # level can be 1 (slow), 2 (medium), 3 (fast)
-    if ser: ser.write(str(level).encode())
+    if ser: ser.write(f"{level}\n".encode())
 
 def robot_forward():
     if ser: 
         set_speed(2) # Normal speed for forward
-        ser.write(b'F')
+        ser.write(b'F\n')
 
 def robot_backward():
     if ser: 
         set_speed(2)
-        ser.write(b'B')
+        ser.write(b'B\n')
 
 def robot_left():
     if ser: 
-        set_speed(1) # Minimum speed for rotating
-        ser.write(b'L')
+        set_speed(1) # Slower speed (1) for precise tracking
+        ser.write(b'L\n')
 
 def robot_right():
     if ser: 
-        set_speed(1) # Minimum speed for rotating
-        ser.write(b'R')
+        set_speed(1) # Slower speed (1) for precise tracking
+        ser.write(b'R\n')
 
 def robot_spin_search():
     # Spin slowly to find ball.
     if ser:
-        set_speed(1) # Minimum speed for rotating
-        ser.write(b'R')
-
-# --- BUTTON HANDLER ---
-def toggle_mode():
-    global robot_active
-    robot_active = not robot_active
-    if robot_active:
-        print("\n>>> ACTIVE: Robot Started. Searching for ball... <<<")
-    else:
-        print("\n>>> PAUSED: Robot Stopped. <<<")
-        robot_stop()
-
-run_button = Button(BUTTON_PIN, bounce_time=0.2)
-run_button.when_pressed = toggle_mode
-
+        set_speed(1) # Slower speed (1) to systematically scan for balls
+        ser.write(b'R\n')
 
 # --- THREAD 1: SENSOR READER ---
 def update_sensors():
@@ -167,13 +151,14 @@ def update_sensors():
 
 # --- THREAD 2: CAMERA & YOLO ---
 def camera_yolo_loop():
-    global running, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm
+    global running, robot_active, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm
     
     # 1. Initialize Camera
     try:
         picam2 = Picamera2()
         config = picam2.create_video_configuration(
             main={"size": (CAPTURE_WIDTH, CAPTURE_HEIGHT), "format": "RGB888"},
+            transform=Transform(hflip=1, vflip=1),
             buffer_count=12
         )
         picam2.configure(config)
@@ -239,6 +224,7 @@ def camera_yolo_loop():
                         # Check for largest ball tracking
                         # box.xywh returns center_x, center_y, width, height
                         x, y, w, h = box.xywh[0]
+                        
                         area = float(w) * float(h)
                         if area > max_area:
                             max_area = area
@@ -264,13 +250,36 @@ def camera_yolo_loop():
                 annotated_frame = last_results[0].plot()
             else:
                 annotated_frame = frame_bgr.copy()
+            
+            if ball_visible:
+                # Calculate bounding box coordinates for the tracked target
+                tl_x = int(ball_x - ball_w / 2)
+                tl_y = int(ball_y - ball_h / 2)
+                br_x = int(ball_x + ball_w / 2)
+                br_y = int(ball_y + ball_h / 2)
+                
+                # Draw a distinct cyan bounding box and text overlay for the targeted ball
+                cv2.rectangle(annotated_frame, (tl_x, tl_y), (br_x, br_y), (255, 255, 0), 3)
+                cv2.putText(annotated_frame, f"TARGET: {ball_distance_cm:.1f}cm", (max(0, tl_x), max(20, tl_y - 10)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+
             cv2.putText(annotated_frame, f"FPS: {int(fps)} | Dist: {ball_distance_cm:.1f}cm", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.imshow("Robot Vision", annotated_frame)
             
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
+                if ser:
+                    print("Q pressed! Executing ARM DOWN and Gripper OPEN...")
+                    ser.write(b'a\n')
+                    time.sleep(1)
+                    ser.write(b'O\n')
+                    time.sleep(1)
                 running = False
                 break
+            elif key == ord('y') and not robot_active:
+                robot_active = True
+                print("\n>>> ACTIVE: Robot Started by 'y' key. Searching for ball... <<<")
                 
         except Exception as e:
             print(f"Detection Loop Error: {e}")
@@ -345,6 +354,7 @@ def robot_control_loop():
                     print(f"Ball Reached! Distance: {ball_distance_cm:.1f}cm. Stopping.")
                     log_motion_action(f"Ball Reached ({ball_distance_cm:.1f}cm)", latest_L, latest_C, latest_R)
                     robot_stop()
+                    robot_active = False
                     # Wait slightly so we don't rapid-fire commands once arrived
                     time.sleep(0.5)
                 elif abs(error) < CENTER_TOLERANCE:
@@ -354,32 +364,21 @@ def robot_control_loop():
                     # Ball is to the Left (x < 160)
                     log_motion_action("Turn LEFT (Track)", latest_L, latest_C, latest_R)
                     robot_left()
-                    time.sleep(0.01)  # turn very slightly
-                    robot_stop()
-                    time.sleep(0.3)   # wait for camera to update frame
                 else:
                     # Ball is to the Right (x > 160)
                     log_motion_action("Turn RIGHT (Track)", latest_L, latest_C, latest_R)
                     robot_right()
-                    time.sleep(0.01)  # turn very slightly
-                    robot_stop()
-                    time.sleep(0.3)   # wait for camera to update frame
                 
-                # Short delay to prevent flooding serial
-                time.sleep(0.05)
+                # Short delay to prevent flooding serial, motors run continuously
+                time.sleep(0.1)
 
             # ----------------------------------
             # PRIORITY 3: SEARCHING (NO BALL)
             # ----------------------------------
             else:
                 # No ball seen? Rotate to find one.
-                # "Step 1... rotate find ping-pong balls"
-                # print("Searching...")
-                # log_motion_action("Spin Search", latest_L, latest_C, latest_R) # Optional: reduce log spam
                 robot_spin_search()
-                time.sleep(0.05)  # pulse spin to rotate slowly
-                robot_stop()
-                time.sleep(0.15)  # give camera time to catch the ball
+                time.sleep(0.1)  # Run motors continuously while searching
 
         else:
             # If not active, do nothing
@@ -393,8 +392,14 @@ def robot_control_loop():
 if __name__ == "__main__":
     print("---------------------------------------")
     print("      ROBOT BALL CHASER ACTIVATED      ")
-    print(f"      Button Pin: {BUTTON_PIN}")
+    print("Waiting for 'y' input to start movement...")
     print("---------------------------------------")
+
+    # Execute ARM UP before moving
+    if ser:
+        print("Executing ARM UP before moving...")
+        ser.write(b'A\n')
+        time.sleep(1)
 
     # Start Sensors Thread
     t_sensors = threading.Thread(target=update_sensors)
@@ -406,10 +411,19 @@ if __name__ == "__main__":
     t_control.daemon = True
     t_control.start()
 
-    # Start Camera/YOLO (Run in main thread as it needs GUI)
-    camera_yolo_loop()
-
-    # Ensure clean exit
-    running = False
-    robot_stop()
-    print("Exiting...")
+    try:
+        # Start Camera/YOLO (Run in main thread as it needs GUI)
+        camera_yolo_loop()
+    except KeyboardInterrupt:
+        print("\nCtrl+C pressed!")
+        if ser:
+            print("Executing ARM DOWN and Gripper OPEN...")
+            ser.write(b'a\n')
+            time.sleep(1)
+            ser.write(b'O\n')
+            time.sleep(1)
+    finally:
+        # Ensure clean exit
+        running = False
+        robot_stop()
+        print("Exiting...")
