@@ -262,32 +262,35 @@ def camera_yolo_loop():
                 ball_visible = True
                 ball_x, ball_y, ball_w, ball_h = largest_box
                 
-                # Calculate distance based on y-pixel (distance from top edge)
-                # Pinhole calculation is disabled since perspective makes it inaccurate.
-                # TODO: Replace the values here with your actual calibration measurements!
-                # Example: If y=100 means 40cm, y=150 means 30cm, y=200 means 20cm, etc.
-                y_calibration = {
-                    75: 50.0,
-                    100: 40.0,
-                    150: 30.0,
-                    200: 90.0,
-                    240: 60.0
+                # Calculate distance based on bounding box Area
+                ball_area = ball_w * ball_h
+                
+                # TODO: Replace these placeholder areas with actual bounding box areas at these distances!
+                # Example: If area is 12000 => 15cm, area is 3000 => 30cm, etc.
+                area_calibration = {
+                    7000.0: 15.0,
+                    2000.0: 30.0,
+                    850.0: 45.0,
+                    450.0: 60.0,
+                    290.0: 75.0,
+                    180.0: 90.0,
+                    70.0: 150.0
                 }
                 
-                # Simple linear interpolation for the given ball_y
-                sorted_y = sorted(y_calibration.keys())
-                if ball_y <= sorted_y[0]:
-                    ball_distance_cm = y_calibration[sorted_y[0]]
-                elif ball_y >= sorted_y[-1]:
-                    ball_distance_cm = y_calibration[sorted_y[-1]]
+                # Simple linear interpolation for the given ball_area
+                sorted_a = sorted(area_calibration.keys())
+                if ball_area <= sorted_a[0]:
+                    ball_distance_cm = area_calibration[sorted_a[0]]
+                elif ball_area >= sorted_a[-1]:
+                    ball_distance_cm = area_calibration[sorted_a[-1]]
                 else:
-                    # Find which two points ball_y falls between
-                    for i in range(len(sorted_y) - 1):
-                        y1, y2 = sorted_y[i], sorted_y[i+1]
-                        if y1 <= ball_y <= y2:
-                            d1, d2 = y_calibration[y1], y_calibration[y2]
+                    # Find which two points ball_area falls between
+                    for i in range(len(sorted_a) - 1):
+                        a1, a2 = sorted_a[i], sorted_a[i+1]
+                        if a1 <= ball_area <= a2:
+                            d1, d2 = area_calibration[a1], area_calibration[a2]
                             # Linear interpolate the distance
-                            ball_distance_cm = d1 + (d2 - d1) * ((ball_y - y1) / (y2 - y1))
+                            ball_distance_cm = d1 + (d2 - d1) * ((ball_area - a1) / (a2 - a1))
                             break
             else:
                 ball_visible = False
@@ -310,14 +313,25 @@ def camera_yolo_loop():
                 tl_y = int(ball_y - ball_h / 2)
                 br_x = int(ball_x + ball_w / 2)
                 br_y = int(ball_y + ball_h / 2)
+                ball_area = ball_w * ball_h
                 
                 # Draw a distinct cyan bounding box and text overlay for the targeted ball
                 cv2.rectangle(annotated_frame, (tl_x, tl_y), (br_x, br_y), (255, 255, 0), 3)
                 cv2.putText(annotated_frame, f"TARGET: {ball_distance_cm:.1f}cm", (max(0, tl_x), max(20, tl_y - 10)),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+                
+                top_text = f"FPS: {int(fps)} | Dist: {ball_distance_cm:.1f}cm"
+                area_text = f"Area: {int(ball_area)}"
+            else:
+                top_text = f"FPS: {int(fps)} | Dist: No Target"
+                area_text = ""
 
-            cv2.putText(annotated_frame, f"FPS: {int(fps)} | Dist: {ball_distance_cm:.1f}cm", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.putText(annotated_frame, top_text, (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+            
+            if area_text:
+                cv2.putText(annotated_frame, area_text, (10, 55),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             
             if show_grid:
                 # Draw horizontal grid lines
