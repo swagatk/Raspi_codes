@@ -1664,3 +1664,62 @@
 2026-04-22 14:58:04 | Action: Turn RIGHT (Track) | L:103 C:86 R:999
 2026-04-22 14:58:05 | Action: BLOCKED (34cm) | L:108 C:34 R:32
 2026-04-22 14:58:05 | Action: Turn RIGHT (Avoid) | L:31 C:30 R:234
+2026-04-24 10:44:42 | Action: Ball Reached (57.1cm) | L:85 C:83 R:87
+2026-04-24 10:59:29 | Action: BLOCKED (31cm) | L:8 C:31 R:131
+2026-04-24 10:59:30 | Action: Turn RIGHT (Avoid) | L:8 C:31 R:119
+2026-04-24 10:59:30 | Action: BLOCKED (30cm) | L:8 C:30 R:138
+2026-04-24 10:59:31 | Action: Turn RIGHT (Avoid) | L:9 C:30 R:129
+2026-04-24 10:59:32 | Action: BLOCKED (31cm) | L:9 C:31 R:179
+2026-04-24 10:59:32 | Action: Turn RIGHT (Avoid) | L:9 C:30 R:176
+2026-04-24 10:59:32 | Action: BLOCKED (30cm) | L:8 C:30 R:110
+2026-04-24 10:59:33 | Action: Turn RIGHT (Avoid) | L:9 C:31 R:108
+2026-04-24 10:59:34 | Action: BLOCKED (31cm) | L:8 C:31 R:9
+2026-04-24 10:59:34 | Action: Turn RIGHT (Avoid) | L:7 C:30 R:11
+2026-04-24 10:59:35 | Action: BLOCKED (12cm) | L:7 C:12 R:9
+2026-04-24 10:59:36 | Action: Turn RIGHT (Avoid) | L:7 C:34 R:9
+2026-04-24 10:59:36 | Action: Nudge RIGHT | L:6 C:104 R:8
+2026-04-24 10:59:37 | Action: Nudge LEFT | L:999 C:999 R:9
+2026-04-24 10:59:37 | Action: BLOCKED (9cm) | L:10 C:9 R:9
+2026-04-24 10:59:38 | Action: Turn RIGHT (Avoid) | L:9 C:178 R:10
+2026-04-24 10:59:38 | Action: BLOCKED (31cm) | L:163 C:31 R:99
+2026-04-24 10:59:39 | Action: Turn LEFT (Avoid) | L:164 C:32 R:10
+2026-04-24 10:59:39 | Action: BLOCKED (31cm) | L:8 C:31 R:138
+2026-04-24 10:59:40 | Action: Turn RIGHT (Avoid) | L:8 C:31 R:156
+2026-04-24 10:59:41 | Action: BLOCKED (30cm) | L:8 C:30 R:108
+2026-04-24 10:59:41 | Action: Turn RIGHT (Avoid) | L:8 C:31 R:113
+2026-04-24 10:59:42 | Action: BLOCKED (30cm) | L:8 C:30 R:68
+2026-04-24 10:59:42 | Action: Turn RIGHT (Avoid) | L:9 C:31 R:66
+2026-04-24 10:59:43 | Action: Nudge RIGHT | L:10 C:114 R:112
+2026-04-24 10:59:44 | Action: BLOCKED (29cm) | L:9 C:29 R:113
+2026-04-24 10:59:44 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:86
+2026-04-24 10:59:45 | Action: BLOCKED (30cm) | L:9 C:30 R:81
+2026-04-24 10:59:45 | Action: Turn RIGHT (Avoid) | L:8 C:31 R:80
+2026-04-24 10:59:46 | Action: BLOCKED (30cm) | L:8 C:30 R:89
+2026-04-24 10:59:47 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:79
+2026-04-24 10:59:48 | Action: BLOCKED (29cm) | L:9 C:29 R:89
+2026-04-24 10:59:48 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:114
+2026-04-24 10:59:49 | Action: BLOCKED (30cm) | L:8 C:30 R:999
+2026-04-24 10:59:50 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:225
+2026-04-24 10:59:50 | Action: BLOCKED (30cm) | L:8 C:30 R:58
+2026-04-24 10:59:51 | Action: Turn RIGHT (Avoid) | L:8 C:31 R:296
+2026-04-24 10:59:51 | Action: BLOCKED (30cm) | L:8 C:30 R:55
+2026-04-24 10:59:52 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:57
+2026-04-24 10:59:52 | Action: BLOCKED (31cm) | L:8 C:31 R:61
+2026-04-24 10:59:53 | Action: Turn RIGHT (Avoid) | L:8 C:29 R:61
+2026-04-24 10:59:54 | Action: BLOCKED (29cm) | L:8 C:29 R:70
+2026-04-24 10:59:54 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:73
+2026-04-24 10:59:55 | Action: Nudge RIGHT | L:8 C:63 R:75
+2026-04-24 10:59:55 | Action: Nudge RIGHT | L:9 C:67 R:75
+2026-04-24 10:59:55 | Action: Nudge RIGHT | L:8 C:61 R:74
+2026-04-24 10:59:55 | Action: Nudge RIGHT | L:9 C:59 R:75
+2026-04-24 11:09:05 | Action: Ball Reached (57.7cm) | L:136 C:140 R:166
+2026-04-24 11:09:59 | Action: BLOCKED (30cm) | L:8 C:30 R:123
+2026-04-24 11:10:00 | Action: Turn RIGHT (Avoid) | L:8 C:30 R:123
+2026-04-24 11:10:00 | Action: BLOCKED (30cm) | L:8 C:30 R:123
+2026-04-24 11:10:01 | Action: Turn LEFT (Avoid) | L:148 C:73 R:76
+2026-04-24 11:10:02 | Action: Ball Reached (46.1cm) | L:155 C:164 R:163
+2026-04-24 11:10:52 | Action: Turn RIGHT (Track) | L:999 C:165 R:164
+2026-04-24 11:10:53 | Action: Turn RIGHT (Track) | L:999 C:165 R:164
+2026-04-24 11:10:53 | Action: Turn RIGHT (Track) | L:177 C:164 R:163
+2026-04-24 11:10:53 | Action: Turn RIGHT (Track) | L:177 C:164 R:163
+2026-04-24 11:10:53 | Action: Ball Reached (29.8cm) | L:155 C:158 R:208

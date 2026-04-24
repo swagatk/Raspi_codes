@@ -48,6 +48,10 @@ STOP_DIST = 35        # cm
 SIDE_DIST = 30        # cm
 CENTER_TOLERANCE = 80 # pixels from center to consider "centered"
 
+# Camera Configuration
+CAMERA_TYPE = "usb" # Options: "picamera" or "usb"
+USB_CAMERA_PATH = "/dev/video2"  # Pass the explicit device path
+
 # Camera Settings & Distance Calculation
 CAPTURE_WIDTH = 320
 CAPTURE_HEIGHT = 240
@@ -68,6 +72,8 @@ TARGET_REACHED_CM = 60.0 # Distance to stop in front of the ball
 # Thread Control
 running = True
 robot_active = False # Start paused, wait for button press
+execute_ball_catch = False
+arm_is_up = True     # Track arm state (True=UP, False=DOWN)
 
 # Sensor Readings (Shared)
 latest_L = 999
@@ -151,28 +157,35 @@ def update_sensors():
 
 # --- THREAD 2: CAMERA & YOLO ---
 def camera_yolo_loop():
-    global running, robot_active, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm
+    global running, robot_active, execute_ball_catch, arm_is_up, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm
     
+    show_grid = False
+
     # 1. Initialize Camera
+    cap = None
+    picam2 = None
     try:
-        picam2 = Picamera2()
-        config = picam2.create_video_configuration(
-            main={"size": (CAPTURE_WIDTH, CAPTURE_HEIGHT), "format": "RGB888"},
-            transform=Transform(hflip=1, vflip=1),
-            buffer_count=12
-        )
-        picam2.configure(config)
-        # Flip if needed (based on ball_detection.py which had hflip=1, vflip=0)
-        # picam2.camera.Controls.Transform = Transform(hflip=1, vflip=0)
-        # Note: Picamera2 configuration method varies. 
-        # ball_detection.py used: picam2.preview_configuration.transform = Transform(hflip=1, vflip=0)
-        # We will try to rely on default or apply similar if needed.
-        # However, for simplicity let's stick to standard config first. 
-        # If orientation is wrong, we can adjust.
-        picam2.start()
-        print("Camera Started.")
+        if CAMERA_TYPE == "picamera":
+            picam2 = Picamera2()
+            config = picam2.create_video_configuration(
+                main={"size": (CAPTURE_WIDTH, CAPTURE_HEIGHT), "format": "RGB888"},
+                transform=Transform(hflip=1, vflip=1),
+                buffer_count=12
+            )
+            picam2.configure(config)
+            picam2.start()
+            print("PiCamera Started.")
+        elif CAMERA_TYPE == "usb":
+            cap = cv2.VideoCapture(USB_CAMERA_PATH, cv2.CAP_V4L2)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT)
+            if not cap.isOpened():
+                raise Exception(f"Cannot open USB camera at {USB_CAMERA_PATH}")
+            print(f"USB Camera Started ({USB_CAMERA_PATH}).")
+        else:
+            raise Exception("Invalid CAMERA_TYPE specified.")
     except Exception as e:
-        print(f"Camera Error: {e}")
+        print(f"Camera Initialize Error: {e}")
         return
 
     # 2. Load Model
@@ -182,7 +195,8 @@ def camera_yolo_loop():
         print("Model Loaded.")
     except Exception as e:
         print(f"YOLO Error: {e}")
-        picam2.stop()
+        if picam2: picam2.stop()
+        if cap: cap.release()
         return
 
     print("Starting Detection Loop...")
@@ -193,11 +207,20 @@ def camera_yolo_loop():
     while running:
         try:
             # Capture
-            frame = picam2.capture_array()
-            
-            # PiCamera v3 with libcamera outputs BGR despite "RGB888" format
-            # No conversion needed - frame is already in BGR format for OpenCV
-            frame_bgr = frame
+            if CAMERA_TYPE == "picamera":
+                frame_bgr = picam2.capture_array()
+                # PiCamera v3 with libcamera outputs BGR despite "RGB888" format
+                # No conversion needed - frame is already in BGR format for OpenCV
+            else:
+                ret, frame = cap.read()
+                if not ret:
+                    print("Failed to grab frame from USB camera. Reconnecting...")
+                    time.sleep(0.5)
+                    continue
+                # Optional: Flip USB camera if it's mounted upside down
+                # frame = cv2.flip(frame, -1) # -1 is both axes
+                frame_bgr = frame
+
             frame_counter += 1
             
             # Run inference only every SKIP_FRAMES frames
@@ -224,18 +247,48 @@ def camera_yolo_loop():
                         # Check for largest ball tracking
                         # box.xywh returns center_x, center_y, width, height
                         x, y, w, h = box.xywh[0]
+                        w_f, h_f = float(w), float(h)
+                        aspect_ratio = w_f / h_f if h_f > 0 else 0
                         
-                        area = float(w) * float(h)
-                        if area > max_area:
-                            max_area = area
-                            largest_box = (float(x), float(y), float(w), float(h))
+                        area = w_f * h_f
+                        # Filter by aspect ratio (approx 1:1 for a sphere) to avoid merging multiple balls
+                        if 0.7 <= aspect_ratio <= 1.3:
+                            if area > max_area:
+                                max_area = area
+                                largest_box = (float(x), float(y), w_f, h_f)
             
             # Update Shared State
             if largest_box:
                 ball_visible = True
                 ball_x, ball_y, ball_w, ball_h = largest_box
-                # Calculate distance using pinhole camera model: Distance = (Real_Size * Focal_Length) / Pixel_Size
-                ball_distance_cm = (BALL_DIAMETER_CM * FOCAL_LENGTH_X) / ball_w
+                
+                # Calculate distance based on y-pixel (distance from top edge)
+                # Pinhole calculation is disabled since perspective makes it inaccurate.
+                # TODO: Replace the values here with your actual calibration measurements!
+                # Example: If y=100 means 40cm, y=150 means 30cm, y=200 means 20cm, etc.
+                y_calibration = {
+                    75: 50.0,
+                    100: 40.0,
+                    150: 30.0,
+                    200: 90.0,
+                    240: 60.0
+                }
+                
+                # Simple linear interpolation for the given ball_y
+                sorted_y = sorted(y_calibration.keys())
+                if ball_y <= sorted_y[0]:
+                    ball_distance_cm = y_calibration[sorted_y[0]]
+                elif ball_y >= sorted_y[-1]:
+                    ball_distance_cm = y_calibration[sorted_y[-1]]
+                else:
+                    # Find which two points ball_y falls between
+                    for i in range(len(sorted_y) - 1):
+                        y1, y2 = sorted_y[i], sorted_y[i+1]
+                        if y1 <= ball_y <= y2:
+                            d1, d2 = y_calibration[y1], y_calibration[y2]
+                            # Linear interpolate the distance
+                            ball_distance_cm = d1 + (d2 - d1) * ((ball_y - y1) / (y2 - y1))
+                            break
             else:
                 ball_visible = False
                 ball_distance_cm = 999.0
@@ -265,10 +318,20 @@ def camera_yolo_loop():
 
             cv2.putText(annotated_frame, f"FPS: {int(fps)} | Dist: {ball_distance_cm:.1f}cm", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            
+            if show_grid:
+                # Draw horizontal grid lines
+                for grid_y in [120, 150, 180, 200, 240]:
+                    cv2.line(annotated_frame, (0, grid_y), (CAPTURE_WIDTH, grid_y), (255, 255, 255), 1)
+                    cv2.putText(annotated_frame, f"y={grid_y}", (5, grid_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+
             cv2.imshow("Robot Vision", annotated_frame)
             
             key = cv2.waitKey(1) & 0xFF
-            if key == ord('q'):
+            if key == ord('g') or key == ord('G'):
+                show_grid = not show_grid
+                print(f"Grid toggled: {show_grid}")
+            elif key == ord('q'):
                 if ser:
                     print("Q pressed! Executing ARM DOWN and Gripper OPEN...")
                     ser.write(b'a\n')
@@ -278,66 +341,133 @@ def camera_yolo_loop():
                 running = False
                 break
             elif key == ord('y') and not robot_active:
+                if not arm_is_up and ser:
+                    print("\n>>> Arm is DOWN. Moving Arm UP before starting... <<<")
+                    ser.write(b'A\n')
+                    arm_is_up = True
+                    time.sleep(1.0)  # Wait for the arm to raise
                 robot_active = True
                 print("\n>>> ACTIVE: Robot Started by 'y' key. Searching for ball... <<<")
+            elif key == ord('b') or key == ord('B'):
+                execute_ball_catch = True
+                print("\n>>> Ball Catch Manoeuvre Initialized by 'B' key. <<<")
+            elif key == ord('u') or key == ord('U'):
+                if ser:
+                    ser.write(b'A\n')
+                    arm_is_up = True
+                    print("\n>>> Arm UP (Obstacle Avoidance ENABLED) <<<")
+            elif key == ord('j') or key == ord('J'):
+                if ser:
+                    ser.write(b'a\n')
+                    arm_is_up = False
+                    print("\n>>> Arm DOWN (Obstacle Avoidance DISABLED) <<<")
                 
         except Exception as e:
             print(f"Detection Loop Error: {e}")
             time.sleep(0.1)
 
-    picam2.stop()
+    if picam2: picam2.stop()
+    if cap: cap.release()
     cv2.destroyAllWindows()
 
 
 # --- THREAD 3: ROBOT CONTROL ---
 def robot_control_loop():
-    global running, robot_active
+    global running, robot_active, execute_ball_catch, arm_is_up
     global latest_L, latest_C, latest_R
     global ball_visible, ball_x, ball_distance_cm
     
     print("Robot Control Loop Started.")
     
     while running:
+        if execute_ball_catch and ser:
+            execute_ball_catch = False
+            was_active = robot_active
+            robot_active = False # Pause normal control
+            robot_stop()
+            time.sleep(0.1)
+
+            print("\n[BALL CATCH] Checking path...")
+            if latest_C > 30: # Assuming 30cm is the threshold
+                print(f"[BALL CATCH] Path clear ({latest_C}cm). Moving forward ~30cm.")
+                robot_forward()
+                time.sleep(1.0) # Approx time to move 30cm
+                robot_stop()
+                time.sleep(0.2)
+            else:
+                print(f"[BALL CATCH] Path blocked ({latest_C}cm). Skipping initial forward move.")
+
+            print("\n[BALL CATCH] Executing Manoeuvre...")
+            ser.write(b'S\n') # Ensure stopped first
+            time.sleep(0.1)
+            ser.write(b'a\n') # Arm DOWN
+            arm_is_up = False # Disable obstacle avoidance
+            time.sleep(2.0)
+            ser.write(b'O\n') # Gripper OPEN
+            time.sleep(1.0)
+            
+            ser.write(b'F\n') # Move forward
+            time.sleep(1.5) # Short interval
+            ser.write(b'C\n') # Close gripper
+            time.sleep(1.0) # Wait for close
+            ser.write(b'S\n') # Stop
+            time.sleep(0.5)
+            
+            for _ in range(3):
+                ser.write(b'F\n') # Move forwards
+                time.sleep(1.0)
+                ser.write(b'S\n') # Stop to scoop
+                time.sleep(0.2)
+                ser.write(b'O\n') # Open gripper
+                time.sleep(1.0)
+                ser.write(b'C\n') # Close gripper
+                time.sleep(1.0)
+            
+            robot_active = was_active # Restore previous state
+            print("\n[BALL CATCH] Manoeuvre Complete.")
+            continue
+
         if robot_active and ser:
             # ----------------------------------
-            # PRIORITY 1: OBSTACLE AVOIDANCE
+            # PRIORITY 1: OBSTACLE AVOIDANCE (Only if Arm is UP)
             # ----------------------------------
-            if latest_C < STOP_DIST:
-                log_motion_action(f"BLOCKED ({latest_C}cm)", latest_L, latest_C, latest_R)
-                print(f"OBSTACLE AHEAD ({latest_C}cm)! Avoiding...")
-                robot_stop()
-                time.sleep(0.1)
-                robot_backward()
-                time.sleep(0.3)
-                
-                # Turn away from obstacle
-                if latest_L > latest_R:
-                    log_motion_action("Turn LEFT (Avoid)", latest_L, latest_C, latest_R)
-                    robot_left()
-                else:
-                    log_motion_action("Turn RIGHT (Avoid)", latest_L, latest_C, latest_R)
+            if arm_is_up:
+                if latest_C < STOP_DIST:
+                    log_motion_action(f"BLOCKED ({latest_C}cm)", latest_L, latest_C, latest_R)
+                    print(f"OBSTACLE AHEAD ({latest_C}cm)! Avoiding...")
+                    robot_stop()
+                    time.sleep(0.1)
+                    robot_backward()
+                    time.sleep(0.3)
+                    
+                    # Turn away from obstacle
+                    if latest_L > latest_R:
+                        log_motion_action("Turn LEFT (Avoid)", latest_L, latest_C, latest_R)
+                        robot_left()
+                    else:
+                        log_motion_action("Turn RIGHT (Avoid)", latest_L, latest_C, latest_R)
+                        robot_right()
+                    time.sleep(0.5)
+                    robot_stop()
+                    continue # Skip rest of loop to re-evaluate sensors
+
+                elif latest_L < SIDE_DIST:
+                    log_motion_action("Nudge RIGHT", latest_L, latest_C, latest_R)
+                    print("Too close Left - Nudging Right")
                     robot_right()
-                time.sleep(0.5)
-                robot_stop()
-                continue # Skip rest of loop to re-evaluate sensors
+                    time.sleep(0.1)
+                    robot_forward()
+                    time.sleep(0.1)
+                    continue
 
-            elif latest_L < SIDE_DIST:
-                log_motion_action("Nudge RIGHT", latest_L, latest_C, latest_R)
-                print("Too close Left - Nudging Right")
-                robot_right()
-                time.sleep(0.1)
-                robot_forward()
-                time.sleep(0.1)
-                continue
-
-            elif latest_R < SIDE_DIST:
-                log_motion_action("Nudge LEFT", latest_L, latest_C, latest_R)
-                print("Too close Right - Nudging Left")
-                robot_left()
-                time.sleep(0.1)
-                robot_forward()
-                time.sleep(0.1)
-                continue
+                elif latest_R < SIDE_DIST:
+                    log_motion_action("Nudge LEFT", latest_L, latest_C, latest_R)
+                    print("Too close Right - Nudging Left")
+                    robot_left()
+                    time.sleep(0.1)
+                    robot_forward()
+                    time.sleep(0.1)
+                    continue
 
             # ----------------------------------
             # PRIORITY 2: BALL TRACKING

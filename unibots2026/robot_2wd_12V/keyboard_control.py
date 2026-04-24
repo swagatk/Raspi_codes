@@ -8,6 +8,10 @@ import threading
 import select
 import subprocess
 
+# --- CAMERA CONFIGURATION ---
+# Select which script to launch when pressing 'V' for Live Video. Options: 'picamera' or 'usb'
+CAMERA_TYPE = 'usb'
+
 # --- GLOBAL VARIABLES ---
 # We use this to stop the background thread when we quit
 running = True 
@@ -145,8 +149,13 @@ try:
                 if camera_process is None or camera_process.poll() is not None:
                     # Start camera script as a separate background process
                     # Use sys.executable to ensure we use the same Python environment (YOLO env)
-                    camera_process = subprocess.Popen([sys.executable, '/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/arduino_motor_test/picamera_test.py'])
-                    print("\n[CAMERA] Started Live Video!")
+                    if CAMERA_TYPE == 'picamera':
+                        camera_script = '/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/arduino_motor_test/picamera_test.py'
+                    else:
+                        camera_script = '/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/usb_camera_test.py'
+                        
+                    camera_process = subprocess.Popen([sys.executable, camera_script])
+                    print(f"\n[CAMERA] Started Live Video! ({CAMERA_TYPE})")
                 else:
                     # Terminate if it's already running
                     camera_process.terminate()
