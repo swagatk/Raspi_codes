@@ -7,13 +7,14 @@ import glob
 import os
 
 # --- CONFIGURATION ---
+CAMERA_TYPE = "usb" # Options: "picamera" or "usb"
 CHECKERBOARD = (8, 6) # Inner corners
 SQUARE_SIZE = 0.028   # Size of a single square in meters (28mm = 0.028m)
 VISUALIZE = True      # Set to True to visualize corner detection
 
 # Get the directory where this script is located
 script_dir = os.path.expanduser('~/')
-image_folder = os.path.join(script_dir, 'calibration_images', '*.jpg')
+image_folder = os.path.join(script_dir, f'calibration_images_{CAMERA_TYPE}', '*.jpg')
 
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 objp = np.zeros((CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)

@@ -255,8 +255,8 @@ void loop() {
     else if (command == 'S') stopMotors();                        
     
     // Interpret Speed Command
-    else if (command == '1') motorSpeed = 100;
-    else if (command == '2') motorSpeed = 180;
+    else if (command == '1') motorSpeed = 100; // Increased from 100 for more turning torque
+    else if (command == '2') motorSpeed = 130;
     else if (command == '3') motorSpeed = 255;
     
     // Interpret Arm Commands

@@ -8,14 +8,44 @@ import cv2
 from pupil_apriltags import Detector
 import time
 import math
-try:
-    from picamera2 import Picamera2
-except ImportError:
-    print("Picamera2 is not installed or not found. Please install proper packages (e.g. python3-picamera2).")
-    exit(1)
+import glob
+
 # --- CONFIGURATION ---
+CAMERA_TYPE = "usb"  # Options: "picamera" or "usb"
+
+def find_usb_camera():
+    video_devices = sorted(glob.glob('/dev/video*'))
+    for dev in video_devices:
+        try:
+            num = int(dev.replace('/dev/video', ''))
+            if num >= 10:
+                continue
+        except ValueError:
+            continue
+            
+        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
+        if cap.isOpened():
+            ret, _ = cap.read()
+            cap.release()
+            if ret:
+                return dev
+    return "/dev/video2" # Fallback
+
+USB_CAMERA_PATH = find_usb_camera()
+
+try:
+    if CAMERA_TYPE == "picamera":
+        from picamera2 import Picamera2
+except ImportError:
+    if CAMERA_TYPE == "picamera":
+        print("Picamera2 is not installed or not found. Please install proper packages (e.g. python3-picamera2).")
+        exit(1)
+
 # Replace with the 4 numbers from your calibration script!
-CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+if CAMERA_TYPE == "picamera":
+    CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+elif CAMERA_TYPE == "usb":
+    CAMERA_PARAMS = camera_params = (742.843247995633, 743.2228374107693, 322.3205884283167, 234.06623771807327)
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
 SCALE = 2.0
 
@@ -26,14 +56,25 @@ CENTER_X = FRAME_WIDTH // 2   # 320
 CENTER_Y = FRAME_HEIGHT // 2  # 240
 
 # --- SETUP HARDWARE ---
-# Initialize Picamera2
-picam2 = Picamera2()
-config = picam2.create_video_configuration(
-    main={"size": (640, 480), "format": "RGB888"},
-    controls={"FrameRate": 30}
-)
-picam2.configure(config)
-picam2.start()
+picam2 = None
+cap = None
+
+if CAMERA_TYPE == "picamera":
+    picam2 = Picamera2()
+    config = picam2.create_video_configuration(
+        main={"size": (FRAME_WIDTH, FRAME_HEIGHT), "format": "RGB888"},
+        controls={"FrameRate": 30}
+    )
+    picam2.configure(config)
+    picam2.start()
+    print("PiCamera Started.")
+elif CAMERA_TYPE == "usb":
+    cap = cv2.VideoCapture(USB_CAMERA_PATH, cv2.CAP_V4L2)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+    if not cap.isOpened():
+        raise Exception(f"Cannot open USB camera at {USB_CAMERA_PATH}")
+    print(f"USB Camera Started ({USB_CAMERA_PATH}).")
 
 # Initialize Detector (quad_decimate=2.0 speeds up detection by shrinking the image internally)
 at_detector = Detector(families='tagStandard41h12', quad_decimate=2.0)
@@ -41,7 +82,14 @@ at_detector = Detector(families='tagStandard41h12', quad_decimate=2.0)
 print("Vision System Online. Press 'Q' to quit.")
 
 while True:
-    frame = picam2.capture_array()
+    if CAMERA_TYPE == "picamera":
+        frame = picam2.capture_array()
+    else:
+        ret, frame = cap.read()
+        if not ret:
+            print("Failed to grab frame. Reconnecting...")
+            time.sleep(0.5)
+            continue
         
     # 1. Grayscale Conversion (Crucial for Speed)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -126,5 +174,6 @@ while True:
     if cv2.waitKey(1) == ord('q'):
         break
 
-picam2.stop()
+if picam2: picam2.stop()
+if cap: cap.release()
 cv2.destroyAllWindows()

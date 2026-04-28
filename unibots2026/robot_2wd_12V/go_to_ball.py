@@ -46,11 +46,34 @@ def log_motion_action(action_desc, l, c, r):
 # Movement Thresholds
 STOP_DIST = 35        # cm
 SIDE_DIST = 30        # cm
-CENTER_TOLERANCE = 80 # pixels from center to consider "centered"
+CENTER_TOLERANCE = 40 # pixels from center to consider "centered"
 
 # Camera Configuration
 CAMERA_TYPE = "usb" # Options: "picamera" or "usb"
-USB_CAMERA_PATH = "/dev/video2"  # Pass the explicit device path
+
+def find_usb_camera():
+    import glob
+    video_devices = sorted(glob.glob('/dev/video*'))
+    for dev in video_devices:
+        try:
+            # Skip codec/isp devices (usually video10 and above)
+            num = int(dev.replace('/dev/video', ''))
+            if num >= 10:
+                continue
+        except ValueError:
+            continue
+            
+        print(f"Testing {dev}...")
+        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
+        if cap.isOpened():
+            ret, _ = cap.read()
+            cap.release()
+            if ret:
+                print(f"Found working camera at {dev}")
+                return dev
+    return "/dev/video2" # Fallback
+
+USB_CAMERA_PATH = find_usb_camera()
 
 # Camera Settings & Distance Calculation
 CAPTURE_WIDTH = 320
@@ -59,14 +82,18 @@ CENTER_X = CAPTURE_WIDTH // 2
 SKIP_FRAMES = 3  # Run detection 1 out of every N frames (higher = faster FPS)
 
 # Camera Calibration Parameters (from go_to_home.py, tuned for 640x480)
-CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+if CAMERA_TYPE == "picamera":
+    CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+else:
+    CAMERA_PARAMS = (742.843247995633, 743.2228374107693, 322.3205884283167, 234.06623771807327)
 ORIGINAL_CALIB_WIDTH = 640
 
 # Scale the focal length (fx) to match the current capture resolution (320x240)
 FOCAL_LENGTH_X = CAMERA_PARAMS[0] * (CAPTURE_WIDTH / ORIGINAL_CALIB_WIDTH)
 BALL_DIAMETER_CM = 4.0 # Standard ping-pong ball size (~4.0 cm). Adjust if needed.
-TARGET_REACHED_CM = 60.0 # Distance to stop in front of the ball
-
+TARGET_REACHED_CM = 40.0 # Distance to stop in front of the ball
+CAPTURE_DISTANCE_CM = 10.0 # Target forward travel distance during the ball catch manoeuver
+CAPTURE_SPEED_CM_S = 10.6 # Approximate cm/sec speed of robot using motor speed level '2'
 
 # --- GLOBAL VARIABLES ---
 # Thread Control
@@ -130,6 +157,11 @@ def robot_right():
         set_speed(1) # Slower speed (1) for precise tracking
         ser.write(b'R\n')
 
+def robot_forward_slow():
+    if ser:
+        set_speed(1) # Slower speed (1) for searching safely
+        ser.write(b'F\n')
+
 def robot_spin_search():
     # Spin slowly to find ball.
     if ser:
@@ -191,7 +223,7 @@ def camera_yolo_loop():
     # 2. Load Model
     try:
         print(f"Loading YOLO model: {MODEL_PATH}")
-        model = YOLO(MODEL_PATH)
+        model = YOLO(MODEL_PATH, task='detect')
         print("Model Loaded.")
     except Exception as e:
         print(f"YOLO Error: {e}")
@@ -203,6 +235,13 @@ def camera_yolo_loop():
     prev_time = time.time()
     frame_counter = 0
     last_results = None
+    
+    # Target stabilization tracking
+    consecutive_detections = 0
+    consecutive_misses = 0
+    CONFIRM_FRAMES = 3   # Frames required to confirm target
+    MISS_FRAMES_TOLERANCE = 5 # Frames to keep target despite missing
+    current_target_box = None
     
     while running:
         try:
@@ -229,10 +268,11 @@ def camera_yolo_loop():
                 last_results = results
             
             # Process Detections using last_results (allows tracking even on skipped frames)
-            # We want to find the largest ball (closest)
+            # We want to find the largest ball (closest) that matches previous target if it exists
             largest_box = None
             max_area = 0
-            
+            candidate_boxes = []
+
             if last_results and len(last_results) > 0:
                 for r in last_results:
                     boxes = r.boxes
@@ -249,49 +289,89 @@ def camera_yolo_loop():
                         x, y, w, h = box.xywh[0]
                         w_f, h_f = float(w), float(h)
                         aspect_ratio = w_f / h_f if h_f > 0 else 0
-                        
                         area = w_f * h_f
-                        # Filter by aspect ratio (approx 1:1 for a sphere) to avoid merging multiple balls
-                        if 0.7 <= aspect_ratio <= 1.3:
-                            if area > max_area:
-                                max_area = area
-                                largest_box = (float(x), float(y), w_f, h_f)
-            
+                        
+                        # Filter by wildly relaxed aspect ratio (handle wide/tall boxes from grouped balls)
+                        # Two balls side-by-side easily exceeds a 2.0 aspect ratio due to bounding box margins
+                        if 0.2 <= aspect_ratio <= 5.0:
+                            candidate_boxes.append((float(x), float(y), w_f, h_f, area))
+
+            # Advanced target stabilization and debouncing
+            best_match = None
+            if candidate_boxes:
+                # Find absolutely largest candidate in the current frame
+                largest_candidate = max(candidate_boxes, key=lambda b: b[4])
+
+                # Find candidate closest to existing target
+                closest_candidate = None
+                if current_target_box:
+                    cx, cy = current_target_box[0], current_target_box[1]
+                    best_dist = 80 # Max search radius in pixels
+                    for b in candidate_boxes:
+                        dist = ((b[0] - cx)**2 + (b[1] - cy)**2)**0.5
+                        if dist < best_dist:
+                            best_dist = dist
+                            closest_candidate = b
+                            
+                if current_target_box and closest_candidate:
+                    # Prioritize nearer objects: If the largest candidate in frame is significantly 
+                    # larger (e.g., >1.5x area) than the currently tracked ball, SWITCH to it!
+                    if largest_candidate[4] > closest_candidate[4] * 1.5:
+                        best_match = largest_candidate
+                        consecutive_detections = 1 # Reset confidence count for the new target
+                    else:
+                        best_match = closest_candidate
+                else:
+                    # No target lock, or target lost -> pick the largest ball available
+                    best_match = largest_candidate
+
+            if best_match:
+                consecutive_misses = 0
+                consecutive_detections += 1
+                
+                # Apply Exponential Moving Average (EMA) for smoother box tracking
+                if current_target_box is None:
+                    current_target_box = (best_match[0], best_match[1], best_match[2], best_match[3])
+                else:
+                    alpha = 0.5 # Smoothing factor
+                    current_target_box = (
+                        alpha * best_match[0] + (1 - alpha) * current_target_box[0],
+                        alpha * best_match[1] + (1 - alpha) * current_target_box[1],
+                        alpha * best_match[2] + (1 - alpha) * current_target_box[2],
+                        alpha * best_match[3] + (1 - alpha) * current_target_box[3]
+                    )
+
+                # Only output visible ball if we've seen it for enough frames
+                if consecutive_detections >= CONFIRM_FRAMES:
+                    largest_box = current_target_box
+            else:
+                consecutive_misses += 1
+                if consecutive_misses > MISS_FRAMES_TOLERANCE:
+                    # Give up on the target
+                    current_target_box = None
+                    consecutive_detections = 0
+                    largest_box = None
+                else:
+                    # Tolerate the miss and keep using the last known target box
+                    if consecutive_detections >= CONFIRM_FRAMES:
+                        largest_box = current_target_box
+
             # Update Shared State
             if largest_box:
                 ball_visible = True
                 ball_x, ball_y, ball_w, ball_h = largest_box
                 
-                # Calculate distance based on bounding box Area
-                ball_area = ball_w * ball_h
-                
-                # TODO: Replace these placeholder areas with actual bounding box areas at these distances!
-                # Example: If area is 12000 => 15cm, area is 3000 => 30cm, etc.
-                area_calibration = {
-                    7000.0: 15.0,
-                    2000.0: 30.0,
-                    850.0: 45.0,
-                    450.0: 60.0,
-                    290.0: 75.0,
-                    180.0: 90.0,
-                    70.0: 150.0
-                }
-                
-                # Simple linear interpolation for the given ball_area
-                sorted_a = sorted(area_calibration.keys())
-                if ball_area <= sorted_a[0]:
-                    ball_distance_cm = area_calibration[sorted_a[0]]
-                elif ball_area >= sorted_a[-1]:
-                    ball_distance_cm = area_calibration[sorted_a[-1]]
+                # Calculate distance reliably using focal length instead of bounding box area
+                # Distance = (Real Diameter * Focal Length) / Pixel Diameter
+                # CRITICAL FIX: We use min(ball_w, ball_h) instead of max().
+                # If YOLO merges 2 balls side-by-side, the bounding box width doubles, 
+                # but the bounding box height remains the exact diameter of a single ball!
+                # min() ensures we always grab the true 4cm diameter edge.
+                pixel_diameter = min(ball_w, ball_h)
+                if pixel_diameter > 0:
+                    ball_distance_cm = (BALL_DIAMETER_CM * FOCAL_LENGTH_X) / pixel_diameter
                 else:
-                    # Find which two points ball_area falls between
-                    for i in range(len(sorted_a) - 1):
-                        a1, a2 = sorted_a[i], sorted_a[i+1]
-                        if a1 <= ball_area <= a2:
-                            d1, d2 = area_calibration[a1], area_calibration[a2]
-                            # Linear interpolate the distance
-                            ball_distance_cm = d1 + (d2 - d1) * ((ball_area - a1) / (a2 - a1))
-                            break
+                    ball_distance_cm = 999.0
             else:
                 ball_visible = False
                 ball_distance_cm = 999.0
@@ -401,41 +481,42 @@ def robot_control_loop():
             robot_stop()
             time.sleep(0.1)
 
-            print("\n[BALL CATCH] Checking path...")
-            if latest_C > 30: # Assuming 30cm is the threshold
-                print(f"[BALL CATCH] Path clear ({latest_C}cm). Moving forward ~30cm.")
-                robot_forward()
-                time.sleep(1.0) # Approx time to move 30cm
-                robot_stop()
-                time.sleep(0.2)
-            else:
-                print(f"[BALL CATCH] Path blocked ({latest_C}cm). Skipping initial forward move.")
-
             print("\n[BALL CATCH] Executing Manoeuvre...")
             ser.write(b'S\n') # Ensure stopped first
             time.sleep(0.1)
             ser.write(b'a\n') # Arm DOWN
             arm_is_up = False # Disable obstacle avoidance
             time.sleep(2.0)
-            ser.write(b'O\n') # Gripper OPEN
+            
+            ser.write(b'O\n') # Gripper OPEN initially
             time.sleep(1.0)
+
+            print(f"[BALL CATCH] Moving forward {CAPTURE_DISTANCE_CM}cm while opening/closing gripper...")
+            # Move forward slowly (speed '2') for specified distance while opening and closing
+            set_speed(2)
+            ser.write(b'F\n')
             
-            ser.write(b'F\n') # Move forward
-            time.sleep(1.5) # Short interval
-            ser.write(b'C\n') # Close gripper
-            time.sleep(1.0) # Wait for close
-            ser.write(b'S\n') # Stop
+            time_to_move = CAPTURE_DISTANCE_CM / CAPTURE_SPEED_CM_S
+            start_time = time.time()
+            last_toggle = start_time
+            gripper_state = b'O\n'
+            
+            while (time.time() - start_time) < time_to_move:
+                current_time = time.time()
+                # Toggle gripper every 0.4 seconds
+                if current_time - last_toggle >= 0.4:
+                    if gripper_state == b'O\n':
+                        ser.write(b'C\n')
+                        gripper_state = b'C\n'
+                    else:
+                        ser.write(b'O\n')
+                        gripper_state = b'O\n'
+                    last_toggle = current_time
+                time.sleep(0.02)
+            
+            ser.write(b'C\n') # Final state: closed
             time.sleep(0.5)
-            
-            for _ in range(3):
-                ser.write(b'F\n') # Move forwards
-                time.sleep(1.0)
-                ser.write(b'S\n') # Stop to scoop
-                time.sleep(0.2)
-                ser.write(b'O\n') # Open gripper
-                time.sleep(1.0)
-                ser.write(b'C\n') # Close gripper
-                time.sleep(1.0)
+            ser.write(b'S\n') # Stop robot
             
             robot_active = was_active # Restore previous state
             print("\n[BALL CATCH] Manoeuvre Complete.")
@@ -502,26 +583,31 @@ def robot_control_loop():
                     # Wait slightly so we don't rapid-fire commands once arrived
                     time.sleep(0.5)
                 elif abs(error) < CENTER_TOLERANCE:
-                    # Ball is roughly centered, move towards it
-                    robot_forward()
+                    # Ball is roughly centered, move towards it straight
+                    robot_forward_slow()
+                    time.sleep(0.1)
+                    robot_stop()         # Move in small, deliberate forward steps
                 elif error < 0:
                     # Ball is to the Left (x < 160)
                     log_motion_action("Turn LEFT (Track)", latest_L, latest_C, latest_R)
-                    robot_left()
+                    robot_left()         # Turn towards the ball
+                    time.sleep(0.06)     # Short nudge to adjust angle
+                    robot_stop()         # Stop immediately to re-evaluate center natively
+                    time.sleep(0.05)     # Wait for stabilization
                 else:
                     # Ball is to the Right (x > 160)
                     log_motion_action("Turn RIGHT (Track)", latest_L, latest_C, latest_R)
-                    robot_right()
-                
-                # Short delay to prevent flooding serial, motors run continuously
-                time.sleep(0.1)
+                    robot_right()        # Turn towards the ball
+                    time.sleep(0.06)     # Short nudge to adjust angle
+                    robot_stop()         # Stop immediately to re-evaluate center natively
+                    time.sleep(0.05)     # Wait for stabilization
 
             # ----------------------------------
             # PRIORITY 3: SEARCHING (NO BALL)
             # ----------------------------------
             else:
-                # No ball seen? Rotate to find one.
-                robot_spin_search()
+                # No ball seen? Move forward slowly to find one.
+                robot_forward_slow()
                 time.sleep(0.1)  # Run motors continuously while searching
 
         else:
