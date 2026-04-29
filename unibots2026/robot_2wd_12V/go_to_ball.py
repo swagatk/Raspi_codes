@@ -92,8 +92,9 @@ ORIGINAL_CALIB_WIDTH = 640
 FOCAL_LENGTH_X = CAMERA_PARAMS[0] * (CAPTURE_WIDTH / ORIGINAL_CALIB_WIDTH)
 BALL_DIAMETER_CM = 4.0 # Standard ping-pong ball size (~4.0 cm). Adjust if needed.
 TARGET_REACHED_CM = 40.0 # Distance to stop in front of the ball
-CAPTURE_DISTANCE_CM = 10.0 # Target forward travel distance during the ball catch manoeuver
+CAPTURE_DISTANCE_CM = 15.0 # Target forward travel distance during the ball catch manoeuver
 CAPTURE_SPEED_CM_S = 10.6 # Approximate cm/sec speed of robot using motor speed level '2'
+CAPTURE_GRIPPER_CYCLES = 4 # Number of open-close gripper operations during forward movement
 
 # --- GLOBAL VARIABLES ---
 # Thread Control
@@ -497,14 +498,21 @@ def robot_control_loop():
             ser.write(b'F\n')
             
             time_to_move = CAPTURE_DISTANCE_CM / CAPTURE_SPEED_CM_S
+            
+            # Calculate toggle interval based on desired number of cycles (2 toggles per cycle)
+            if CAPTURE_GRIPPER_CYCLES > 0:
+                toggle_interval = time_to_move / (CAPTURE_GRIPPER_CYCLES * 2)
+            else:
+                toggle_interval = time_to_move + 1 # Never toggle
+                
             start_time = time.time()
             last_toggle = start_time
             gripper_state = b'O\n'
             
             while (time.time() - start_time) < time_to_move:
                 current_time = time.time()
-                # Toggle gripper every 0.4 seconds
-                if current_time - last_toggle >= 0.4:
+                # Toggle gripper based on calculated interval
+                if current_time - last_toggle >= toggle_interval:
                     if gripper_state == b'O\n':
                         ser.write(b'C\n')
                         gripper_state = b'C\n'
@@ -517,6 +525,11 @@ def robot_control_loop():
             ser.write(b'C\n') # Final state: closed
             time.sleep(0.5)
             ser.write(b'S\n') # Stop robot
+            
+            time.sleep(0.5)
+            ser.write(b'A\n') # Arm UP
+            arm_is_up = True
+            time.sleep(2.0)
             
             robot_active = was_active # Restore previous state
             print("\n[BALL CATCH] Manoeuvre Complete.")
@@ -550,18 +563,22 @@ def robot_control_loop():
                     log_motion_action("Nudge RIGHT", latest_L, latest_C, latest_R)
                     print("Too close Left - Nudging Right")
                     robot_right()
-                    time.sleep(0.1)
+                    time.sleep(0.2)
                     robot_forward()
-                    time.sleep(0.1)
+                    time.sleep(0.2)
+                    robot_stop()
+                    time.sleep(0.2) # Allow camera to stabilize
                     continue
 
                 elif latest_R < SIDE_DIST:
                     log_motion_action("Nudge LEFT", latest_L, latest_C, latest_R)
                     print("Too close Right - Nudging Left")
                     robot_left()
-                    time.sleep(0.1)
+                    time.sleep(0.2)
                     robot_forward()
-                    time.sleep(0.1)
+                    time.sleep(0.2)
+                    robot_stop()
+                    time.sleep(0.2) # Allow camera to stabilize
                     continue
 
             # ----------------------------------
@@ -574,45 +591,58 @@ def robot_control_loop():
                 
                 # print(f"Tracking Ball: x={ball_x:.1f}, dist={ball_distance_cm:.1f}cm")
                 
-                if ball_distance_cm <= TARGET_REACHED_CM:
-                    # Ball is very close, stop!
+                if abs(error) >= CENTER_TOLERANCE:
+                    # Ball is NOT centered, turn to center it first (even if it's close)
+                    if error < 0:
+                        # Ball is to the Left (x < 160)
+                        log_motion_action("Turn LEFT (Track)", latest_L, latest_C, latest_R)
+                        robot_left()         # Turn towards the ball
+                        time.sleep(0.05)     # Short nudge to adjust angle
+                        robot_stop()         # Stop immediately to re-evaluate center natively
+                        time.sleep(0.2)      # Longer wait for camera stabilization to avoid overshooting
+                    else:
+                        # Ball is to the Right (x > 160)
+                        log_motion_action("Turn RIGHT (Track)", latest_L, latest_C, latest_R)
+                        robot_right()        # Turn towards the ball
+                        time.sleep(0.05)     # Short nudge to adjust angle
+                        robot_stop()         # Stop immediately to re-evaluate center natively
+                        time.sleep(0.2)      # Longer wait for camera stabilization to avoid overshooting
+                elif ball_distance_cm <= TARGET_REACHED_CM:
+                    # Ball is roughly centered AND very close, stop!
                     print(f"Ball Reached! Distance: {ball_distance_cm:.1f}cm. Stopping.")
                     log_motion_action(f"Ball Reached ({ball_distance_cm:.1f}cm)", latest_L, latest_C, latest_R)
                     robot_stop()
                     robot_active = False
                     # Wait slightly so we don't rapid-fire commands once arrived
                     time.sleep(0.5)
-                elif abs(error) < CENTER_TOLERANCE:
-                    # Ball is roughly centered, move towards it straight
-                    robot_forward_slow()
-                    time.sleep(0.1)
-                    robot_stop()         # Move in small, deliberate forward steps
-                elif error < 0:
-                    # Ball is to the Left (x < 160)
-                    log_motion_action("Turn LEFT (Track)", latest_L, latest_C, latest_R)
-                    robot_left()         # Turn towards the ball
-                    time.sleep(0.06)     # Short nudge to adjust angle
-                    robot_stop()         # Stop immediately to re-evaluate center natively
-                    time.sleep(0.05)     # Wait for stabilization
                 else:
-                    # Ball is to the Right (x > 160)
-                    log_motion_action("Turn RIGHT (Track)", latest_L, latest_C, latest_R)
-                    robot_right()        # Turn towards the ball
-                    time.sleep(0.06)     # Short nudge to adjust angle
-                    robot_stop()         # Stop immediately to re-evaluate center natively
-                    time.sleep(0.05)     # Wait for stabilization
+                    # Ball is roughly centered but still far, move towards it straight
+                    log_motion_action("Forward (Track)", latest_L, latest_C, latest_R)
+                    robot_forward_slow()
+                    time.sleep(0.5)      # Move forward longer to close distance
+                    robot_stop()         # Stop to re-evaluate
+                    time.sleep(0.1)      # Brief stabilization
 
             # ----------------------------------
             # PRIORITY 3: SEARCHING (NO BALL)
             # ----------------------------------
             else:
-                # No ball seen? Move forward slowly to find one.
-                robot_forward_slow()
-                time.sleep(0.1)  # Run motors continuously while searching
+                # No ball seen? Stop and go back to searching mode.
+                print("Target lost. Stopping and waiting to re-acquire...")
+                robot_stop()
+                robot_active = False
 
         else:
-            # If not active, do nothing
-            time.sleep(0.1)
+            # If not active, but we don't see a ball, spin and search slowly
+            if not execute_ball_catch:
+                if not ball_visible:
+                    robot_right()
+                    time.sleep(0.1)
+                    robot_stop()
+                    time.sleep(0.5) # Stop and let camera frame update
+                else:
+                    # Ball is visible but robot is not active yet. Just wait.
+                    time.sleep(0.1)
     
     # Cleanup
     robot_stop()

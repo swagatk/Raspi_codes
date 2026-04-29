@@ -1,287 +1,348 @@
 import time
 import threading
 import sys
+import termios
+import tty
+import select
+import os
 import cv2
-from apriltag_detection import * 
+import logging
+from tqdm import tqdm
+from robot_hardware import RobotController
+from vision_module import VisionModule
+import config
+from config import *
 
-# from servo_test import move_arm_up, move_arm_drop, arm_rest_pose
-# Configuration Variables (User Defined Durations in seconds)
-# Maximum total time reduced to ~180s (3 minutes)
-TIME_STEP_1_HOME_TAG_CAPTURE = 5
-TIME_STEP_2_ROTATE_180 = 5
-TIME_STEP_3A_SCAN_BALLS = 15
-TIME_STEP_3B_GO_TO_BALL = 45
-TIME_STEP_4_CAPTURE_MANOEUVRE = 30
-TIME_STEP_5_SECURE_BALL = 5
-TIME_STEP_6_GO_TO_HOME = 50
-TIME_STEP_7_DROP_MANOEUVRE = 20
-# TOTAL: ~175 seconds
+LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log")
+os.makedirs(LOG_DIR, exist_ok=True)
 
-# Settings
-FRAME_WIDTH = 320
-FRAME_HEIGHT = 240
-FPS = 30
-CONSECUTIVE_FRAMES_REQUIRED = 3
-
-# State Management
-is_running = False
-current_step = 0
-latest_frame = None
-frame_lock = threading.Lock()
-sequence_start_time = 0
-
-# Simulated/Imported specific commands 
-# You'll need to import the exact functions from your other modules here
-# from servo_test import move_arm_up, move_arm_drop, arm_rest_pose, send_cmd
-# from go_to_home import navigate_to_home, capture_home_tags
-# from ball_detection import detect_orange_balls
-# from go_to_ball import navigate_to_ball
-# from keyboard_control import drive_forward, stop_robot, turn_robot
-
-def print_progress_bar(step, step_name, elapsed, duration, bar_length=20):
-    """Draws a progress bar in the terminal."""
-    fraction = elapsed / duration if duration > 0 else 1
-    fraction = min(max(fraction, 0), 1) # Clamp between 0-1
-    filled_length = int(bar_length * fraction)
-    bar = '=' * filled_length + '>' + ' ' * (bar_length - filled_length - 1)
-    
-    total_elapsed = time.time() - sequence_start_time
-    minutes = int(total_elapsed // 60)
-    seconds = int(total_elapsed % 60)
-    
-    sys.stdout.write(f"\r[{bar}] Step {step}: {step_name} | Sub-timer: {int(elapsed)}s/{duration}s | Total: {minutes}m{seconds}s  ")
-    sys.stdout.flush()
-
-def button_monitor_thread():
-    """Monitor a physical button to start/stop the autonomous sequence."""
-    global is_running, current_step, sequence_start_time
-    
-    print("Press Enter to start/stop...")
-    while True:
+class TqdmLoggingHandler(logging.Handler):
+    def emit(self, record):
         try:
-            user_input = input("") 
-            if user_input.strip() == "":
-                is_running = not is_running
-                if is_running:
-                    print("\nButton pressed: Sequence STARTED.")
-                    sequence_start_time = time.time()
-                    current_step = 1
+            msg = self.format(record)
+            tqdm.write(msg)
+            self.flush()
+        except Exception:
+            self.handleError(record)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler(os.path.join(LOG_DIR, "motion_plan.log")),
+        TqdmLoggingHandler()
+    ]
+)
+
+def get_key(timeout=0.1):
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        r, w, e = select.select([sys.stdin], [], [], timeout)
+        if r:
+            ch = sys.stdin.read(1)
+        else:
+            ch = None
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+button_pressed = False
+mission_running = False
+
+def check_button_thread():
+    global button_pressed, mission_running
+    while True:
+        key = get_key(0.5)
+        if key:
+            key = key.lower()
+            if key == 'y':  
+                if not mission_running:
+                    button_pressed = True
+                    mission_running = True
                 else:
-                    print("\nButton pressed: Sequence STOPPED.")
-                    current_step = 0
-                    execute_stop_safely()
-                    
-        except KeyboardInterrupt:
-            break
-        time.sleep(0.1)
+                    mission_running = False  # emergency stop
 
-def camera_capture_thread():
-    """Capture video in a separate thread for optimal performance."""
-    global latest_frame, is_running
+def save_annotated_frame(vision, filename):
+    if vision.frame is not None:
+        annotated = vision.frame.copy()
+        if vision.ball_detected:
+            cv2.putText(annotated, f"Dist: {vision.ball_distance:.1f}cm", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        try:
+            full_path = os.path.join(LOG_DIR, filename)
+            cv2.imwrite(full_path, annotated)
+        except Exception as e:
+            logging.error(f"Failed to save image {full_path}: {e}")
+
+def global_progress_thread():
+    TOTAL_DUR = 180
+    with tqdm(total=TOTAL_DUR, desc="Mission Progress (3m)", position=0, leave=True, bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt}s") as pbar:
+        while mission_running and pbar.n < TOTAL_DUR:
+            time.sleep(1)
+            pbar.update(1)
+
+def main():
+    global robot, vision
+    logging.info("--- Step 1: Initialization phase ---")
+    robot = RobotController()
+    vision = VisionModule()
     
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
-    cap.set(cv2.CAP_PROP_FPS, FPS)
+    if not robot.ser:
+        logging.error("Motor/Arduino initialization failed (Check serial connection).")
+        sys.exit(1)
+    else:
+        logging.info("Motor status: OK")
+        
+    robot.start_sensors()
+    vision.start()
     
-    while True:
-        ret, frame = cap.read()
-        if ret:
-            with frame_lock:
-                latest_frame = frame
+    # Simple check for camera start
+    time.sleep(2)
+    if vision.frame is None:
+        logging.error("Camera status: FAILED to capture frames. Exiting.")
+        robot.stop()
+        vision.stop()
+        sys.exit(1)
+    else:
+        logging.info("Camera status: OK")
+        
+    # Assuming ultrasonic is returning valid numbers
+    if robot.latest_C == 999 and robot.latest_L == 999:
+        logging.warning("Ultrasonic sensor status: No initial readings received yet.")
+    else:
+        logging.info(f"Ultrasonic sensor status: OK (L:{robot.latest_L} C:{robot.latest_C} R:{robot.latest_R})")
+
+    logging.info("Moving ARM to UP pose.")
+    robot.arm_up()
+    time.sleep(1)
+    
+    threading.Thread(target=check_button_thread, daemon=True).start()
+    logging.info("System Online. Waiting for button press ('y' key) to start mission sequence...")
+    
+    while not button_pressed:
+        time.sleep(0.1)
+        
+    logging.info("Button pressed. Mission Started!")
+    if not mission_running: return
+    
+    threading.Thread(target=global_progress_thread, daemon=True).start()
+    
+    # ---------------------------------------------------------
+    # STEP 2: Confirm Home Location (~20 seconds)
+    # ---------------------------------------------------------
+    logging.info("--- Step 2: Confirm Home Location ---")
+    start_time = time.time()
+    home_confirmed = False
+    
+    while mission_running and (time.time() - start_time < 20.0):
+        # We expect some delay to fetch tags
+        time.sleep(0.2)
+        visible_tags = [t.tag_id for t in vision.tags]
+        matched = [t for t in config.HOME_TAG_IDS if t in visible_tags]
+        
+        if len(matched) > 0: # At least one home tag
+            logging.info(f"Home tag(s) {matched} confirmed!")
+            save_annotated_frame(vision, "home_tag.jpg")
+            home_confirmed = True
+            break
         else:
-            time.sleep(0.01)
+            logging.info("Home tags not visible. Adjusting view backwards...")
+            robot.move('B', '1')
+            time.sleep(0.3)
+            robot.halt()
+            time.sleep(0.5) # Wait for camera to stabilize
             
-        if not is_running and current_step == 0:
-            time.sleep(0.1)
-
-    cap.release()   
-
-def execute_stop_safely():
-    """Immediately stop all motors and safe the arm."""
-    print("\nEMERGENCY STOP executed.")
-    # stop_robot()
-    # send_cmd(b'a\n') # Arm down/Rest
-
-def step_1_home_capture():
-    start_time = time.time()
-    consecutive_frames = 0
-    duration = TIME_STEP_1_HOME_TAG_CAPTURE
-    detected_home_tags = []
-    
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar(1, "Home Tag Capture", elapsed, duration)
+    if not home_confirmed:
+        logging.error("Home tags not detected within time limit. Exiting mission.")
+        robot.stop()
+        vision.stop()
+        sys.exit(1)
         
-        if elapsed >= duration:
-            break
-            
-        with frame_lock:
-            frame = latest_frame
-            
-        if frame is not None:
-            tag_detections = capture_home_tag_function(frame)
-            if len(tag_detections) >= 2: 
-                consecutive_frames +=1
-                # Save the tag IDs locally to return later
-                detected_home_tags = [tag.tag_id for tag in tag_detections[:2]]
-            
-            if consecutive_frames >= CONSECUTIVE_FRAMES_REQUIRED:
-                print("\nHome tags successfully captured.")
-                return detected_home_tags 
-        time.sleep(0.1)
+    logging.info("Step 2 completed successfully.")
+    if not mission_running: return
 
-    return detected_home_tags
-
-def step_2_rotate_180():
-    start_time = time.time()
-    duration = TIME_STEP_2_ROTATE_180
+    # ---------------------------------------------------------
+    # STEP 3: Exploration (~ 2 minutes)
+    # ---------------------------------------------------------
+    logging.info("--- Step 3: Exploration Phase ---")
+    exploration_start = time.time()
     
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar(2, "Rotating 180 degrees", elapsed, duration)
-        if elapsed >= duration:
-            break
-        time.sleep(0.1)
-    print()
-
-def step_3_scan_and_go_to_ball():
-    start_time = time.time()
-    duration = TIME_STEP_3A_SCAN_BALLS
-    
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar("3A", "Scanning for balls", elapsed, duration)
-        if elapsed >= duration:
-            break
-        # Mock detection logic
-        time.sleep(0.05)
-    print()
-    
-    if not is_running: return
+    while mission_running and (time.time() - exploration_start < 120.0):
         
-    start_time = time.time()
-    duration = TIME_STEP_3B_GO_TO_BALL
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar("3B", "Navigating to ball", elapsed, duration)
-        if elapsed >= duration:
-            break
-        time.sleep(0.1)
-    print()
-
-def step_4_capture_manoeuvre():
-    start_time = time.time()
-    duration = TIME_STEP_4_CAPTURE_MANOEUVRE
-    
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar(4, "Ball capture manouver", elapsed, duration)
-        if elapsed >= duration:
-            break
-        time.sleep(0.1)
-    print()
+        # 1. Search for target
+        logging.info("Searching for target...")
+        ball_found = False
+        search_start = time.time()
         
-def step_5_secure_ball():
-    start_time = time.time()
-    duration = TIME_STEP_5_SECURE_BALL
-    
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar(5, "Securing ball / Arm UP", elapsed, duration)
-        if elapsed >= duration:
-            break
-        time.sleep(0.1)
-    print()
-
-def step_6_go_home():
-    start_time = time.time()
-    duration = TIME_STEP_6_GO_TO_HOME
-    
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar(6, "Navigating to Home", elapsed, duration)
-        if elapsed >= duration:
-            break
-        time.sleep(0.1)
-    print()
-
-def step_7_drop_manoeuvre():
-    start_time = time.time()
-    duration = TIME_STEP_7_DROP_MANOEUVRE
-    
-    while is_running:
-        elapsed = time.time() - start_time
-        print_progress_bar(7, "Executing Drop", elapsed, duration)
-        if elapsed >= duration:
-            break
-        time.sleep(0.1)
-    print()
-
-def step_8_rest_pose():
-    print("Step 8: Entering Rest Pose.")
-    execute_stop_safely()
-
-def autonomous_sequence():
-    """Main state machine running the steps sequentially."""
-    global current_step, is_running
-    
-    # Store the home tags globally once captured
-    home_tags = []
-    
-    while True:
-        if is_running:
-            if current_step == 1:
-                home_tags = step_1_home_capture()
-                if home_tags:
-                    print(f"Captured Home Tags: {home_tags}")
-                if is_running: current_step = 2
+        while mission_running and (time.time() - search_start < 15.0) and (time.time() - exploration_start < 120.0):
+            if vision.ball_detected:
+                logging.info(f"Target detected at {vision.ball_distance:.1f}cm! Saving image.")
+                save_annotated_frame(vision, f"target_detected_{int(time.time())}.jpg")
+                ball_found = True
+                break
+            # Rotate by a slightly larger amount to search faster
+            robot.move('R', '2')
+            time.sleep(0.3)
+            robot.halt()
+            time.sleep(0.3)
             
-            elif current_step == 2:
-                step_2_rotate_180()
-                if is_running: current_step = 3
+        if not ball_found:
+            # Continue tracking elapsed time
+            continue
+            
+        # 2. Approach target
+        logging.info("Approaching the target...")
+        reached = False
+        approach_start = time.time()
+        
+        while mission_running and (time.time() - approach_start < 30.0) and (time.time() - exploration_start < 120.0):
+            # Obstacle avoidance priority
+            if robot.latest_C < STOP_DIST:
+                logging.warning(f"Obstacle in center ({robot.latest_C}cm)! Evading...")
+                robot.halt()
+                robot.move('B', '1')
+                time.sleep(0.3)
+                robot.move('L', '1')
+                time.sleep(0.3)
+                robot.halt()
+                time.sleep(0.2)
+                continue
                 
-            elif current_step == 3:
-                step_3_scan_and_go_to_ball()
-                if is_running: current_step = 4
+            if vision.ball_detected:
+                error = vision.ball_x - 160
+                if abs(error) >= CENTER_TOLERANCE:
+                    # Centering
+                    if error < 0: robot.move('L', '1')
+                    else: robot.move('R', '1')
+                    time.sleep(0.1)
+                    robot.halt()
+                    time.sleep(0.2)
+                else:
+                    if vision.ball_distance <= TARGET_REACHED_CM:
+                        logging.info("Target reached distance limit.")
+                        robot.halt()
+                        reached = True
+                        break
+                    else:
+                        robot.move('F', '1')
+                        time.sleep(0.2)
+                        robot.halt()
+                        time.sleep(0.1)
+            else:
+                logging.warning("Target lost during approach. Will rescan.")
+                robot.halt()
+                break # break approach loop, re-enter search
                 
-            elif current_step == 4:
-                step_4_capture_manoeuvre()
-                if is_running: current_step = 5
+        # 3. Grab the ball
+        if reached:
+            logging.info("Grabbing the ball...")
+            robot.arm_down()
+            time.sleep(2.0)
+            robot.gripper_open()
+            time.sleep(1.0)
+            
+            logging.info(f"Moving forward {config.CAPTURE_DISTANCE_CM}cm while toggling gripper {config.CAPTURE_GRIPPER_CYCLES} times...")
+            robot.move('F', '2')
+            
+            time_to_move = config.CAPTURE_DISTANCE_CM / config.CAPTURE_SPEED_CM_S
+            
+            if config.CAPTURE_GRIPPER_CYCLES > 0:
+                toggle_interval = time_to_move / (config.CAPTURE_GRIPPER_CYCLES * 2)
+            else:
+                toggle_interval = time_to_move + 1  # Never toggle
                 
-            elif current_step == 5:
-                step_5_secure_ball()
-                if is_running: current_step = 6
+            start_m = time.time()
+            last_toggle = start_m
+            gripper_is_open = True
+            
+            while (time.time() - start_m) < time_to_move:
+                current_time = time.time()
+                if current_time - last_toggle >= toggle_interval:
+                    if gripper_is_open:
+                        robot.gripper_close()
+                        gripper_is_open = False
+                    else:
+                        robot.gripper_open()
+                        gripper_is_open = True
+                    last_toggle = current_time
+                time.sleep(0.02)
                 
-            elif current_step == 6:
-                step_6_go_home()
-                if is_running: current_step = 7
-                
-            elif current_step == 7:
-                step_7_drop_manoeuvre()
-                if is_running: current_step = 8
-                
-            elif current_step == 8:
-                step_8_rest_pose()
-                print("Sequence Completed Successfully.")
-                is_running = False
-                current_step = 0
-                
+            robot.gripper_close()
+            time.sleep(0.5)
+            robot.halt()
+            time.sleep(0.5)
+            
+            robot.arm_up()
+            time.sleep(2)
+            logging.info("Ball grab complete.")
+            
+    logging.info("Step 3 Exploration time completed.")
+    if not mission_running: return
+
+    # ---------------------------------------------------------
+    # STEP 4: Returning home (~40 seconds)
+    # ---------------------------------------------------------
+    logging.info("--- Step 4: Returning home ---")
+    home_start = time.time()
+    
+    # We would normally estimate robot pose here using pupil_apriltags map
+    logging.info("Estimating robot pose from vision data...")
+    
+    while mission_running and (time.time() - home_start < 40.0):
+        visible_tags = [t.tag_id for t in vision.tags]
+        matched = [t for t in config.HOME_TAG_IDS if t in visible_tags]
+        
+        if len(matched) > 0:
+            logging.info("Home tag spotted. Approaching...")
+            if robot.latest_C <= config.TARGET_REACHED_CM + 10:
+                logging.info("Arrived at home location.")
+                robot.halt()
+                break
+            else:
+                robot.move('F', '1')
+                time.sleep(0.2)
+                robot.halt()
+                time.sleep(0.1)
         else:
-            time.sleep(0.1)
+            # Spin with a slightly larger rotation to scan for home tags faster
+            robot.move('R', '2')
+            time.sleep(0.3)
+            robot.halt()
+            time.sleep(0.3)
+            
+    # Drop sequence
+    logging.info("Executing Ball drop...")
+    robot.arm_drop()
+    time.sleep(2)
+    robot.gripper_open()
+    time.sleep(1)
+    
+    robot.arm_down()
+    robot.halt()
+    logging.info("Mission sequence finalized. Entering rest pose and shutting down.")
+
+global robot, vision
+robot = None
+vision = None
 
 if __name__ == "__main__":
-    cam_thread = threading.Thread(target=camera_capture_thread, daemon=True)
-    cam_thread.start()
-    
-    btn_thread = threading.Thread(target=button_monitor_thread, daemon=True)
-    btn_thread.start()
-    
-    print("Starting Main Autonomous Loop Handler...")
-    
     try:
-        autonomous_sequence()
+        main()
     except KeyboardInterrupt:
-        print("\nInterrupted by user, shutting down.")
-        execute_stop_safely()
-
+        logging.info("Interrupted by user (Ctrl+C)")
+    except Exception as e:
+        logging.error(f"Mission crashed due to exception: {e}")
+    finally:
+        if robot is not None:
+            logging.info("Moving ARM to DOWN pose before exit.")
+            try:
+                robot.arm_down()
+                time.sleep(1)
+            except:
+                pass
+            robot.stop()
+        if vision is not None:
+            vision.stop()
+        sys.exit(0)

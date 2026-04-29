@@ -10,7 +10,10 @@ import subprocess
 
 # --- CAMERA CONFIGURATION ---
 # Select which script to launch when pressing 'V' for Live Video. Options: 'picamera' or 'usb'
-CAMERA_TYPE = 'usb'
+CAMERA_TYPE = 'picamera'
+
+# --- MANOEUVRE CONFIGURATION ---
+CAPTURE_GRIPPER_CYCLES = 3 # Number of open-close gripper operations during forward movement
 
 # --- GLOBAL VARIABLES ---
 # We use this to stop the background thread when we quit
@@ -114,31 +117,55 @@ try:
             elif key == 'f': cmd = b'f\n'
             elif key == 'g': cmd = b'g\n'
             elif key == 'b': 
-                print("\n[BALL CATCH] Executing Manoeuvre...")
+                print("\r\n[BALL CATCH] Executing Manoeuvre...")
                 ser.write(b'S\n') # Ensure stopped first
                 time.sleep(0.1)
                 ser.write(b'a\n') # Arm DOWN
                 time.sleep(2.0)
-                ser.write(b'O\n') # Gripper OPEN
+                
+                ser.write(b'O\n') # Gripper OPEN initially
                 time.sleep(1.0)
+
+                print("\r\n[BALL CATCH] Moving forward while opening/closing gripper...")
+                # Move forward slowly while opening and closing
+                ser.write(b'2\n')
+                time.sleep(0.1)
+                ser.write(b'F\n')
                 
-                ser.write(b'F\n') # Move forward
-                time.sleep(1.5) # Short interval
-                ser.write(b'C\n') # Close gripper
-                time.sleep(1.0) # Wait for close
-                ser.write(b'S\n') # Stop
-                time.sleep(0.5)
+                # Move for approx 1.5 seconds (roughly 15cm)
+                time_to_move = 1.5
                 
-                for _ in range(3):
-                    ser.write(b'F\n') # Move forwards
-                    time.sleep(1.0)
-                    ser.write(b'S\n') # Stop to scoop
-                    time.sleep(0.2)
-                    ser.write(b'O\n') # Open gripper
-                    time.sleep(1.0)
-                    ser.write(b'C\n') # Close gripper
-                    time.sleep(1.0)
+                # Calculate toggle interval based on desired number of cycles (2 toggles per cycle)
+                if CAPTURE_GRIPPER_CYCLES > 0:
+                    toggle_interval = time_to_move / (CAPTURE_GRIPPER_CYCLES * 2)
+                else:
+                    toggle_interval = time_to_move + 1 # Never toggle
                     
+                start_time = time.time()
+                last_toggle = start_time
+                gripper_state = b'O\n'
+                
+                while (time.time() - start_time) < time_to_move:
+                    current_time = time.time()
+                    # Toggle gripper based on calculated interval
+                    if current_time - last_toggle >= toggle_interval:
+                        if gripper_state == b'O\n':
+                            ser.write(b'C\n')
+                            gripper_state = b'C\n'
+                        else:
+                            ser.write(b'O\n')
+                            gripper_state = b'O\n'
+                        last_toggle = current_time
+                    time.sleep(0.02)
+                
+                ser.write(b'C\n') # Final state: closed
+                time.sleep(0.5)
+                ser.write(b'S\n') # Stop robot
+                
+                time.sleep(0.5)
+                ser.write(b'A\n') # Arm UP
+                time.sleep(2.0)
+                
                 cmd = b'S\n'
                 current_cmd = b'S\n'
                 
@@ -155,16 +182,16 @@ try:
                         camera_script = '/home/pi/Raspi_codes/unibots2026/robot_2wd_12V/usb_camera_test.py'
                         
                     camera_process = subprocess.Popen([sys.executable, camera_script])
-                    print(f"\n[CAMERA] Started Live Video! ({CAMERA_TYPE})")
+                    print(f"\r\n[CAMERA] Started Live Video! ({CAMERA_TYPE})")
                 else:
                     # Terminate if it's already running
                     camera_process.terminate()
                     camera_process.wait() # Wait for it to close cleanly
                     camera_process = None
-                    print("\n[CAMERA] Stopped Live Video!")
+                    print("\r\n[CAMERA] Stopped Live Video!")
             elif key == 'q': 
                 ser.write(b'S\n')
-                print("\nExecuting ARM DOWN (a) and Gripper OPEN (O)...")
+                print("\r\nExecuting ARM DOWN (a) and Gripper OPEN (O)...")
                 ser.write(b'a\n')
                 time.sleep(2.0)
                 ser.write(b'O\n')
@@ -179,7 +206,7 @@ try:
         if key and cmd is not None:
             if cmd != current_cmd:
                 # Debug line to prove Python is reading the key
-                sys.stdout.write(f"\n[KEY PRESSED] Sending: {cmd.decode('utf-8').strip()}\n")
+                sys.stdout.write(f"\r\n[KEY PRESSED] Sending: {cmd.decode('utf-8').strip()}\r\n")
                 sys.stdout.flush()
                 ser.write(cmd)
                 current_cmd = cmd
