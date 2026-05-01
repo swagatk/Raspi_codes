@@ -2638,3 +2638,966 @@
 2026-05-01 11:09:14 | Action: Turn RIGHT (Track) | L:86 C:87 R:110
 2026-05-01 11:09:14 | Action: Turn RIGHT (Track) | L:87 C:86 R:999
 2026-05-01 11:09:14 | Action: Ball Reached (27.2cm) | L:85 C:86 R:129
+2026-05-01 13:41:25 | Action: Turn RIGHT (Track) | L:999 C:122 R:123
+2026-05-01 13:41:25 | Action: Turn RIGHT (Track) | L:145 C:123 R:121
+2026-05-01 13:41:26 | Action: Turn RIGHT (Track) | L:145 C:123 R:123
+2026-05-01 13:41:26 | Action: Turn RIGHT (Track) | L:147 C:121 R:123
+2026-05-01 13:41:26 | Action: Turn RIGHT (Track) | L:143 C:124 R:123
+2026-05-01 13:41:27 | Action: Turn RIGHT (Track) | L:145 C:124 R:121
+2026-05-01 13:41:27 | Action: Turn RIGHT (Track) | L:144 C:123 R:121
+2026-05-01 13:41:28 | Action: Ball Reached (25.5cm) | L:145 C:122 R:124
+2026-05-01 13:46:33 | Action: Forward (Track) | L:84 C:85 R:154
+2026-05-01 13:46:34 | Action: Forward (Track) | L:79 C:84 R:151
+2026-05-01 13:46:35 | Action: Forward (Track) | L:76 C:80 R:145
+2026-05-01 13:46:36 | Action: Forward (Track) | L:66 C:69 R:144
+2026-05-01 13:46:36 | Action: Forward (Track) | L:61 C:62 R:133
+2026-05-01 13:46:38 | Action: Forward (Track) | L:54 C:59 R:127
+2026-05-01 13:46:39 | Action: Forward (Track) | L:49 C:999 R:111
+2026-05-01 13:46:39 | Action: Forward (Track) | L:43 C:95 R:93
+2026-05-01 13:46:40 | Action: Forward (Track) | L:40 C:999 R:112
+2026-05-01 13:46:41 | Action: Ball Reached (36.7cm) | L:40 C:999 R:81
+2026-05-01 13:47:07 | Action: Nudge RIGHT | L:18 C:84 R:80
+2026-05-01 13:47:08 | Action: Nudge RIGHT | L:17 C:79 R:80
+2026-05-01 13:47:09 | Action: Turn RIGHT (Track) | L:67 C:75 R:76
+2026-05-01 13:47:09 | Action: Forward (Track) | L:66 C:73 R:76
+2026-05-01 13:47:10 | Action: Turn LEFT (Track) | L:64 C:69 R:75
+2026-05-01 13:47:11 | Action: Turn LEFT (Track) | L:63 C:75 R:67
+2026-05-01 13:47:11 | Action: Turn LEFT (Track) | L:999 C:78 R:66
+2026-05-01 13:47:11 | Action: Nudge LEFT | L:999 C:74 R:6
+2026-05-01 13:47:12 | Action: Nudge RIGHT | L:12 C:82 R:65
+2026-05-01 13:47:13 | Action: Turn RIGHT (Track) | L:999 C:68 R:59
+2026-05-01 13:47:14 | Action: Turn RIGHT (Track) | L:999 C:59 R:57
+2026-05-01 13:47:14 | Action: Turn RIGHT (Track) | L:999 C:59 R:62
+2026-05-01 13:47:14 | Action: Turn RIGHT (Track) | L:52 C:59 R:60
+2026-05-01 13:47:15 | Action: Ball Reached (26.0cm) | L:51 C:61 R:61
+2026-05-01 13:51:25 | Action: Turn RIGHT (Track) | L:84 C:137 R:102
+2026-05-01 13:51:25 | Action: Turn RIGHT (Track) | L:83 C:139 R:102
+2026-05-01 13:51:25 | Action: Turn RIGHT (Track) | L:82 C:137 R:102
+2026-05-01 13:51:26 | Action: Turn RIGHT (Track) | L:83 C:138 R:101
+2026-05-01 13:51:26 | Action: Turn RIGHT (Track) | L:83 C:140 R:101
+2026-05-01 13:51:26 | Action: Turn RIGHT (Track) | L:84 C:138 R:101
+2026-05-01 13:51:27 | Action: Turn RIGHT (Track) | L:82 C:139 R:101
+2026-05-01 13:51:27 | Action: Turn RIGHT (Track) | L:82 C:138 R:102
+2026-05-01 13:51:28 | Action: Turn RIGHT (Track) | L:81 C:139 R:101
+2026-05-01 13:51:28 | Action: Turn RIGHT (Track) | L:82 C:140 R:102
+2026-05-01 13:51:28 | Action: Turn RIGHT (Track) | L:83 C:139 R:100
+2026-05-01 13:51:29 | Action: Turn RIGHT (Track) | L:83 C:138 R:102
+2026-05-01 13:51:29 | Action: Turn RIGHT (Track) | L:83 C:138 R:102
+2026-05-01 13:51:29 | Action: Turn RIGHT (Track) | L:83 C:140 R:103
+2026-05-01 13:51:29 | Action: Turn RIGHT (Track) | L:82 C:139 R:101
+2026-05-01 13:51:30 | Action: Turn RIGHT (Track) | L:83 C:139 R:102
+2026-05-01 13:51:30 | Action: Turn RIGHT (Track) | L:84 C:140 R:101
+2026-05-01 13:51:30 | Action: Turn RIGHT (Track) | L:84 C:138 R:102
+2026-05-01 13:51:31 | Action: Turn RIGHT (Track) | L:83 C:138 R:102
+2026-05-01 13:51:32 | Action: Turn RIGHT (Track) | L:82 C:139 R:102
+2026-05-01 13:51:32 | Action: Turn RIGHT (Track) | L:84 C:140 R:101
+2026-05-01 13:51:32 | Action: Turn RIGHT (Track) | L:84 C:142 R:101
+2026-05-01 13:51:33 | Action: Turn RIGHT (Track) | L:84 C:142 R:101
+2026-05-01 13:51:33 | Action: Turn RIGHT (Track) | L:83 C:139 R:103
+2026-05-01 13:51:33 | Action: Turn RIGHT (Track) | L:83 C:139 R:103
+2026-05-01 13:51:33 | Action: Turn RIGHT (Track) | L:82 C:138 R:101
+2026-05-01 13:51:34 | Action: Turn RIGHT (Track) | L:82 C:107 R:103
+2026-05-01 13:51:34 | Action: Turn RIGHT (Track) | L:82 C:81 R:101
+2026-05-01 13:51:35 | Action: Turn RIGHT (Track) | L:84 C:105 R:102
+2026-05-01 13:51:35 | Action: Turn RIGHT (Track) | L:83 C:141 R:103
+2026-05-01 13:51:35 | Action: Turn RIGHT (Track) | L:83 C:105 R:102
+2026-05-01 13:51:36 | Action: Turn RIGHT (Track) | L:84 C:108 R:102
+2026-05-01 13:51:36 | Action: Turn RIGHT (Track) | L:84 C:138 R:100
+2026-05-01 13:51:36 | Action: Turn RIGHT (Track) | L:84 C:106 R:102
+2026-05-01 13:51:37 | Action: Turn RIGHT (Track) | L:85 C:109 R:82
+2026-05-01 13:51:37 | Action: Turn RIGHT (Track) | L:84 C:104 R:102
+2026-05-01 13:51:37 | Action: Turn RIGHT (Track) | L:83 C:105 R:103
+2026-05-01 13:51:38 | Action: Turn RIGHT (Track) | L:83 C:106 R:101
+2026-05-01 13:51:38 | Action: Forward (Track) | L:84 C:105 R:102
+2026-05-01 13:51:39 | Action: Forward (Track) | L:80 C:102 R:99
+2026-05-01 13:51:40 | Action: Turn RIGHT (Track) | L:78 C:97 R:92
+2026-05-01 13:51:40 | Action: Turn RIGHT (Track) | L:127 C:92 R:93
+2026-05-01 13:51:41 | Action: Ball Reached (37.0cm) | L:125 C:92 R:92
+2026-05-01 13:52:05 | Action: Turn RIGHT (Track) | L:81 C:61 R:59
+2026-05-01 13:52:05 | Action: Turn RIGHT (Track) | L:82 C:60 R:59
+2026-05-01 13:52:06 | Action: Turn RIGHT (Track) | L:84 C:60 R:58
+2026-05-01 13:52:06 | Action: Turn RIGHT (Track) | L:83 C:60 R:58
+2026-05-01 13:52:07 | Action: Turn RIGHT (Track) | L:83 C:59 R:58
+2026-05-01 13:52:07 | Action: Turn RIGHT (Track) | L:82 C:59 R:59
+2026-05-01 13:52:07 | Action: Turn RIGHT (Track) | L:83 C:60 R:59
+2026-05-01 13:52:08 | Action: Turn RIGHT (Track) | L:84 C:60 R:59
+2026-05-01 13:52:08 | Action: Turn RIGHT (Track) | L:83 C:59 R:59
+2026-05-01 13:52:08 | Action: Turn RIGHT (Track) | L:82 C:59 R:58
+2026-05-01 13:52:09 | Action: Turn RIGHT (Track) | L:83 C:58 R:59
+2026-05-01 13:52:09 | Action: Turn RIGHT (Track) | L:82 C:60 R:60
+2026-05-01 13:52:09 | Action: Turn RIGHT (Track) | L:81 C:61 R:60
+2026-05-01 13:52:09 | Action: Turn RIGHT (Track) | L:82 C:59 R:61
+2026-05-01 13:52:10 | Action: Turn RIGHT (Track) | L:83 C:59 R:60
+2026-05-01 13:52:10 | Action: Turn RIGHT (Track) | L:83 C:60 R:59
+2026-05-01 13:52:10 | Action: Turn RIGHT (Track) | L:81 C:59 R:59
+2026-05-01 13:52:11 | Action: Turn RIGHT (Track) | L:81 C:59 R:60
+2026-05-01 13:52:11 | Action: Turn RIGHT (Track) | L:82 C:60 R:61
+2026-05-01 13:52:11 | Action: Turn RIGHT (Track) | L:81 C:60 R:60
+2026-05-01 13:52:12 | Action: Turn RIGHT (Track) | L:81 C:60 R:60
+2026-05-01 13:52:12 | Action: Turn RIGHT (Track) | L:81 C:59 R:59
+2026-05-01 13:52:12 | Action: Turn RIGHT (Track) | L:80 C:59 R:59
+2026-05-01 13:52:13 | Action: OBSTACLE (L:81 C:59 R:6) | L:81 C:59 R:6
+2026-05-01 13:52:13 | Action: Turn LEFT (Avoid) | L:81 C:59 R:60
+2026-05-01 13:52:21 | Action: Turn RIGHT (Track) | L:81 C:60 R:59
+2026-05-01 13:52:21 | Action: Turn RIGHT (Track) | L:82 C:60 R:59
+2026-05-01 13:52:22 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:22 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:22 | Action: Turn RIGHT (Track) | L:81 C:59 R:60
+2026-05-01 13:52:23 | Action: Turn RIGHT (Track) | L:81 C:60 R:61
+2026-05-01 13:52:23 | Action: Turn RIGHT (Track) | L:82 C:59 R:59
+2026-05-01 13:52:24 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:24 | Action: Turn RIGHT (Track) | L:83 C:58 R:58
+2026-05-01 13:52:24 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:25 | Action: Turn RIGHT (Track) | L:80 C:60 R:60
+2026-05-01 13:52:25 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:25 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:26 | Action: Turn RIGHT (Track) | L:84 C:60 R:60
+2026-05-01 13:52:26 | Action: Turn RIGHT (Track) | L:83 C:59 R:61
+2026-05-01 13:52:27 | Action: Turn RIGHT (Track) | L:81 C:59 R:60
+2026-05-01 13:52:27 | Action: Turn RIGHT (Track) | L:83 C:59 R:60
+2026-05-01 13:52:27 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:28 | Action: Turn RIGHT (Track) | L:83 C:59 R:59
+2026-05-01 13:52:28 | Action: Turn RIGHT (Track) | L:83 C:58 R:59
+2026-05-01 13:52:28 | Action: Turn RIGHT (Track) | L:82 C:58 R:60
+2026-05-01 13:52:29 | Action: Turn RIGHT (Track) | L:81 C:60 R:60
+2026-05-01 13:52:29 | Action: Turn RIGHT (Track) | L:84 C:60 R:60
+2026-05-01 13:52:29 | Action: Turn RIGHT (Track) | L:82 C:59 R:60
+2026-05-01 13:52:29 | Action: Turn RIGHT (Track) | L:83 C:58 R:60
+2026-05-01 13:52:30 | Action: Turn RIGHT (Track) | L:68 C:58 R:59
+2026-05-01 13:52:30 | Action: Turn RIGHT (Track) | L:68 C:59 R:61
+2026-05-01 13:52:31 | Action: Turn RIGHT (Track) | L:68 C:60 R:61
+2026-05-01 13:52:31 | Action: Turn RIGHT (Track) | L:68 C:58 R:61
+2026-05-01 13:52:32 | Action: Ball Reached (28.9cm) | L:67 C:60 R:59
+2026-05-01 13:53:09 | Action: Turn LEFT (Track) | L:61 C:999 R:87
+2026-05-01 13:53:10 | Action: Turn LEFT (Track) | L:62 C:999 R:109
+2026-05-01 13:53:10 | Action: Turn LEFT (Track) | L:56 C:239 R:999
+2026-05-01 13:53:11 | Action: Turn LEFT (Track) | L:57 C:999 R:999
+2026-05-01 13:53:11 | Action: Turn LEFT (Track) | L:57 C:999 R:999
+2026-05-01 13:53:11 | Action: Turn LEFT (Track) | L:56 C:999 R:999
+2026-05-01 13:53:12 | Action: Turn LEFT (Track) | L:57 C:999 R:999
+2026-05-01 13:53:12 | Action: Turn LEFT (Track) | L:58 C:999 R:999
+2026-05-01 13:53:12 | Action: Turn LEFT (Track) | L:56 C:999 R:999
+2026-05-01 13:53:13 | Action: Turn LEFT (Track) | L:57 C:158 R:999
+2026-05-01 13:53:13 | Action: Turn LEFT (Track) | L:57 C:999 R:999
+2026-05-01 13:53:13 | Action: Turn LEFT (Track) | L:57 C:999 R:999
+2026-05-01 13:53:14 | Action: Turn LEFT (Track) | L:58 C:999 R:280
+2026-05-01 13:53:14 | Action: Turn LEFT (Track) | L:57 C:70 R:999
+2026-05-01 13:53:14 | Action: Turn LEFT (Track) | L:56 C:76 R:999
+2026-05-01 13:53:15 | Action: Turn LEFT (Track) | L:57 C:999 R:999
+2026-05-01 13:53:15 | Action: Turn LEFT (Track) | L:58 C:74 R:999
+2026-05-01 13:53:16 | Action: Turn LEFT (Track) | L:58 C:71 R:999
+2026-05-01 13:53:16 | Action: Turn LEFT (Track) | L:57 C:72 R:999
+2026-05-01 13:53:16 | Action: Ball Reached (21.7cm) | L:57 C:70 R:999
+2026-05-01 13:53:23 | Action: Ball Reached (21.7cm) | L:57 C:70 R:999
+2026-05-01 13:54:14 | Action: Forward (Track) | L:41 C:54 R:999
+2026-05-01 13:54:15 | Action: OBSTACLE (L:38 C:103 R:999) | L:38 C:103 R:999
+2026-05-01 13:54:15 | Action: Turn RIGHT (Avoid) | L:38 C:999 R:999
+2026-05-01 13:54:16 | Action: OBSTACLE (L:51 C:77 R:26) | L:51 C:77 R:26
+2026-05-01 13:54:17 | Action: Turn LEFT (Avoid) | L:51 C:77 R:26
+2026-05-01 13:54:18 | Action: OBSTACLE (L:38 C:92 R:999) | L:38 C:92 R:999
+2026-05-01 13:54:18 | Action: Turn RIGHT (Avoid) | L:38 C:999 R:999
+2026-05-01 13:54:20 | Action: OBSTACLE (L:52 C:82 R:29) | L:52 C:82 R:29
+2026-05-01 13:54:20 | Action: Turn LEFT (Avoid) | L:51 C:84 R:29
+2026-05-01 13:54:21 | Action: Turn LEFT (Track) | L:40 C:92 R:999
+2026-05-01 13:54:22 | Action: Forward (Track) | L:40 C:84 R:999
+2026-05-01 13:54:23 | Action: OBSTACLE (L:38 C:88 R:999) | L:38 C:88 R:999
+2026-05-01 13:54:23 | Action: Turn RIGHT (Avoid) | L:37 C:52 R:999
+2026-05-01 13:54:24 | Action: OBSTACLE (L:53 C:999 R:27) | L:53 C:999 R:27
+2026-05-01 13:54:25 | Action: Turn LEFT (Avoid) | L:53 C:999 R:27
+2026-05-01 13:54:26 | Action: OBSTACLE (L:39 C:45 R:999) | L:39 C:45 R:999
+2026-05-01 13:54:26 | Action: Turn RIGHT (Avoid) | L:40 C:94 R:97
+2026-05-01 13:54:28 | Action: OBSTACLE (L:38 C:53 R:290) | L:38 C:53 R:290
+2026-05-01 13:54:28 | Action: Turn RIGHT (Avoid) | L:38 C:53 R:312
+2026-05-01 13:54:29 | Action: OBSTACLE (L:39 C:52 R:999) | L:39 C:52 R:999
+2026-05-01 13:54:29 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:54:31 | Action: OBSTACLE (L:39 C:54 R:999) | L:39 C:54 R:999
+2026-05-01 13:54:31 | Action: Turn RIGHT (Avoid) | L:39 C:58 R:999
+2026-05-01 13:54:32 | Action: OBSTACLE (L:39 C:54 R:999) | L:39 C:54 R:999
+2026-05-01 13:54:33 | Action: Turn RIGHT (Avoid) | L:39 C:53 R:999
+2026-05-01 13:54:34 | Action: OBSTACLE (L:39 C:54 R:168) | L:39 C:54 R:168
+2026-05-01 13:54:34 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:54:35 | Action: OBSTACLE (L:38 C:54 R:999) | L:38 C:54 R:999
+2026-05-01 13:54:36 | Action: Turn RIGHT (Avoid) | L:38 C:54 R:999
+2026-05-01 13:54:37 | Action: OBSTACLE (L:39 C:54 R:193) | L:39 C:54 R:193
+2026-05-01 13:54:37 | Action: Turn RIGHT (Avoid) | L:38 C:54 R:999
+2026-05-01 13:54:39 | Action: OBSTACLE (L:39 C:55 R:999) | L:39 C:55 R:999
+2026-05-01 13:54:39 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:54:40 | Action: OBSTACLE (L:39 C:55 R:999) | L:39 C:55 R:999
+2026-05-01 13:54:40 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:54:42 | Action: OBSTACLE (L:39 C:56 R:999) | L:39 C:56 R:999
+2026-05-01 13:54:42 | Action: Turn RIGHT (Avoid) | L:39 C:55 R:999
+2026-05-01 13:54:43 | Action: OBSTACLE (L:38 C:54 R:999) | L:38 C:54 R:999
+2026-05-01 13:54:44 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:54:45 | Action: OBSTACLE (L:38 C:55 R:999) | L:38 C:55 R:999
+2026-05-01 13:54:46 | Action: Turn RIGHT (Avoid) | L:39 C:55 R:999
+2026-05-01 13:54:47 | Action: OBSTACLE (L:39 C:54 R:999) | L:39 C:54 R:999
+2026-05-01 13:54:47 | Action: Turn RIGHT (Avoid) | L:39 C:55 R:999
+2026-05-01 13:54:49 | Action: OBSTACLE (L:39 C:54 R:115) | L:39 C:54 R:115
+2026-05-01 13:54:49 | Action: Turn RIGHT (Avoid) | L:38 C:55 R:111
+2026-05-01 13:54:50 | Action: OBSTACLE (L:39 C:999 R:75) | L:39 C:999 R:75
+2026-05-01 13:54:51 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:54:52 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:54:52 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:54:54 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:54:54 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:54:55 | Action: OBSTACLE (L:39 C:54 R:999) | L:39 C:54 R:999
+2026-05-01 13:54:55 | Action: Turn RIGHT (Avoid) | L:39 C:55 R:999
+2026-05-01 13:54:57 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:54:57 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:54:58 | Action: OBSTACLE (L:39 C:54 R:179) | L:39 C:54 R:179
+2026-05-01 13:54:58 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:55:00 | Action: OBSTACLE (L:39 C:999 R:179) | L:39 C:999 R:179
+2026-05-01 13:55:00 | Action: Turn RIGHT (Avoid) | L:39 C:55 R:999
+2026-05-01 13:55:01 | Action: OBSTACLE (L:39 C:56 R:175) | L:39 C:56 R:175
+2026-05-01 13:55:02 | Action: Turn RIGHT (Avoid) | L:39 C:56 R:999
+2026-05-01 13:55:03 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:03 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:05 | Action: OBSTACLE (L:39 C:999 R:242) | L:39 C:999 R:242
+2026-05-01 13:55:05 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:06 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:06 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:148
+2026-05-01 13:55:08 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:08 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:09 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:09 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:10 | Action: OBSTACLE (L:38 C:999 R:999) | L:38 C:999 R:999
+2026-05-01 13:55:11 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:12 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:12 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:157
+2026-05-01 13:55:14 | Action: OBSTACLE (L:39 C:999 R:75) | L:39 C:999 R:75
+2026-05-01 13:55:14 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:148
+2026-05-01 13:55:15 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:15 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:17 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:17 | Action: Turn RIGHT (Avoid) | L:39 C:141 R:999
+2026-05-01 13:55:19 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:19 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:20 | Action: OBSTACLE (L:39 C:999 R:286) | L:39 C:999 R:286
+2026-05-01 13:55:20 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:216
+2026-05-01 13:55:22 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:22 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:23 | Action: OBSTACLE (L:39 C:332 R:999) | L:39 C:332 R:999
+2026-05-01 13:55:23 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:305
+2026-05-01 13:55:25 | Action: OBSTACLE (L:39 C:999 R:113) | L:39 C:999 R:113
+2026-05-01 13:55:25 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:26 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:26 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:28 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:28 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:29 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:30 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:31 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:31 | Action: Turn RIGHT (Avoid) | L:40 C:999 R:999
+2026-05-01 13:55:33 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:33 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:34 | Action: OBSTACLE (L:39 C:267 R:999) | L:39 C:267 R:999
+2026-05-01 13:55:35 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:36 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:36 | Action: Turn RIGHT (Avoid) | L:39 C:295 R:999
+2026-05-01 13:55:38 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:38 | Action: Turn RIGHT (Avoid) | L:39 C:55 R:999
+2026-05-01 13:55:39 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:40 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:41 | Action: OBSTACLE (L:39 C:264 R:999) | L:39 C:264 R:999
+2026-05-01 13:55:41 | Action: Turn RIGHT (Avoid) | L:39 C:999 R:999
+2026-05-01 13:55:43 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:43 | Action: Turn RIGHT (Avoid) | L:40 C:999 R:999
+2026-05-01 13:55:44 | Action: Turn LEFT (Track) | L:40 C:999 R:999
+2026-05-01 13:55:45 | Action: Turn LEFT (Track) | L:40 C:999 R:290
+2026-05-01 13:55:45 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:45 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:55:47 | Action: Turn LEFT (Track) | L:40 C:999 R:999
+2026-05-01 13:55:47 | Action: OBSTACLE (L:39 C:999 R:151) | L:39 C:999 R:151
+2026-05-01 13:55:47 | Action: Turn RIGHT (Avoid) | L:39 C:54 R:999
+2026-05-01 13:55:49 | Action: Turn LEFT (Track) | L:41 C:999 R:999
+2026-05-01 13:55:49 | Action: OBSTACLE (L:39 C:54 R:999) | L:39 C:54 R:999
+2026-05-01 13:55:50 | Action: Turn RIGHT (Avoid) | L:39 C:59 R:999
+2026-05-01 13:55:51 | Action: Turn LEFT (Track) | L:40 C:53 R:999
+2026-05-01 13:55:52 | Action: OBSTACLE (L:38 C:53 R:999) | L:38 C:53 R:999
+2026-05-01 13:55:52 | Action: Turn RIGHT (Avoid) | L:39 C:58 R:999
+2026-05-01 13:55:53 | Action: Turn LEFT (Track) | L:40 C:999 R:999
+2026-05-01 13:55:54 | Action: OBSTACLE (L:39 C:53 R:999) | L:39 C:53 R:999
+2026-05-01 13:55:54 | Action: Turn RIGHT (Avoid) | L:40 C:56 R:999
+2026-05-01 13:55:55 | Action: OBSTACLE (L:39 C:999 R:999) | L:39 C:999 R:999
+2026-05-01 13:55:56 | Action: Turn RIGHT (Avoid) | L:40 C:54 R:999
+2026-05-01 15:15:34 | Action: Turn RIGHT (Track) | L:144 C:192 R:119
+2026-05-01 15:15:35 | Action: Turn RIGHT (Track) | L:143 C:192 R:118
+2026-05-01 15:15:35 | Action: Turn RIGHT (Track) | L:145 C:190 R:119
+2026-05-01 15:15:43 | Action: Turn LEFT (Track) | L:188 C:120 R:121
+2026-05-01 15:15:44 | Action: Turn LEFT (Track) | L:190 C:122 R:118
+2026-05-01 15:15:45 | Action: Turn LEFT (Track) | L:146 C:124 R:118
+2026-05-01 15:15:46 | Action: Turn LEFT (Track) | L:145 C:124 R:120
+2026-05-01 15:15:47 | Action: Turn LEFT (Track) | L:144 C:124 R:119
+2026-05-01 15:15:47 | Action: Turn LEFT (Track) | L:146 C:124 R:119
+2026-05-01 15:15:48 | Action: Turn LEFT (Track) | L:144 C:102 R:120
+2026-05-01 15:15:48 | Action: Turn LEFT (Track) | L:146 C:128 R:117
+2026-05-01 15:15:48 | Action: Turn LEFT (Track) | L:145 C:126 R:999
+2026-05-01 15:15:49 | Action: Turn LEFT (Track) | L:147 C:124 R:119
+2026-05-01 15:15:49 | Action: Turn LEFT (Track) | L:145 C:125 R:120
+2026-05-01 15:15:49 | Action: Turn LEFT (Track) | L:146 C:127 R:121
+2026-05-01 15:15:50 | Action: Turn LEFT (Track) | L:145 C:194 R:119
+2026-05-01 15:15:50 | Action: Turn LEFT (Track) | L:145 C:197 R:122
+2026-05-01 15:15:51 | Action: Turn LEFT (Track) | L:145 C:192 R:122
+2026-05-01 15:15:51 | Action: Turn LEFT (Track) | L:144 C:192 R:120
+2026-05-01 15:15:51 | Action: Turn LEFT (Track) | L:143 C:194 R:120
+2026-05-01 15:15:52 | Action: Turn LEFT (Track) | L:143 C:194 R:125
+2026-05-01 15:15:52 | Action: Turn LEFT (Track) | L:143 C:194 R:120
+2026-05-01 15:15:53 | Action: Turn LEFT (Track) | L:144 C:192 R:122
+2026-05-01 15:15:53 | Action: Turn LEFT (Track) | L:144 C:193 R:122
+2026-05-01 15:15:54 | Action: Forward (Track) | L:142 C:194 R:121
+2026-05-01 15:15:55 | Action: Forward (Track) | L:145 C:187 R:116
+2026-05-01 15:15:55 | Action: Turn LEFT (Track) | L:135 C:97 R:111
+2026-05-01 15:15:56 | Action: Forward (Track) | L:133 C:182 R:114
+2026-05-01 15:15:57 | Action: Turn RIGHT (Track) | L:133 C:134 R:181
+2026-05-01 15:15:57 | Action: Turn RIGHT (Track) | L:131 C:132 R:180
+2026-05-01 15:15:57 | Action: Turn RIGHT (Track) | L:130 C:135 R:999
+2026-05-01 15:15:58 | Action: Turn RIGHT (Track) | L:131 C:134 R:999
+2026-05-01 15:15:58 | Action: Turn RIGHT (Track) | L:131 C:133 R:177
+2026-05-01 15:15:59 | Action: Turn RIGHT (Track) | L:132 C:133 R:112
+2026-05-01 15:15:59 | Action: Turn RIGHT (Track) | L:132 C:174 R:178
+2026-05-01 15:15:59 | Action: Turn RIGHT (Track) | L:131 C:134 R:113
+2026-05-01 15:16:00 | Action: Turn RIGHT (Track) | L:130 C:176 R:108
+2026-05-01 15:16:00 | Action: Turn RIGHT (Track) | L:131 C:175 R:110
+2026-05-01 15:16:01 | Action: Turn RIGHT (Track) | L:132 C:174 R:109
+2026-05-01 15:16:01 | Action: Turn RIGHT (Track) | L:131 C:157 R:111
+2026-05-01 15:16:01 | Action: Turn RIGHT (Track) | L:130 C:174 R:110
+2026-05-01 15:16:02 | Action: Turn RIGHT (Track) | L:130 C:177 R:109
+2026-05-01 15:16:02 | Action: Turn RIGHT (Track) | L:130 C:176 R:111
+2026-05-01 15:16:02 | Action: Turn RIGHT (Track) | L:131 C:176 R:112
+2026-05-01 15:16:03 | Action: Turn RIGHT (Track) | L:132 C:176 R:110
+2026-05-01 15:16:03 | Action: Turn RIGHT (Track) | L:130 C:176 R:111
+2026-05-01 15:16:04 | Action: Turn RIGHT (Track) | L:130 C:175 R:110
+2026-05-01 15:16:04 | Action: Turn RIGHT (Track) | L:130 C:128 R:108
+2026-05-01 15:16:04 | Action: Turn RIGHT (Track) | L:131 C:172 R:111
+2026-05-01 15:16:05 | Action: Turn RIGHT (Track) | L:131 C:175 R:111
+2026-05-01 15:16:05 | Action: Turn RIGHT (Track) | L:130 C:167 R:111
+2026-05-01 15:16:05 | Action: Turn RIGHT (Track) | L:130 C:176 R:113
+2026-05-01 15:16:06 | Action: Turn RIGHT (Track) | L:130 C:173 R:111
+2026-05-01 15:16:06 | Action: Turn RIGHT (Track) | L:132 C:175 R:112
+2026-05-01 15:16:07 | Action: Turn RIGHT (Track) | L:132 C:171 R:115
+2026-05-01 15:16:07 | Action: Turn RIGHT (Track) | L:130 C:176 R:111
+2026-05-01 15:16:07 | Action: Turn RIGHT (Track) | L:129 C:177 R:112
+2026-05-01 15:16:08 | Action: Turn RIGHT (Track) | L:129 C:177 R:111
+2026-05-01 15:16:08 | Action: Turn RIGHT (Track) | L:131 C:176 R:111
+2026-05-01 15:16:08 | Action: Turn RIGHT (Track) | L:132 C:174 R:115
+2026-05-01 15:16:09 | Action: Turn RIGHT (Track) | L:131 C:175 R:285
+2026-05-01 15:16:09 | Action: Turn RIGHT (Track) | L:131 C:176 R:112
+2026-05-01 15:16:10 | Action: Turn RIGHT (Track) | L:131 C:177 R:111
+2026-05-01 15:16:10 | Action: Turn RIGHT (Track) | L:132 C:175 R:113
+2026-05-01 15:16:10 | Action: Turn RIGHT (Track) | L:132 C:176 R:114
+2026-05-01 15:16:11 | Action: Forward (Track) | L:132 C:171 R:112
+2026-05-01 15:16:12 | Action: Forward (Track) | L:127 C:171 R:111
+2026-05-01 15:16:12 | Action: Turn RIGHT (Track) | L:123 C:85 R:102
+2026-05-01 15:16:13 | Action: Turn RIGHT (Track) | L:121 C:168 R:100
+2026-05-01 15:16:13 | Action: Ball Reached (39.7cm) | L:121 C:105 R:100
+2026-05-01 15:16:40 | Action: Ball Reached (39.4cm) | L:101 C:129 R:78
+2026-05-01 15:18:59 | Action: Ball Reached (32.2cm) | L:77 C:96 R:109
+2026-05-01 15:19:02 | Action: Ball Reached (32.2cm) | L:76 C:96 R:266
+2026-05-01 15:19:56 | Action: Turn RIGHT (Track) | L:52 C:63 R:999
+2026-05-01 15:19:57 | Action: Turn RIGHT (Track) | L:52 C:59 R:297
+2026-05-01 15:19:58 | Action: Turn RIGHT (Track) | L:52 C:63 R:233
+2026-05-01 15:19:59 | Action: Turn RIGHT (Track) | L:52 C:62 R:235
+2026-05-01 15:19:59 | Action: Turn RIGHT (Track) | L:52 C:63 R:234
+2026-05-01 15:20:00 | Action: Turn RIGHT (Track) | L:52 C:63 R:237
+2026-05-01 15:20:01 | Action: Turn RIGHT (Track) | L:52 C:64 R:999
+2026-05-01 15:20:01 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:02 | Action: Turn RIGHT (Track) | L:53 C:63 R:216
+2026-05-01 15:20:02 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:02 | Action: Turn RIGHT (Track) | L:52 C:64 R:999
+2026-05-01 15:20:03 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:20:03 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:04 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:04 | Action: Turn RIGHT (Track) | L:53 C:61 R:111
+2026-05-01 15:20:04 | Action: Turn RIGHT (Track) | L:52 C:63 R:237
+2026-05-01 15:20:05 | Action: Turn RIGHT (Track) | L:53 C:63 R:170
+2026-05-01 15:20:05 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:05 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:06 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:20:06 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:20:06 | Action: Turn RIGHT (Track) | L:53 C:62 R:234
+2026-05-01 15:20:07 | Action: Turn RIGHT (Track) | L:53 C:63 R:70
+2026-05-01 15:20:07 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:08 | Action: Turn RIGHT (Track) | L:53 C:61 R:289
+2026-05-01 15:20:08 | Action: Turn RIGHT (Track) | L:52 C:61 R:236
+2026-05-01 15:20:08 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:09 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:20:09 | Action: Turn RIGHT (Track) | L:54 C:63 R:79
+2026-05-01 15:20:09 | Action: Turn RIGHT (Track) | L:53 C:62 R:172
+2026-05-01 15:20:10 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:20:10 | Action: Turn RIGHT (Track) | L:52 C:64 R:999
+2026-05-01 15:20:11 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:11 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:11 | Action: Turn RIGHT (Track) | L:53 C:62 R:81
+2026-05-01 15:20:12 | Action: Turn RIGHT (Track) | L:53 C:62 R:237
+2026-05-01 15:20:13 | Action: Turn RIGHT (Track) | L:53 C:63 R:272
+2026-05-01 15:20:13 | Action: Turn RIGHT (Track) | L:54 C:63 R:283
+2026-05-01 15:20:13 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:14 | Action: Turn RIGHT (Track) | L:53 C:62 R:175
+2026-05-01 15:20:14 | Action: Turn RIGHT (Track) | L:53 C:63 R:256
+2026-05-01 15:20:15 | Action: Turn RIGHT (Track) | L:54 C:63 R:170
+2026-05-01 15:20:16 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:16 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:17 | Action: Turn RIGHT (Track) | L:54 C:63 R:324
+2026-05-01 15:20:17 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:18 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:18 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:18 | Action: Turn RIGHT (Track) | L:54 C:63 R:234
+2026-05-01 15:20:19 | Action: Turn RIGHT (Track) | L:53 C:63 R:233
+2026-05-01 15:20:19 | Action: Turn RIGHT (Track) | L:53 C:63 R:163
+2026-05-01 15:20:20 | Action: Turn RIGHT (Track) | L:53 C:62 R:82
+2026-05-01 15:20:20 | Action: Turn RIGHT (Track) | L:53 C:63 R:164
+2026-05-01 15:20:20 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:21 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:21 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:21 | Action: Turn RIGHT (Track) | L:53 C:62 R:148
+2026-05-01 15:20:22 | Action: Turn RIGHT (Track) | L:52 C:64 R:999
+2026-05-01 15:20:22 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:24 | Action: Turn RIGHT (Track) | L:53 C:63 R:232
+2026-05-01 15:20:24 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:20:25 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:20:26 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:20:27 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:20:27 | Action: Turn RIGHT (Track) | L:54 C:62 R:303
+2026-05-01 15:20:28 | Action: Turn RIGHT (Track) | L:54 C:64 R:237
+2026-05-01 15:20:28 | Action: Turn RIGHT (Track) | L:53 C:64 R:91
+2026-05-01 15:20:29 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:29 | Action: Turn RIGHT (Track) | L:54 C:63 R:331
+2026-05-01 15:20:29 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:30 | Action: Turn RIGHT (Track) | L:53 C:65 R:999
+2026-05-01 15:20:30 | Action: Turn RIGHT (Track) | L:54 C:64 R:233
+2026-05-01 15:20:30 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:20:31 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:31 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:32 | Action: Turn RIGHT (Track) | L:53 C:63 R:233
+2026-05-01 15:20:32 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:33 | Action: Turn RIGHT (Track) | L:54 C:64 R:84
+2026-05-01 15:20:33 | Action: Turn RIGHT (Track) | L:53 C:62 R:166
+2026-05-01 15:20:33 | Action: Turn RIGHT (Track) | L:53 C:63 R:97
+2026-05-01 15:20:34 | Action: Turn RIGHT (Track) | L:53 C:64 R:233
+2026-05-01 15:20:34 | Action: OBSTACLE (L:53 C:64 R:30) | L:53 C:64 R:30
+2026-05-01 15:20:34 | Action: Turn LEFT (Avoid) | L:53 C:64 R:30
+2026-05-01 15:20:35 | Action: Turn RIGHT (Track) | L:54 C:55 R:60
+2026-05-01 15:20:47 | Action: Turn RIGHT (Track) | L:52 C:61 R:231
+2026-05-01 15:20:48 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:48 | Action: Turn RIGHT (Track) | L:54 C:64 R:233
+2026-05-01 15:20:48 | Action: Turn RIGHT (Track) | L:54 C:63 R:116
+2026-05-01 15:20:49 | Action: Turn RIGHT (Track) | L:54 C:63 R:263
+2026-05-01 15:20:50 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:50 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:51 | Action: Turn RIGHT (Track) | L:54 C:62 R:277
+2026-05-01 15:20:51 | Action: Turn RIGHT (Track) | L:54 C:64 R:238
+2026-05-01 15:20:52 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:52 | Action: Turn RIGHT (Track) | L:54 C:63 R:83
+2026-05-01 15:20:53 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:20:53 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:53 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:54 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:20:54 | Action: Turn RIGHT (Track) | L:54 C:63 R:139
+2026-05-01 15:20:54 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:55 | Action: Turn RIGHT (Track) | L:54 C:63 R:118
+2026-05-01 15:20:55 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:20:56 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:20:56 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:20:57 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:57 | Action: Turn RIGHT (Track) | L:53 C:64 R:285
+2026-05-01 15:20:58 | Action: Turn RIGHT (Track) | L:55 C:64 R:168
+2026-05-01 15:20:58 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:20:59 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:20:59 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:20:59 | Action: Turn RIGHT (Track) | L:55 C:64 R:999
+2026-05-01 15:21:00 | Action: Turn RIGHT (Track) | L:55 C:63 R:164
+2026-05-01 15:21:00 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:21:01 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:01 | Action: Turn RIGHT (Track) | L:54 C:63 R:144
+2026-05-01 15:21:01 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:21:02 | Action: Turn RIGHT (Track) | L:55 C:63 R:170
+2026-05-01 15:21:02 | Action: Turn RIGHT (Track) | L:55 C:63 R:238
+2026-05-01 15:21:03 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:03 | Action: Turn RIGHT (Track) | L:54 C:64 R:271
+2026-05-01 15:21:04 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:04 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:05 | Action: Turn RIGHT (Track) | L:54 C:62 R:174
+2026-05-01 15:21:07 | Action: Turn RIGHT (Track) | L:54 C:63 R:234
+2026-05-01 15:21:08 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:09 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:10 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:11 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:13 | Action: Turn RIGHT (Track) | L:55 C:65 R:999
+2026-05-01 15:21:14 | Action: Turn RIGHT (Track) | L:55 C:64 R:235
+2026-05-01 15:21:14 | Action: Turn RIGHT (Track) | L:54 C:62 R:118
+2026-05-01 15:21:14 | Action: Turn RIGHT (Track) | L:53 C:64 R:173
+2026-05-01 15:21:15 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:15 | Action: Turn RIGHT (Track) | L:55 C:64 R:999
+2026-05-01 15:21:16 | Action: OBSTACLE (L:55 C:62 R:29) | L:55 C:62 R:29
+2026-05-01 15:21:16 | Action: Turn RIGHT (Avoid) | L:54 C:64 R:137
+2026-05-01 15:21:17 | Action: OBSTACLE (L:55 C:64 R:29) | L:55 C:64 R:29
+2026-05-01 15:21:18 | Action: Turn LEFT (Avoid) | L:55 C:64 R:29
+2026-05-01 15:21:19 | Action: Turn RIGHT (Track) | L:55 C:55 R:64
+2026-05-01 15:21:19 | Action: Turn RIGHT (Track) | L:54 C:55 R:63
+2026-05-01 15:21:20 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:21:20 | Action: Turn RIGHT (Track) | L:52 C:63 R:999
+2026-05-01 15:21:21 | Action: Turn RIGHT (Track) | L:52 C:64 R:999
+2026-05-01 15:21:21 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:22 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:22 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:21:22 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:21:23 | Action: Turn RIGHT (Track) | L:53 C:62 R:171
+2026-05-01 15:21:23 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:24 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:21:24 | Action: Turn RIGHT (Track) | L:52 C:61 R:203
+2026-05-01 15:21:24 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:21:25 | Action: Turn RIGHT (Track) | L:53 C:61 R:322
+2026-05-01 15:21:25 | Action: Turn RIGHT (Track) | L:53 C:61 R:234
+2026-05-01 15:21:26 | Action: Turn RIGHT (Track) | L:53 C:62 R:168
+2026-05-01 15:21:26 | Action: Turn RIGHT (Track) | L:52 C:61 R:999
+2026-05-01 15:21:26 | Action: Turn RIGHT (Track) | L:52 C:62 R:81
+2026-05-01 15:21:27 | Action: Turn RIGHT (Track) | L:53 C:62 R:235
+2026-05-01 15:21:27 | Action: Turn RIGHT (Track) | L:53 C:62 R:235
+2026-05-01 15:21:27 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:21:28 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:21:28 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:21:28 | Action: Turn RIGHT (Track) | L:53 C:63 R:176
+2026-05-01 15:21:29 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:21:29 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:30 | Action: Turn RIGHT (Track) | L:53 C:61 R:94
+2026-05-01 15:21:30 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:21:30 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:31 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:31 | Action: Turn RIGHT (Track) | L:53 C:62 R:235
+2026-05-01 15:21:32 | Action: Turn RIGHT (Track) | L:53 C:62 R:171
+2026-05-01 15:21:32 | Action: Turn RIGHT (Track) | L:53 C:61 R:239
+2026-05-01 15:21:32 | Action: Turn RIGHT (Track) | L:53 C:63 R:234
+2026-05-01 15:21:33 | Action: Turn RIGHT (Track) | L:53 C:63 R:237
+2026-05-01 15:21:33 | Action: Turn RIGHT (Track) | L:53 C:62 R:234
+2026-05-01 15:21:34 | Action: Turn RIGHT (Track) | L:53 C:61 R:235
+2026-05-01 15:21:34 | Action: Turn RIGHT (Track) | L:52 C:62 R:238
+2026-05-01 15:21:35 | Action: Turn RIGHT (Track) | L:53 C:63 R:232
+2026-05-01 15:21:35 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:35 | Action: Turn RIGHT (Track) | L:54 C:62 R:238
+2026-05-01 15:21:36 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:21:37 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:37 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:37 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:38 | Action: Turn RIGHT (Track) | L:52 C:62 R:234
+2026-05-01 15:21:38 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:38 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:39 | Action: Turn RIGHT (Track) | L:54 C:63 R:154
+2026-05-01 15:21:39 | Action: Turn RIGHT (Track) | L:54 C:63 R:235
+2026-05-01 15:21:39 | Action: Turn RIGHT (Track) | L:53 C:61 R:82
+2026-05-01 15:21:40 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:40 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:41 | Action: Turn RIGHT (Track) | L:54 C:63 R:215
+2026-05-01 15:21:41 | Action: Turn RIGHT (Track) | L:53 C:61 R:86
+2026-05-01 15:21:42 | Action: Turn RIGHT (Track) | L:53 C:61 R:999
+2026-05-01 15:21:42 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:42 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:43 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:43 | Action: Turn RIGHT (Track) | L:54 C:62 R:235
+2026-05-01 15:21:43 | Action: Turn RIGHT (Track) | L:54 C:62 R:235
+2026-05-01 15:21:44 | Action: Turn RIGHT (Track) | L:52 C:63 R:233
+2026-05-01 15:21:44 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:44 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:45 | Action: Turn RIGHT (Track) | L:53 C:63 R:235
+2026-05-01 15:21:45 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:45 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:21:46 | Action: Turn RIGHT (Track) | L:52 C:63 R:999
+2026-05-01 15:21:46 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:46 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:47 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:21:47 | Action: Turn RIGHT (Track) | L:54 C:62 R:221
+2026-05-01 15:21:48 | Action: Turn RIGHT (Track) | L:53 C:63 R:236
+2026-05-01 15:21:48 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:21:48 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:49 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:49 | Action: Turn RIGHT (Track) | L:54 C:63 R:125
+2026-05-01 15:21:49 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:21:50 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:21:50 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:21:50 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:21:51 | Action: Turn RIGHT (Track) | L:55 C:64 R:233
+2026-05-01 15:21:51 | Action: Turn RIGHT (Track) | L:55 C:62 R:293
+2026-05-01 15:21:52 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:21:52 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:21:52 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:21:53 | Action: Turn RIGHT (Track) | L:55 C:62 R:234
+2026-05-01 15:21:53 | Action: Turn RIGHT (Track) | L:54 C:63 R:234
+2026-05-01 15:21:53 | Action: Turn RIGHT (Track) | L:54 C:63 R:109
+2026-05-01 15:21:54 | Action: Turn RIGHT (Track) | L:54 C:64 R:107
+2026-05-01 15:21:54 | Action: Turn RIGHT (Track) | L:55 C:64 R:999
+2026-05-01 15:21:55 | Action: Turn RIGHT (Track) | L:55 C:63 R:233
+2026-05-01 15:21:55 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:21:56 | Action: Turn RIGHT (Track) | L:54 C:63 R:113
+2026-05-01 15:21:57 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:21:59 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:21:59 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:22:00 | Action: Turn RIGHT (Track) | L:54 C:63 R:233
+2026-05-01 15:22:00 | Action: Turn RIGHT (Track) | L:55 C:64 R:289
+2026-05-01 15:22:00 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:22:01 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:22:01 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:02 | Action: Turn RIGHT (Track) | L:55 C:63 R:237
+2026-05-01 15:22:02 | Action: Turn RIGHT (Track) | L:55 C:64 R:232
+2026-05-01 15:22:02 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:03 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:22:04 | Action: Turn RIGHT (Track) | L:55 C:63 R:233
+2026-05-01 15:22:04 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:22:04 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:22:05 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:05 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:22:06 | Action: Turn RIGHT (Track) | L:55 C:63 R:233
+2026-05-01 15:22:06 | Action: Turn RIGHT (Track) | L:55 C:63 R:231
+2026-05-01 15:22:07 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:22:07 | Action: Turn RIGHT (Track) | L:54 C:62 R:236
+2026-05-01 15:22:07 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:08 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:08 | Action: Turn RIGHT (Track) | L:55 C:64 R:999
+2026-05-01 15:22:08 | Action: Turn RIGHT (Track) | L:55 C:62 R:165
+2026-05-01 15:22:09 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:22:09 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:22:09 | Action: Turn RIGHT (Track) | L:55 C:64 R:999
+2026-05-01 15:22:10 | Action: Turn RIGHT (Track) | L:55 C:62 R:153
+2026-05-01 15:22:10 | Action: Turn RIGHT (Track) | L:55 C:62 R:234
+2026-05-01 15:22:10 | Action: Turn RIGHT (Track) | L:55 C:62 R:999
+2026-05-01 15:22:11 | Action: Turn RIGHT (Track) | L:54 C:61 R:999
+2026-05-01 15:22:11 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:22:12 | Action: Turn RIGHT (Track) | L:55 C:62 R:232
+2026-05-01 15:22:12 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:22:12 | Action: Turn RIGHT (Track) | L:55 C:62 R:193
+2026-05-01 15:22:13 | Action: Turn RIGHT (Track) | L:54 C:63 R:233
+2026-05-01 15:22:13 | Action: Turn RIGHT (Track) | L:54 C:63 R:234
+2026-05-01 15:22:13 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:22:14 | Action: Turn RIGHT (Track) | L:55 C:62 R:233
+2026-05-01 15:22:14 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:22:14 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:22:15 | Action: Turn RIGHT (Track) | L:54 C:63 R:122
+2026-05-01 15:22:15 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:22:15 | Action: Turn RIGHT (Track) | L:55 C:64 R:999
+2026-05-01 15:22:16 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:16 | Action: Turn RIGHT (Track) | L:55 C:63 R:999
+2026-05-01 15:22:17 | Action: Turn RIGHT (Track) | L:53 C:63 R:189
+2026-05-01 15:22:17 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:17 | Action: Turn RIGHT (Track) | L:55 C:64 R:233
+2026-05-01 15:22:18 | Action: Turn RIGHT (Track) | L:54 C:64 R:212
+2026-05-01 15:22:18 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:18 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:22:19 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:19 | Action: Turn RIGHT (Track) | L:54 C:64 R:233
+2026-05-01 15:22:19 | Action: Turn RIGHT (Track) | L:55 C:64 R:99
+2026-05-01 15:22:20 | Action: Turn RIGHT (Track) | L:54 C:63 R:113
+2026-05-01 15:22:20 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:20 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:22:21 | Action: Turn RIGHT (Track) | L:53 C:63 R:234
+2026-05-01 15:22:21 | Action: Turn RIGHT (Track) | L:55 C:63 R:233
+2026-05-01 15:22:22 | Action: Turn RIGHT (Track) | L:54 C:63 R:235
+2026-05-01 15:22:22 | Action: Turn RIGHT (Track) | L:55 C:63 R:113
+2026-05-01 15:22:22 | Action: Turn RIGHT (Track) | L:54 C:62 R:235
+2026-05-01 15:22:23 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:23 | Action: Turn RIGHT (Track) | L:54 C:64 R:233
+2026-05-01 15:22:23 | Action: Turn RIGHT (Track) | L:54 C:64 R:233
+2026-05-01 15:22:24 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:24 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:22:25 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:22:25 | Action: Turn RIGHT (Track) | L:53 C:64 R:999
+2026-05-01 15:22:25 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:26 | Action: Turn RIGHT (Track) | L:54 C:64 R:999
+2026-05-01 15:22:26 | Action: Turn RIGHT (Track) | L:54 C:63 R:234
+2026-05-01 15:22:26 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:22:27 | Action: Turn RIGHT (Track) | L:53 C:62 R:118
+2026-05-01 15:22:27 | Action: Turn RIGHT (Track) | L:54 C:63 R:999
+2026-05-01 15:22:28 | Action: Turn RIGHT (Track) | L:54 C:62 R:235
+2026-05-01 15:22:28 | Action: Turn RIGHT (Track) | L:54 C:62 R:999
+2026-05-01 15:22:28 | Action: Turn RIGHT (Track) | L:53 C:63 R:999
+2026-05-01 15:22:29 | Action: OBSTACLE (L:54 C:63 R:9) | L:54 C:63 R:9
+2026-05-01 15:22:29 | Action: Turn LEFT (Avoid) | L:54 C:63 R:9
+2026-05-01 15:22:30 | Action: Turn RIGHT (Track) | L:53 C:54 R:64
+2026-05-01 15:22:31 | Action: Turn RIGHT (Track) | L:52 C:56 R:65
+2026-05-01 15:22:31 | Action: Turn RIGHT (Track) | L:53 C:56 R:70
+2026-05-01 15:22:31 | Action: Turn RIGHT (Track) | L:53 C:56 R:93
+2026-05-01 15:22:32 | Action: Turn RIGHT (Track) | L:53 C:57 R:69
+2026-05-01 15:22:32 | Action: Turn RIGHT (Track) | L:52 C:55 R:95
+2026-05-01 15:22:32 | Action: Turn RIGHT (Track) | L:51 C:55 R:66
+2026-05-01 15:22:33 | Action: Turn RIGHT (Track) | L:52 C:56 R:68
+2026-05-01 15:22:33 | Action: Turn RIGHT (Track) | L:53 C:60 R:196
+2026-05-01 15:22:33 | Action: Turn RIGHT (Track) | L:53 C:57 R:66
+2026-05-01 15:22:34 | Action: Turn RIGHT (Track) | L:52 C:59 R:71
+2026-05-01 15:22:34 | Action: Turn RIGHT (Track) | L:52 C:59 R:68
+2026-05-01 15:22:34 | Action: Turn RIGHT (Track) | L:52 C:60 R:69
+2026-05-01 15:22:35 | Action: Turn RIGHT (Track) | L:52 C:60 R:66
+2026-05-01 15:22:35 | Action: Turn RIGHT (Track) | L:52 C:59 R:72
+2026-05-01 15:22:35 | Action: Turn RIGHT (Track) | L:52 C:58 R:310
+2026-05-01 15:22:36 | Action: Turn RIGHT (Track) | L:52 C:57 R:218
+2026-05-01 15:22:36 | Action: Turn RIGHT (Track) | L:52 C:56 R:95
+2026-05-01 15:22:37 | Action: Turn RIGHT (Track) | L:52 C:59 R:67
+2026-05-01 15:22:37 | Action: Turn RIGHT (Track) | L:52 C:57 R:67
+2026-05-01 15:22:37 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:22:37 | Action: Turn RIGHT (Track) | L:52 C:58 R:999
+2026-05-01 15:22:38 | Action: Turn RIGHT (Track) | L:52 C:61 R:69
+2026-05-01 15:22:38 | Action: Turn RIGHT (Track) | L:51 C:61 R:999
+2026-05-01 15:22:39 | Action: Turn RIGHT (Track) | L:51 C:59 R:93
+2026-05-01 15:22:39 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:22:39 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:22:40 | Action: Turn RIGHT (Track) | L:52 C:61 R:91
+2026-05-01 15:22:40 | Action: Turn RIGHT (Track) | L:52 C:62 R:96
+2026-05-01 15:22:40 | Action: Turn RIGHT (Track) | L:52 C:63 R:999
+2026-05-01 15:22:41 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:22:41 | Action: Turn RIGHT (Track) | L:52 C:61 R:82
+2026-05-01 15:22:41 | Action: Turn RIGHT (Track) | L:52 C:62 R:232
+2026-05-01 15:22:42 | Action: Turn RIGHT (Track) | L:52 C:61 R:999
+2026-05-01 15:22:42 | Action: Turn RIGHT (Track) | L:52 C:61 R:999
+2026-05-01 15:22:42 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:22:43 | Action: Turn RIGHT (Track) | L:53 C:62 R:999
+2026-05-01 15:22:43 | Action: Turn RIGHT (Track) | L:52 C:62 R:999
+2026-05-01 15:22:44 | Action: Turn RIGHT (Track) | L:52 C:61 R:999
+2026-05-01 15:22:44 | Action: Turn RIGHT (Track) | L:52 C:61 R:66
+2026-05-01 15:22:44 | Action: Ball Reached (22.2cm) | L:51 C:62 R:142
+2026-05-01 15:26:18 | Action: Turn LEFT (Track) | L:211 C:148 R:145
+2026-05-01 15:26:18 | Action: Turn LEFT (Track) | L:209 C:999 R:147
+2026-05-01 15:26:19 | Action: Turn LEFT (Track) | L:209 C:999 R:147
+2026-05-01 15:26:19 | Action: Turn LEFT (Track) | L:210 C:153 R:146
+2026-05-01 15:26:19 | Action: Turn LEFT (Track) | L:214 C:150 R:146
+2026-05-01 15:26:20 | Action: Turn LEFT (Track) | L:212 C:152 R:148
+2026-05-01 15:26:20 | Action: Turn LEFT (Track) | L:213 C:151 R:147
+2026-05-01 15:26:20 | Action: Turn LEFT (Track) | L:212 C:151 R:144
+2026-05-01 15:26:21 | Action: Turn LEFT (Track) | L:211 C:210 R:146
+2026-05-01 15:26:21 | Action: Turn LEFT (Track) | L:212 C:150 R:147
+2026-05-01 15:26:22 | Action: Turn LEFT (Track) | L:152 C:210 R:148
+2026-05-01 15:26:22 | Action: Turn LEFT (Track) | L:149 C:211 R:146
+2026-05-01 15:26:22 | Action: Turn LEFT (Track) | L:149 C:212 R:145
+2026-05-01 15:26:30 | Action: Turn LEFT (Track) | L:210 C:150 R:149
+2026-05-01 15:26:31 | Action: Turn LEFT (Track) | L:212 C:154 R:152
+2026-05-01 15:26:31 | Action: Turn LEFT (Track) | L:212 C:148 R:151
+2026-05-01 15:26:31 | Action: Turn LEFT (Track) | L:211 C:154 R:149
+2026-05-01 15:26:32 | Action: Turn LEFT (Track) | L:210 C:153 R:147
+2026-05-01 15:26:32 | Action: Turn LEFT (Track) | L:212 C:153 R:147
+2026-05-01 15:26:32 | Action: Turn LEFT (Track) | L:212 C:149 R:148
+2026-05-01 15:26:33 | Action: Turn LEFT (Track) | L:211 C:105 R:148
+2026-05-01 15:26:33 | Action: Turn LEFT (Track) | L:212 C:999 R:147
+2026-05-01 15:26:33 | Action: Turn LEFT (Track) | L:212 C:152 R:149
+2026-05-01 15:26:34 | Action: Turn LEFT (Track) | L:211 C:215 R:147
+2026-05-01 15:26:34 | Action: Turn LEFT (Track) | L:212 C:214 R:148
+2026-05-01 15:26:35 | Action: Turn LEFT (Track) | L:212 C:215 R:122
+2026-05-01 15:26:35 | Action: Turn LEFT (Track) | L:213 C:215 R:150
+2026-05-01 15:26:35 | Action: Turn LEFT (Track) | L:213 C:151 R:148
+2026-05-01 15:26:36 | Action: Turn LEFT (Track) | L:213 C:216 R:147
+2026-05-01 15:26:36 | Action: Turn LEFT (Track) | L:211 C:213 R:148
+2026-05-01 15:26:37 | Action: Turn LEFT (Track) | L:213 C:214 R:149
+2026-05-01 15:26:37 | Action: Turn LEFT (Track) | L:214 C:999 R:146
+2026-05-01 15:26:37 | Action: Turn LEFT (Track) | L:214 C:212 R:147
+2026-05-01 15:26:38 | Action: Turn LEFT (Track) | L:152 C:212 R:148
+2026-05-01 15:26:38 | Action: Turn LEFT (Track) | L:149 C:212 R:145
+2026-05-01 15:26:38 | Action: Turn LEFT (Track) | L:150 C:211 R:148
+2026-05-01 15:26:39 | Action: Turn LEFT (Track) | L:152 C:212 R:150
+2026-05-01 15:26:39 | Action: Turn LEFT (Track) | L:215 C:153 R:148
+2026-05-01 15:26:39 | Action: Turn LEFT (Track) | L:151 C:213 R:147
+2026-05-01 15:26:40 | Action: Turn LEFT (Track) | L:149 C:216 R:148
+2026-05-01 15:26:40 | Action: Turn LEFT (Track) | L:147 C:211 R:147
+2026-05-01 15:26:41 | Action: Turn LEFT (Track) | L:149 C:213 R:148
+2026-05-01 15:26:41 | Action: Turn LEFT (Track) | L:149 C:213 R:150
+2026-05-01 15:26:41 | Action: Turn LEFT (Track) | L:149 C:208 R:148
+2026-05-01 15:26:42 | Action: Turn LEFT (Track) | L:147 C:214 R:999
+2026-05-01 15:26:42 | Action: Turn LEFT (Track) | L:147 C:215 R:147
+2026-05-01 15:26:43 | Action: Turn LEFT (Track) | L:147 C:212 R:148
+2026-05-01 15:26:43 | Action: Turn LEFT (Track) | L:148 C:212 R:149
+2026-05-01 15:26:43 | Action: Turn LEFT (Track) | L:148 C:214 R:149
+2026-05-01 15:26:44 | Action: Turn LEFT (Track) | L:147 C:214 R:151
+2026-05-01 15:26:44 | Action: Turn LEFT (Track) | L:146 C:216 R:147
+2026-05-01 15:26:45 | Action: Turn LEFT (Track) | L:147 C:214 R:999
+2026-05-01 15:26:45 | Action: Turn LEFT (Track) | L:148 C:213 R:149
+2026-05-01 15:26:45 | Action: Turn LEFT (Track) | L:147 C:221 R:110
+2026-05-01 15:26:46 | Action: Turn LEFT (Track) | L:147 C:214 R:150
+2026-05-01 15:26:46 | Action: Turn LEFT (Track) | L:145 C:127 R:149
+2026-05-01 15:26:46 | Action: Turn LEFT (Track) | L:146 C:213 R:282
+2026-05-01 15:26:47 | Action: Turn LEFT (Track) | L:148 C:212 R:999
+2026-05-01 15:26:47 | Action: Turn LEFT (Track) | L:148 C:153 R:150
+2026-05-01 15:26:48 | Action: Turn LEFT (Track) | L:145 C:214 R:105
+2026-05-01 15:26:48 | Action: Turn LEFT (Track) | L:146 C:215 R:999
+2026-05-01 15:26:48 | Action: Turn LEFT (Track) | L:146 C:197 R:999
+2026-05-01 15:26:49 | Action: Turn LEFT (Track) | L:147 C:119 R:999
+2026-05-01 15:26:49 | Action: Turn LEFT (Track) | L:148 C:214 R:145
+2026-05-01 15:26:49 | Action: Turn LEFT (Track) | L:147 C:214 R:201
+2026-05-01 15:26:50 | Action: Forward (Track) | L:146 C:214 R:999
+2026-05-01 15:26:51 | Action: Forward (Track) | L:144 C:99 R:999
+2026-05-01 15:26:51 | Action: Ball Reached (37.4cm) | L:138 C:202 R:202
+2026-05-01 15:28:37 | Action: Turn LEFT (Track) | L:108 C:107 R:170
+2026-05-01 15:28:38 | Action: Turn LEFT (Track) | L:108 C:106 R:157
+2026-05-01 15:28:38 | Action: Turn LEFT (Track) | L:108 C:107 R:170
+2026-05-01 15:28:39 | Action: Turn LEFT (Track) | L:107 C:107 R:168
+2026-05-01 15:28:39 | Action: Ball Reached (39.0cm) | L:107 C:106 R:169
+2026-05-01 15:29:05 | Action: Turn RIGHT (Track) | L:74 C:70 R:71
+2026-05-01 15:29:05 | Action: Turn RIGHT (Track) | L:74 C:70 R:70
+2026-05-01 15:29:06 | Action: Turn RIGHT (Track) | L:71 C:71 R:73
+2026-05-01 15:29:06 | Action: Turn RIGHT (Track) | L:70 C:76 R:78
+2026-05-01 15:29:07 | Action: Ball Reached (33.1cm) | L:69 C:75 R:999
+2026-05-01 15:30:24 | Action: Ball Reached (25.5cm) | L:40 C:38 R:197
+2026-05-01 15:31:28 | Action: OBSTACLE (L:39 C:38 R:198) | L:39 C:38 R:198
+2026-05-01 15:31:29 | Action: Turn RIGHT (Avoid) | L:40 C:38 R:197
+2026-05-01 15:31:30 | Action: OBSTACLE (L:38 C:203 R:100) | L:38 C:203 R:100
+2026-05-01 15:31:30 | Action: Turn RIGHT (Avoid) | L:38 C:198 R:100
+2026-05-01 15:31:31 | Action: Turn RIGHT (Track) | L:999 C:115 R:119
+2026-05-01 15:31:32 | Action: Turn RIGHT (Track) | L:89 C:114 R:120
+2026-05-01 15:31:32 | Action: Turn RIGHT (Track) | L:87 C:114 R:120
+2026-05-01 15:31:33 | Action: Turn RIGHT (Track) | L:90 C:103 R:120
+2026-05-01 15:31:33 | Action: Ball Reached (19.6cm) | L:97 C:102 R:121
+2026-05-01 15:32:01 | Action: Turn LEFT (Track) | L:71 C:92 R:87
+2026-05-01 15:32:02 | Action: Turn LEFT (Track) | L:85 C:80 R:90
+2026-05-01 15:32:02 | Action: Turn LEFT (Track) | L:86 C:91 R:91
+2026-05-01 15:32:12 | Action: Ball Reached (32.9cm) | L:71 C:90 R:94
+2026-05-01 15:32:31 | Action: Turn LEFT (Track) | L:999 C:60 R:56
+2026-05-01 15:32:32 | Action: Turn LEFT (Track) | L:999 C:59 R:57
+2026-05-01 15:32:32 | Action: OBSTACLE (L:30 C:67 R:57) | L:30 C:67 R:57
+2026-05-01 15:32:33 | Action: Turn LEFT (Avoid) | L:999 C:65 R:57
+2026-05-01 15:32:34 | Action: Turn RIGHT (Track) | L:999 C:999 R:999
+2026-05-01 15:32:34 | Action: Turn RIGHT (Track) | L:999 C:999 R:96
+2026-05-01 15:32:44 | Action: Turn RIGHT (Track) | L:62 C:59 R:61
+2026-05-01 15:32:45 | Action: Turn RIGHT (Track) | L:62 C:60 R:61
+2026-05-01 15:32:45 | Action: Turn RIGHT (Track) | L:63 C:60 R:62
+2026-05-01 15:32:45 | Action: Turn RIGHT (Track) | L:60 C:58 R:61
+2026-05-01 15:32:46 | Action: Turn RIGHT (Track) | L:59 C:57 R:999
+2026-05-01 15:32:46 | Action: Turn RIGHT (Track) | L:58 C:59 R:999
+2026-05-01 15:32:47 | Action: Turn RIGHT (Track) | L:59 C:59 R:999
+2026-05-01 15:32:47 | Action: Turn RIGHT (Track) | L:59 C:58 R:97
+2026-05-01 15:32:47 | Action: Turn RIGHT (Track) | L:58 C:58 R:999
+2026-05-01 15:32:48 | Action: Turn RIGHT (Track) | L:59 C:58 R:999
+2026-05-01 15:32:48 | Action: Turn RIGHT (Track) | L:57 C:58 R:97
+2026-05-01 15:32:48 | Action: Turn RIGHT (Track) | L:57 C:59 R:999
+2026-05-01 15:32:49 | Action: Turn RIGHT (Track) | L:58 C:58 R:247
+2026-05-01 15:32:49 | Action: Turn RIGHT (Track) | L:57 C:60 R:90
+2026-05-01 15:32:50 | Action: Turn RIGHT (Track) | L:57 C:58 R:999
+2026-05-01 15:32:50 | Action: Turn RIGHT (Track) | L:56 C:59 R:211
+2026-05-01 15:32:50 | Action: Turn RIGHT (Track) | L:56 C:59 R:77
+2026-05-01 15:32:51 | Action: Turn RIGHT (Track) | L:57 C:60 R:999
+2026-05-01 15:32:51 | Action: Turn RIGHT (Track) | L:57 C:60 R:999
+2026-05-01 15:32:51 | Action: Turn RIGHT (Track) | L:57 C:60 R:999
+2026-05-01 15:32:52 | Action: Turn RIGHT (Track) | L:56 C:59 R:188
+2026-05-01 15:32:52 | Action: Turn RIGHT (Track) | L:57 C:60 R:262
+2026-05-01 15:32:52 | Action: Turn RIGHT (Track) | L:56 C:60 R:999
+2026-05-01 15:32:53 | Action: Ball Reached (19.2cm) | L:57 C:61 R:999
+2026-05-01 15:33:14 | Action: OBSTACLE (L:31 C:999 R:151) | L:31 C:999 R:151
+2026-05-01 15:33:14 | Action: Turn RIGHT (Avoid) | L:32 C:999 R:82
+2026-05-01 15:33:15 | Action: OBSTACLE (L:33 C:83 R:140) | L:33 C:83 R:140
+2026-05-01 15:33:15 | Action: Turn RIGHT (Avoid) | L:33 C:85 R:140
+2026-05-01 15:33:17 | Action: Turn LEFT (Track) | L:77 C:141 R:145
+2026-05-01 15:33:18 | Action: Turn RIGHT (Track) | L:281 C:79 R:141
+2026-05-01 15:33:18 | Action: OBSTACLE (L:32 C:149 R:140) | L:32 C:149 R:140
+2026-05-01 15:33:18 | Action: Turn RIGHT (Avoid) | L:34 C:148 R:140
+2026-05-01 15:33:19 | Action: Turn LEFT (Track) | L:76 C:81 R:999
+2026-05-01 15:33:20 | Action: Turn RIGHT (Track) | L:75 C:68 R:73
+2026-05-01 15:33:20 | Action: Turn RIGHT (Track) | L:75 C:141 R:999
+2026-05-01 15:33:21 | Action: Turn LEFT (Track) | L:140 C:143 R:999
+2026-05-01 15:33:21 | Action: Turn LEFT (Track) | L:140 C:143 R:999
+2026-05-01 15:33:22 | Action: Turn LEFT (Track) | L:143 C:145 R:999
+2026-05-01 15:33:22 | Action: Turn LEFT (Track) | L:78 C:141 R:999
+2026-05-01 15:33:22 | Action: Turn LEFT (Track) | L:142 C:144 R:999
+2026-05-01 15:33:23 | Action: Turn LEFT (Track) | L:76 C:64 R:75
+2026-05-01 15:33:23 | Action: Turn LEFT (Track) | L:76 C:71 R:999
+2026-05-01 15:33:24 | Action: Ball Reached (19.1cm) | L:76 C:67 R:310
+2026-05-01 15:33:56 | Action: Turn RIGHT (Track) | L:147 C:159 R:999
+2026-05-01 15:33:56 | Action: Turn RIGHT (Track) | L:146 C:94 R:999
+2026-05-01 15:33:57 | Action: Turn RIGHT (Track) | L:146 C:83 R:999
+2026-05-01 15:33:57 | Action: Turn RIGHT (Track) | L:145 C:89 R:999
+2026-05-01 15:33:58 | Action: Turn RIGHT (Track) | L:145 C:85 R:999
+2026-05-01 15:33:58 | Action: Turn RIGHT (Track) | L:146 C:83 R:999
+2026-05-01 15:33:58 | Action: Turn RIGHT (Track) | L:147 C:999 R:999
+2026-05-01 15:33:58 | Action: Turn RIGHT (Track) | L:147 C:86 R:999
+2026-05-01 15:33:59 | Action: Turn RIGHT (Track) | L:146 C:88 R:999
+2026-05-01 15:33:59 | Action: Turn RIGHT (Track) | L:86 C:87 R:999
+2026-05-01 15:34:00 | Action: Turn RIGHT (Track) | L:146 C:87 R:999
+2026-05-01 15:34:00 | Action: Turn RIGHT (Track) | L:146 C:84 R:999
+2026-05-01 15:34:00 | Action: Turn RIGHT (Track) | L:147 C:84 R:999
+2026-05-01 15:34:01 | Action: Turn RIGHT (Track) | L:146 C:85 R:999
+2026-05-01 15:34:01 | Action: Turn RIGHT (Track) | L:145 C:92 R:999
+2026-05-01 15:34:02 | Action: Turn RIGHT (Track) | L:147 C:89 R:999
+2026-05-01 15:34:02 | Action: Turn RIGHT (Track) | L:147 C:999 R:999
+2026-05-01 15:34:02 | Action: Turn RIGHT (Track) | L:148 C:999 R:999
+2026-05-01 15:34:03 | Action: Turn RIGHT (Track) | L:145 C:91 R:999
+2026-05-01 15:34:03 | Action: Turn RIGHT (Track) | L:145 C:999 R:999
+2026-05-01 15:34:03 | Action: Turn RIGHT (Track) | L:146 C:999 R:999
+2026-05-01 15:34:04 | Action: Turn RIGHT (Track) | L:147 C:999 R:999
+2026-05-01 15:34:04 | Action: Turn RIGHT (Track) | L:147 C:999 R:999
+2026-05-01 15:34:04 | Action: Turn RIGHT (Track) | L:102 C:999 R:49
+2026-05-01 15:34:05 | Action: Turn RIGHT (Track) | L:86 C:999 R:53
+2026-05-01 15:34:05 | Action: Turn RIGHT (Track) | L:87 C:999 R:49
+2026-05-01 15:34:06 | Action: Ball Reached (24.4cm) | L:88 C:999 R:999
+2026-05-01 15:34:49 | Action: Turn LEFT (Track) | L:134 C:999 R:235
+2026-05-01 15:34:50 | Action: Turn LEFT (Track) | L:135 C:999 R:999
+2026-05-01 15:34:50 | Action: Turn LEFT (Track) | L:139 C:268 R:999
+2026-05-01 15:34:50 | Action: Turn LEFT (Track) | L:137 C:266 R:999
+2026-05-01 15:34:51 | Action: Turn LEFT (Track) | L:136 C:999 R:999
+2026-05-01 15:34:51 | Action: Turn LEFT (Track) | L:133 C:999 R:999
+2026-05-01 15:34:51 | Action: Ball Reached (25.8cm) | L:135 C:999 R:999
+2026-05-01 15:35:15 | Action: Turn LEFT (Track) | L:134 C:999 R:250
+2026-05-01 15:35:15 | Action: Turn LEFT (Track) | L:133 C:999 R:999
+2026-05-01 15:35:16 | Action: Turn LEFT (Track) | L:131 C:265 R:999
+2026-05-01 15:35:16 | Action: Turn LEFT (Track) | L:132 C:999 R:999
+2026-05-01 15:35:16 | Action: Turn LEFT (Track) | L:132 C:999 R:267
+2026-05-01 15:35:17 | Action: Turn LEFT (Track) | L:133 C:999 R:999
+2026-05-01 15:35:17 | Action: Turn LEFT (Track) | L:132 C:999 R:999
+2026-05-01 15:35:17 | Action: Turn LEFT (Track) | L:132 C:207 R:999
+2026-05-01 15:35:18 | Action: Turn LEFT (Track) | L:132 C:999 R:999
+2026-05-01 15:35:18 | Action: Turn LEFT (Track) | L:132 C:999 R:999
+2026-05-01 15:35:19 | Action: Turn LEFT (Track) | L:134 C:999 R:137
+2026-05-01 15:35:19 | Action: Turn LEFT (Track) | L:133 C:999 R:999
+2026-05-01 15:35:19 | Action: Ball Reached (28.2cm) | L:132 C:999 R:999
+2026-05-01 15:36:31 | Action: Turn LEFT (Track) | L:122 C:999 R:121
+2026-05-01 15:36:31 | Action: Turn LEFT (Track) | L:124 C:122 R:120
+2026-05-01 15:36:32 | Action: Turn LEFT (Track) | L:192 C:120 R:119
+2026-05-01 15:36:32 | Action: Turn LEFT (Track) | L:192 C:121 R:119
+2026-05-01 15:36:33 | Action: Turn LEFT (Track) | L:195 C:197 R:119
+2026-05-01 15:36:33 | Action: Turn LEFT (Track) | L:154 C:196 R:120
+2026-05-01 15:36:34 | Action: Turn LEFT (Track) | L:153 C:195 R:120
+2026-05-01 15:36:34 | Action: Turn LEFT (Track) | L:149 C:196 R:118
+2026-05-01 15:36:34 | Action: Turn LEFT (Track) | L:150 C:197 R:118
+2026-05-01 15:36:35 | Action: Turn LEFT (Track) | L:152 C:169 R:119
+2026-05-01 15:36:35 | Action: Forward (Track) | L:151 C:195 R:123
+2026-05-01 15:36:36 | Action: Forward (Track) | L:152 C:194 R:118
+2026-05-01 15:36:37 | Action: Forward (Track) | L:145 C:113 R:107
+2026-05-01 15:36:37 | Action: Turn RIGHT (Track) | L:172 C:101 R:100
+2026-05-01 15:36:38 | Action: Turn RIGHT (Track) | L:102 C:98 R:98
+2026-05-01 15:36:39 | Action: Turn RIGHT (Track) | L:103 C:97 R:99
+2026-05-01 15:36:57 | Action: Turn RIGHT (Track) | L:91 C:999 R:133
+2026-05-01 15:36:58 | Action: Turn RIGHT (Track) | L:89 C:999 R:136
+2026-05-01 15:36:58 | Action: Turn RIGHT (Track) | L:89 C:140 R:136
+2026-05-01 15:36:59 | Action: Turn RIGHT (Track) | L:91 C:139 R:136
+2026-05-01 15:36:59 | Action: Turn RIGHT (Track) | L:90 C:166 R:136
+2026-05-01 15:37:00 | Action: Turn RIGHT (Track) | L:171 C:141 R:141
+2026-05-01 15:37:00 | Action: Turn RIGHT (Track) | L:171 C:142 R:135
+2026-05-01 15:37:01 | Action: Ball Reached (16.8cm) | L:172 C:136 R:135
+2026-05-01 15:37:20 | Action: Ball Reached (35.8cm) | L:137 C:106 R:103
+2026-05-01 15:37:49 | Action: Turn LEFT (Track) | L:63 C:78 R:73
+2026-05-01 15:37:50 | Action: Turn LEFT (Track) | L:62 C:90 R:72
+2026-05-01 15:37:50 | Action: Turn LEFT (Track) | L:63 C:90 R:74
+2026-05-01 15:37:50 | Action: Turn LEFT (Track) | L:62 C:92 R:74
+2026-05-01 15:37:51 | Action: Turn LEFT (Track) | L:62 C:97 R:75
+2026-05-01 15:37:51 | Action: Turn LEFT (Track) | L:62 C:78 R:74
+2026-05-01 15:37:52 | Action: Turn LEFT (Track) | L:63 C:93 R:94
+2026-05-01 15:37:52 | Action: Turn LEFT (Track) | L:63 C:104 R:93
+2026-05-01 15:37:52 | Action: Forward (Track) | L:63 C:70 R:93
+2026-05-01 15:37:53 | Action: Forward (Track) | L:58 C:96 R:88
+2026-05-01 15:37:54 | Action: Turn RIGHT (Track) | L:53 C:91 R:87
+2026-05-01 15:37:54 | Action: Turn RIGHT (Track) | L:51 C:264 R:88
+2026-05-01 15:37:54 | Action: Turn RIGHT (Track) | L:50 C:91 R:246
+2026-05-01 15:37:55 | Action: Turn RIGHT (Track) | L:51 C:89 R:999
+2026-05-01 15:37:55 | Action: Turn RIGHT (Track) | L:51 C:89 R:999
+2026-05-01 15:37:56 | Action: Turn RIGHT (Track) | L:51 C:84 R:68
+2026-05-01 15:37:56 | Action: Turn RIGHT (Track) | L:51 C:89 R:80
+2026-05-01 15:37:56 | Action: Turn RIGHT (Track) | L:50 C:90 R:999
+2026-05-01 15:37:57 | Action: Turn RIGHT (Track) | L:50 C:88 R:73
+2026-05-01 15:37:57 | Action: Turn RIGHT (Track) | L:51 C:90 R:72
+2026-05-01 15:37:57 | Action: Turn RIGHT (Track) | L:51 C:86 R:81
+2026-05-01 15:37:58 | Action: Turn RIGHT (Track) | L:51 C:86 R:84
+2026-05-01 15:37:58 | Action: Turn RIGHT (Track) | L:52 C:82 R:999
+2026-05-01 15:37:59 | Action: Forward (Track) | L:52 C:89 R:70
+2026-05-01 15:38:00 | Action: Forward (Track) | L:49 C:85 R:999
+2026-05-01 15:38:01 | Action: Forward (Track) | L:999 C:999 R:75
+2026-05-01 15:38:02 | Action: OBSTACLE (L:38 C:999 R:51) | L:38 C:999 R:51
+2026-05-01 15:38:02 | Action: Turn RIGHT (Avoid) | L:35 C:999 R:999
+2026-05-01 15:38:03 | Action: Forward (Track) | L:65 C:49 R:51
+2026-05-01 15:38:15 | Action: Turn LEFT (Track) | L:999 C:153 R:150
+2026-05-01 15:38:16 | Action: Turn LEFT (Track) | L:999 C:79 R:147
+2026-05-01 15:38:16 | Action: Turn LEFT (Track) | L:41 C:318 R:149
+2026-05-01 15:38:16 | Action: Forward (Track) | L:42 C:81 R:153
+2026-05-01 15:38:17 | Action: Turn RIGHT (Track) | L:41 C:76 R:144
+2026-05-01 15:38:18 | Action: Forward (Track) | L:999 C:74 R:75
+2026-05-01 15:38:18 | Action: Forward (Track) | L:40 C:146 R:139
+2026-05-01 15:38:19 | Action: Forward (Track) | L:266 C:139 R:133
+2026-05-01 15:38:20 | Action: Ball Reached (39.8cm) | L:231 C:112 R:126

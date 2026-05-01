@@ -5,9 +5,15 @@ import serial.tools.list_ports
 import threading
 import datetime
 import os
+import numpy as np
 from picamera2 import Picamera2
 from libcamera import Transform
 from ultralytics import YOLO
+try:
+    from pupil_apriltags import Detector as PoseDetector
+except ImportError:
+    print("Warning: pupil_apriltags not found! Tag detection will fail.")
+
 
 # --- CONFIGURATION ---
 def find_arduino_port():
@@ -44,8 +50,8 @@ def log_motion_action(action_desc, l, c, r):
         f.write(log_entry)
 
 # Movement Thresholds
-STOP_DIST = 35        # cm
-SIDE_DIST = 30        # cm
+STOP_DIST = 30        # cm
+SIDE_DIST = 40        # cm
 CENTER_TOLERANCE = 40 # pixels from center to consider "centered"
 
 # Camera Configuration
@@ -91,7 +97,7 @@ ORIGINAL_CALIB_WIDTH = 640
 # Scale the focal length (fx) to match the current capture resolution (320x240)
 FOCAL_LENGTH_X = CAMERA_PARAMS[0] * (CAPTURE_WIDTH / ORIGINAL_CALIB_WIDTH)
 BALL_DIAMETER_CM = 4.0 # Standard ping-pong ball size (~4.0 cm). Adjust if needed.
-TARGET_REACHED_CM = 40.0 # Distance to stop in front of the ball
+TARGET_REACHED_CM = 30.0 # Distance to stop in front of the ball
 CAPTURE_DISTANCE_CM = 15.0 # Target forward travel distance during the ball catch manoeuver
 CAPTURE_SPEED_CM_S = 10.6 # Approximate cm/sec speed of robot using motor speed level '2'
 CAPTURE_GRIPPER_CYCLES = 4 # Number of open-close gripper operations during forward movement
@@ -115,6 +121,13 @@ ball_y = 0
 ball_w = 0
 ball_h = 0
 ball_distance_cm = 999.0 # Store calculated distance
+
+# Tag Detection (Shared)
+tag_visible = False
+tag_distance_cm = 999.0
+tag_yaw_deg = 0.0
+top_camera_frame = None  # To share the frame with the main loop
+top_camera_tags = []     # Store tag data for rendering
 
 # Serial Connection
 try:
@@ -140,33 +153,39 @@ def set_speed(level):
 
 def robot_forward():
     if ser: 
+        print(f"Moving FORWARD | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
         set_speed(2) # Normal speed for forward
         ser.write(b'F\n')
 
 def robot_backward():
     if ser: 
+        print(f"Moving BACKWARD | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
         set_speed(2)
         ser.write(b'B\n')
 
 def robot_left():
     if ser: 
+        print(f"Moving LEFT | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
         set_speed(1) # Slower speed (1) for precise tracking
         ser.write(b'L\n')
 
 def robot_right():
     if ser: 
+        print(f"Moving RIGHT | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
         set_speed(1) # Slower speed (1) for precise tracking
         ser.write(b'R\n')
 
 def robot_forward_slow():
     if ser:
+        print(f"Moving FORWARD (Slow) | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
         set_speed(1) # Slower speed (1) for searching safely
         ser.write(b'F\n')
 
 def robot_spin_search():
     # Spin slowly to find ball.
     if ser:
-        set_speed(1) # Slower speed (1) to systematically scan for balls
+        print(f"Spin SEARCHING | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
+        set_speed(2) # Increased to speed(2) to ensure motors have enough torque to rotate
         ser.write(b'R\n')
 
 # --- THREAD 1: SENSOR READER ---
@@ -421,6 +440,37 @@ def camera_yolo_loop():
                     cv2.putText(annotated_frame, f"y={grid_y}", (5, grid_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
             cv2.imshow("Robot Vision", annotated_frame)
+
+            # Show top camera feed if arm is DOWN
+            if not arm_is_up and top_camera_frame is not None:
+                arm_view = top_camera_frame.copy()
+                
+                # Annotate C sensor reading
+                cv2.putText(arm_view, f"C Sensor: {latest_C} cm", (20, 40), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                
+                # Annotate tag data
+                if top_camera_tags:
+                    for tag in top_camera_tags:
+                        dist_cm = (tag.pose_t[2][0] / 3.0) * 100.0
+                        corners = tag.corners.astype(int)
+                        # Draw bounding box around tag
+                        for i in range(4):
+                            cv2.line(arm_view, tuple(corners[i]), tuple(corners[(i+1)%4]), (0, 255, 0), 2)
+                        
+                        center = tuple(tag.center.astype(int))
+                        cv2.circle(arm_view, center, 4, (0, 0, 255), -1)
+                        cv2.putText(arm_view, f"ID: {tag.tag_id} ({dist_cm:.1f}cm)", 
+                                    (corners[0][0], corners[0][1] - 10), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+                            
+                cv2.imshow("Top Camera (Arm DOWN)", arm_view)
+            else:
+                try:
+                    if cv2.getWindowProperty("Top Camera (Arm DOWN)", cv2.WND_PROP_VISIBLE) >= 0:
+                        cv2.destroyWindow("Top Camera (Arm DOWN)")
+                except cv2.error:
+                    pass
             
             key = cv2.waitKey(1) & 0xFF
             if key == ord('g') or key == ord('G'):
@@ -452,7 +502,9 @@ def camera_yolo_loop():
                     arm_is_up = True
                     print("\n>>> Arm UP (Obstacle Avoidance ENABLED) <<<")
             elif key == ord('j') or key == ord('J'):
-                if ser:
+                if latest_L < 50 or latest_C < 50 or latest_R < 50:
+                    print(f"Too close to an obstacle, can not lower the arm (L:{latest_L} C:{latest_C} R:{latest_R})")
+                elif ser:
                     ser.write(b'a\n')
                     arm_is_up = False
                     print("\n>>> Arm DOWN (Obstacle Avoidance DISABLED) <<<")
@@ -466,17 +518,99 @@ def camera_yolo_loop():
     cv2.destroyAllWindows()
 
 
-# --- THREAD 3: ROBOT CONTROL ---
+# --- THREAD 3: PICAMERA & TAGS ---
+def picamera_tag_loop():
+    global running, tag_visible, tag_distance_cm, tag_yaw_deg, top_camera_frame, top_camera_tags
+    
+    try:
+        picam2 = Picamera2()
+        config = picam2.create_video_configuration(
+            main={"size": (320, 240), "format": "RGB888"},
+            transform=Transform(hflip=1, vflip=1),
+            controls={"FrameRate": 30},
+            buffer_count=2
+        )
+        picam2.configure(config)
+        picam2.start()
+        print("PiCamera for Tags Started (320x240).")
+    except Exception as e:
+        print(f"PiCamera Tag Initialize Error: {e}")
+        return
+
+    try:
+        apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=2.0)
+    except Exception as e:
+        print(f"Failed to initialize PoseDetector: {e}")
+        if picam2: picam2.stop()
+        return
+
+    CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
+    TAG_SIZE = 0.10
+    SCALE = 3.0
+
+    frame_skip = 3
+    frame_count = 0
+
+    while running:
+        try:
+            frame_bgr = picam2.capture_array()
+            frame_count += 1
+            if frame_count % frame_skip != 0:
+                continue
+
+            gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
+            tags = apriltag_detector.detect(gray, estimate_tag_pose=True,
+                                            camera_params=CAMERA_PARAMS, tag_size=TAG_SIZE)
+            
+            if tags:
+                closest_dist_m = 999.0
+                closest_yaw = 0.0
+                
+                for tag in tags:
+                    dist_m = tag.pose_t[2][0] / SCALE
+                    if dist_m < closest_dist_m:
+                        closest_dist_m = dist_m
+                        R = tag.pose_R
+                        yaw = np.arctan2(-R[2][0], np.sqrt(R[2][1]**2 + R[2][2]**2))
+                        closest_yaw = np.degrees(yaw)
+                
+                tag_distance_cm = closest_dist_m * 100.0
+                tag_yaw_deg = closest_yaw
+                tag_visible = True
+            else:
+                tag_visible = False
+                tag_distance_cm = 999.0
+            
+            top_camera_tags = tags
+            top_camera_frame = frame_bgr.copy()
+            
+        except Exception as e:
+            # print(f"Tag Loop Error: {e}")
+            time.sleep(0.01)
+            
+        time.sleep(0.01)
+
+    if picam2: picam2.stop()
+
+
+# --- THREAD 4: ROBOT CONTROL ---
 def robot_control_loop():
     global running, robot_active, execute_ball_catch, arm_is_up
     global latest_L, latest_C, latest_R
     global ball_visible, ball_x, ball_distance_cm
+    global tag_visible, tag_distance_cm, tag_yaw_deg
     
     print("Robot Control Loop Started.")
+    obstacle_streak = 0
     
     while running:
         if execute_ball_catch and ser:
             execute_ball_catch = False
+            
+            if latest_L < 50 or latest_C < 50 or latest_R < 50:
+                print(f"Too close to an obstacle, can not lower the arm (L:{latest_L} C:{latest_C} R:{latest_R})")
+                continue
+                
             was_active = robot_active
             robot_active = False # Pause normal control
             robot_stop()
@@ -540,45 +674,84 @@ def robot_control_loop():
             # PRIORITY 1: OBSTACLE AVOIDANCE (Only if Arm is UP)
             # ----------------------------------
             if arm_is_up:
-                if latest_C < STOP_DIST:
-                    log_motion_action(f"BLOCKED ({latest_C}cm)", latest_L, latest_C, latest_R)
-                    print(f"OBSTACLE AHEAD ({latest_C}cm)! Avoiding...")
+                if latest_C < STOP_DIST or latest_L < SIDE_DIST or latest_R < SIDE_DIST:
+                    obstacle_streak += 1
+                    log_motion_action(f"OBSTACLE (L:{latest_L} C:{latest_C} R:{latest_R})", latest_L, latest_C, latest_R)
+                    print(f"OBSTACLE DETECTED! (L:{latest_L}, C:{latest_C}, R:{latest_R}) Avoiding... (Attempt {obstacle_streak})")
+                    robot_stop()
+                    time.sleep(0.1)
+                    
+                    # Corner Escape Maneuver
+                    if obstacle_streak >= 3:
+                        print("Stuck in corner! Backing up and rotating to escape...")
+                        log_motion_action("CORNER ESCAPE", latest_L, latest_C, latest_R)
+                        
+                        # Strong backup
+                        set_speed(2)
+                        if ser: ser.write(b'B\n')
+                        time.sleep(0.7)
+                        
+                        # ~90 degree rotation (approx 1.2s on speed 2)
+                        set_speed(2)
+                        if latest_L < latest_R:
+                            if ser: ser.write(b'R\n')
+                        else:
+                            if ser: ser.write(b'L\n')
+                        time.sleep(1.2)
+                        
+                        robot_stop()
+                        time.sleep(0.5)
+                        obstacle_streak = 0
+                        continue
+                    
+                    if latest_C < STOP_DIST:
+                        robot_backward()
+                        time.sleep(0.3)
+                    
+                    # Turn slowly away from the closest obstacle
+                    if latest_L < latest_R:
+                        log_motion_action("Turn RIGHT (Avoid)", latest_L, latest_C, latest_R)
+                        robot_right()
+                    else:
+                        log_motion_action("Turn LEFT (Avoid)", latest_L, latest_C, latest_R)
+                        robot_left()
+                        
+                    time.sleep(0.6) # Turn slowly to avoid obstacle
+                    robot_stop()
+                    time.sleep(0.5) # Allow camera and sensors to stabilize before searching again
+                    continue # Skip rest of loop to re-evaluate sensors
+                else:
+                    # Clear streak if path is clear
+                    obstacle_streak = 0
+
+            else:
+                # ----------------------------------
+                # OBSTACLE AVOIDANCE (Arm is DOWN)
+                # ----------------------------------
+                # Ignore L and R sensors. Use Center US and Tag Detection.
+                if latest_C < 50 or (tag_visible and tag_distance_cm < 50):
+                    log_motion_action(f"BLOCKED ARM DOWN (C:{latest_C}cm, Tag:{tag_distance_cm:.1f}cm)", latest_L, latest_C, latest_R)
+                    print(f"OBSTACLE AHEAD (Arm DOWN)! Avoiding... C:{latest_C}cm Tag:{tag_distance_cm:.1f}cm")
                     robot_stop()
                     time.sleep(0.1)
                     robot_backward()
                     time.sleep(0.3)
                     
-                    # Turn away from obstacle
-                    if latest_L > latest_R:
-                        log_motion_action("Turn LEFT (Avoid)", latest_L, latest_C, latest_R)
-                        robot_left()
+                    if tag_visible and tag_distance_cm < 50:
+                        # Turn away from tag wall
+                        if tag_yaw_deg > 0:
+                            log_motion_action(f"Turn LEFT (Avoid Tag Yaw {tag_yaw_deg:.1f})", latest_L, latest_C, latest_R)
+                            robot_left()
+                        else:
+                            log_motion_action(f"Turn RIGHT (Avoid Tag Yaw {tag_yaw_deg:.1f})", latest_L, latest_C, latest_R)
+                            robot_right()
                     else:
-                        log_motion_action("Turn RIGHT (Avoid)", latest_L, latest_C, latest_R)
+                        # Default turn when blind/no tag
+                        log_motion_action("Turn RIGHT (Blind Avoid)", latest_L, latest_C, latest_R)
                         robot_right()
+                        
                     time.sleep(0.5)
                     robot_stop()
-                    continue # Skip rest of loop to re-evaluate sensors
-
-                elif latest_L < SIDE_DIST:
-                    log_motion_action("Nudge RIGHT", latest_L, latest_C, latest_R)
-                    print("Too close Left - Nudging Right")
-                    robot_right()
-                    time.sleep(0.2)
-                    robot_forward()
-                    time.sleep(0.2)
-                    robot_stop()
-                    time.sleep(0.2) # Allow camera to stabilize
-                    continue
-
-                elif latest_R < SIDE_DIST:
-                    log_motion_action("Nudge LEFT", latest_L, latest_C, latest_R)
-                    print("Too close Right - Nudging Left")
-                    robot_left()
-                    time.sleep(0.2)
-                    robot_forward()
-                    time.sleep(0.2)
-                    robot_stop()
-                    time.sleep(0.2) # Allow camera to stabilize
                     continue
 
             # ----------------------------------
@@ -636,10 +809,11 @@ def robot_control_loop():
             # If not active, but we don't see a ball, spin and search slowly
             if not execute_ball_catch:
                 if not ball_visible:
-                    robot_right()
-                    time.sleep(0.1)
+                    # Use slightly larger rotation so it doesn't get stuck barely moving
+                    robot_spin_search()
+                    time.sleep(0.3)
                     robot_stop()
-                    time.sleep(0.5) # Stop and let camera frame update
+                    time.sleep(0.6) # Stop and let camera frame update
                 else:
                     # Ball is visible but robot is not active yet. Just wait.
                     time.sleep(0.1)
@@ -670,6 +844,11 @@ if __name__ == "__main__":
     t_control = threading.Thread(target=robot_control_loop)
     t_control.daemon = True
     t_control.start()
+
+    # Start PiCamera Tag Thread
+    t_tag = threading.Thread(target=picamera_tag_loop)
+    t_tag.daemon = True
+    t_tag.start()
 
     try:
         # Start Camera/YOLO (Run in main thread as it needs GUI)
