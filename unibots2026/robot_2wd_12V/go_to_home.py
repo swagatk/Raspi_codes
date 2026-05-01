@@ -9,14 +9,46 @@ import sys
 import select
 import threading
 from picamera2 import Picamera2
+from libcamera import Transform
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 
-# --- CONFIGURATION ---
-CAMERA_PARAMS =  (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+# --- CAMERA CONFIGURATION ---
+CAMERA_TYPE = "usb"  # Options: "picamera" or "usb"
+
+def find_usb_camera():
+    import glob
+    video_devices = sorted(glob.glob('/dev/video*'))
+    for dev in video_devices:
+        try:
+            num = int(dev.replace('/dev/video', ''))
+            if num >= 10:
+                continue
+        except ValueError:
+            continue
+            
+        print(f"Testing {dev}...")
+        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
+        if cap.isOpened():
+            ret, _ = cap.read()
+            cap.release()
+            if ret:
+                print(f"Found working camera at {dev}")
+                return dev
+    return "/dev/video0" # Fallback
+
+USB_CAMERA_PATH = find_usb_camera()
+
+# Configure calibration parameters dynamically based on selected camera
+if CAMERA_TYPE == "picamera":
+    CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+else:
+    CAMERA_PARAMS = (742.843247995633, 743.2228374107693, 322.3205884283167, 234.06623771807327)
+
+# --- MAP CONFIGURATION ---
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
 SCALE = 2.0     # Scale factor for Picamera distance calibration
 
@@ -72,14 +104,14 @@ ARENA_MAP = {
 
 # --- HOME SETTINGS ---
 HOME_TAGS = [14, 15 ]
-FINAL_STOP_DISTANCE_CM = 50
+FINAL_STOP_DISTANCE_CM = 40
 TAG_REACQUIRE_BACKUP_DISTANCE_CM = 80
 TAG_REACQUIRE_BACKUP_DURATION_S = 0.15
 TAG_REACQUIRE_BACKUP_COOLDOWN_S = 0.8
 ROUTE_HEADING_TOL_DEG = 10.0
 ROUTE_COARSE_TURN_THRESHOLD_DEG = 40.0
 ROUTE_COARSE_TURN_DURATION_S = 0.14
-ROUTE_FINE_TURN_DURATION_S = 0.05
+ROUTE_FINE_TURN_DURATION_S = 0.1  # slightly increased duration for faster fine alignment
 ROUTE_COARSE_TURN_SPEED = '1'
 ROUTE_FINE_TURN_SPEED = '1'
 
@@ -243,18 +275,31 @@ time.sleep(1) # Give the arm a moment to start moving
 
 
 # --- CAMERA SETUP & THREADING ---
-from libcamera import Transform
-
 print("Starting Camera...")
-picam2 = Picamera2()
-config = picam2.create_video_configuration(
-    main={"size": (640, 480), "format": "RGB888"},
-    controls={"FrameRate": 30},
-    transform=Transform(hflip=1, vflip=1),
-    buffer_count=2
-)
-picam2.configure(config)
-picam2.start()
+
+# Initialize either Picamera or USB camera based on CAMERA_TYPE
+cap = None
+picam2 = None
+
+if CAMERA_TYPE == "picamera":
+    picam2 = Picamera2()
+    config = picam2.create_video_configuration(
+        main={"size": (640, 480), "format": "RGB888"},
+        controls={"FrameRate": 30},
+        transform=Transform(hflip=1, vflip=1),
+        buffer_count=2
+    )
+    picam2.configure(config)
+    picam2.start()
+    print("PiCamera Started.")
+elif CAMERA_TYPE == "usb":
+    cap = cv2.VideoCapture(USB_CAMERA_PATH, cv2.CAP_V4L2)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    if not cap.isOpened():
+        print(f"Error: Cannot open USB camera at {USB_CAMERA_PATH}")
+        sys.exit(1)
+    print(f"USB Camera Started ({USB_CAMERA_PATH}).")
 
 detector = Detector(families='tagStandard41h12', quad_decimate=2.0)
 
@@ -264,7 +309,15 @@ def camera_capture_thread():
     global running, raw_frame
     while running:
         try:
-            raw_frame = picam2.capture_array()
+            if CAMERA_TYPE == "picamera":
+                raw_frame = picam2.capture_array()
+            else:
+                ret, frame = cap.read()
+                if ret:
+                    # Convert BGR (OpenCV default) to RGB for consistent color
+                    raw_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                else:
+                    time.sleep(0.01)
         except:
             time.sleep(0.01)
 
@@ -775,5 +828,10 @@ finally:
     
     stop_robot()
     time.sleep(0.1)
-    picam2.stop()
+    
+    if CAMERA_TYPE == "picamera" and picam2:
+        picam2.stop()
+    elif CAMERA_TYPE == "usb" and cap:
+        cap.release()
+        
     print("Clean exit.")

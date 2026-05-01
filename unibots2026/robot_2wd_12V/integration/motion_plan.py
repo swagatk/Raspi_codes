@@ -38,7 +38,6 @@ def get_key(timeout=0.1):
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
-        tty.setraw(sys.stdin.fileno())
         r, w, e = select.select([sys.stdin], [], [], timeout)
         if r:
             ch = sys.stdin.read(1)
@@ -164,22 +163,32 @@ def main():
     if not mission_running: return
 
     # ---------------------------------------------------------
-    # STEP 3: Exploration (~ 2 minutes)
+    # STEP 3: Ready to Explore
     # ---------------------------------------------------------
-    logging.info("--- Step 3: Exploration Phase ---")
+    logging.info("--- Step 3: Ready to Explore ---")
+    robot.move('R', '2')
+    time.sleep(1.2) # approximate time to turn 180 degrees
+    robot.halt()
+    time.sleep(0.5)
+    logging.info("Completion of Step 3")
+
+    # ---------------------------------------------------------
+    # STEP 4: Search and Approach balls (~ 2 minutes)
+    # ---------------------------------------------------------
+    logging.info("--- Step 4: Search and Approach balls ---")
     exploration_start = time.time()
     
     while mission_running and (time.time() - exploration_start < 120.0):
         
         # 1. Search for target
-        logging.info("Searching for target...")
+        logging.info("Searching for ball...")
         ball_found = False
         search_start = time.time()
         
         while mission_running and (time.time() - search_start < 15.0) and (time.time() - exploration_start < 120.0):
             if vision.ball_detected:
                 logging.info(f"Target detected at {vision.ball_distance:.1f}cm! Saving image.")
-                save_annotated_frame(vision, f"target_detected_{int(time.time())}.jpg")
+                save_annotated_frame(vision, f"ball_detect_{int(time.time())}.jpg")
                 ball_found = True
                 break
             # Rotate by a slightly larger amount to search faster
@@ -193,7 +202,7 @@ def main():
             continue
             
         # 2. Approach target
-        logging.info("Approaching the target...")
+        logging.info("Approaching the ball...")
         reached = False
         approach_start = time.time()
         
@@ -278,26 +287,44 @@ def main():
             time.sleep(2)
             logging.info("Ball grab complete.")
             
-    logging.info("Step 3 Exploration time completed.")
+    logging.info("Completion of Step 4")
     if not mission_running: return
 
     # ---------------------------------------------------------
-    # STEP 4: Returning home (~40 seconds)
+    # STEP 5: Returning home (~40 seconds)
     # ---------------------------------------------------------
-    logging.info("--- Step 4: Returning home ---")
+    logging.info("--- Step 5: Returning home ---")
     home_start = time.time()
     
-    # We would normally estimate robot pose here using pupil_apriltags map
-    logging.info("Estimating robot pose from vision data...")
+    from map import ARENA_MAP
+    from apriltag_detection import estimate_robot_pose
+    from map_visualizer import generate_localization_image
+    pose_estimated = False
+    
+    logging.info("Moving to Home tag")
     
     while mission_running and (time.time() - home_start < 40.0):
+        # Try to estimate pose until successful
+        if not pose_estimated and vision.frame is not None:
+            pose = estimate_robot_pose(vision.frame, ARENA_MAP)
+            if pose:
+                rx, ry, heading = pose
+                logging.info(f"Robot Pose: x={rx:.2f}, y={ry:.2f}, heading={heading:.1f}")
+                
+                save_path = os.path.join(LOG_DIR, "localization.jpg")
+                generate_localization_image(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path)
+                logging.info(f"Saved layout visualization to {save_path}")
+                pose_estimated = True
+
         visible_tags = [t.tag_id for t in vision.tags]
         matched = [t for t in config.HOME_TAG_IDS if t in visible_tags]
         
         if len(matched) > 0:
             logging.info("Home tag spotted. Approaching...")
-            if robot.latest_C <= config.TARGET_REACHED_CM + 10:
-                logging.info("Arrived at home location.")
+            # When we see the home tag, the wall is our target.
+            # Stop condition based on ultrasonic sensor stop_distance threshold.
+            if robot.latest_C <= STOP_DIST:
+                logging.info("Arrived close to home wall.")
                 robot.halt()
                 break
             else:
@@ -306,7 +333,19 @@ def main():
                 robot.halt()
                 time.sleep(0.1)
         else:
-            # Spin with a slightly larger rotation to scan for home tags faster
+            # If not seeing home tag, avoid obstacles while exploring
+            if robot.latest_C < STOP_DIST:
+                logging.warning(f"Obstacle in center ({robot.latest_C}cm)! Evading...")
+                robot.halt()
+                robot.move('B', '1')
+                time.sleep(0.3)
+                robot.move('L', '1')
+                time.sleep(0.3)
+                robot.halt()
+                time.sleep(0.2)
+                continue
+
+            # Spin with a slightly larger rotation to scan for home tags
             robot.move('R', '2')
             time.sleep(0.3)
             robot.halt()

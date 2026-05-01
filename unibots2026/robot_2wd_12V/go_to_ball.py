@@ -597,14 +597,14 @@ def robot_control_loop():
                         # Ball is to the Left (x < 160)
                         log_motion_action("Turn LEFT (Track)", latest_L, latest_C, latest_R)
                         robot_left()         # Turn towards the ball
-                        time.sleep(0.05)     # Short nudge to adjust angle
+                        time.sleep(0.06)     # Short nudge to adjust angle
                         robot_stop()         # Stop immediately to re-evaluate center natively
                         time.sleep(0.2)      # Longer wait for camera stabilization to avoid overshooting
                     else:
                         # Ball is to the Right (x > 160)
                         log_motion_action("Turn RIGHT (Track)", latest_L, latest_C, latest_R)
                         robot_right()        # Turn towards the ball
-                        time.sleep(0.05)     # Short nudge to adjust angle
+                        time.sleep(0.06)     # Short nudge to adjust angle
                         robot_stop()         # Stop immediately to re-evaluate center natively
                         time.sleep(0.2)      # Longer wait for camera stabilization to avoid overshooting
                 elif ball_distance_cm <= TARGET_REACHED_CM:

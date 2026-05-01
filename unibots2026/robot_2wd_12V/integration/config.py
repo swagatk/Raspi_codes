@@ -12,8 +12,8 @@ PT_MODEL = "/home/pi/yolo_project/orange_ball.pt"
 MODEL_PATH = NCNN_MODEL if os.path.exists(NCNN_MODEL) else PT_MODEL
 
 # Navigation & Obstacle Avoidance
-STOP_DIST = 35        # cm
-SIDE_DIST = 30        # cm
+STOP_DIST = 50       # cm
+SIDE_DIST = 40        # cm
 CENTER_TOLERANCE = 40 # pixels 
 
 # Ball parameters
