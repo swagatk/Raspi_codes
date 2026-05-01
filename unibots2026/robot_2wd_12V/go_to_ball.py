@@ -538,13 +538,15 @@ def picamera_tag_loop():
         return
 
     try:
-        apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=2.0)
+        apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=1.0) # Down from 2.0 because image is already smaller
     except Exception as e:
         print(f"Failed to initialize PoseDetector: {e}")
         if picam2: picam2.stop()
         return
 
-    CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
+    # Scaled down by half since resolution is 320x240 instead of 640x480
+    orig_params = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
+    CAMERA_PARAMS = (orig_params[0] / 2.0, orig_params[1] / 2.0, orig_params[2] / 2.0, orig_params[3] / 2.0)
     TAG_SIZE = 0.10
     SCALE = 3.0
 
