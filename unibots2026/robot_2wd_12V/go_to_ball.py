@@ -87,6 +87,11 @@ CAPTURE_HEIGHT = 240
 CENTER_X = CAPTURE_WIDTH // 2
 SKIP_FRAMES = 3  # Run detection 1 out of every N frames (higher = faster FPS)
 
+# Tag Detector Configuration
+TAG_CAPTURE_WIDTH = 640
+TAG_CAPTURE_HEIGHT = 480
+TAG_SKIP_FRAMES = 3
+
 # Camera Calibration Parameters (from go_to_home.py, tuned for 640x480)
 if CAMERA_TYPE == "picamera":
     CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
@@ -97,7 +102,7 @@ ORIGINAL_CALIB_WIDTH = 640
 # Scale the focal length (fx) to match the current capture resolution (320x240)
 FOCAL_LENGTH_X = CAMERA_PARAMS[0] * (CAPTURE_WIDTH / ORIGINAL_CALIB_WIDTH)
 BALL_DIAMETER_CM = 4.0 # Standard ping-pong ball size (~4.0 cm). Adjust if needed.
-TARGET_REACHED_CM = 30.0 # Distance to stop in front of the ball
+TARGET_REACHED_CM = 40.0 # Distance to stop in front of the ball
 CAPTURE_DISTANCE_CM = 15.0 # Target forward travel distance during the ball catch manoeuver
 CAPTURE_SPEED_CM_S = 10.6 # Approximate cm/sec speed of robot using motor speed level '2'
 CAPTURE_GRIPPER_CYCLES = 4 # Number of open-close gripper operations during forward movement
@@ -108,6 +113,7 @@ running = True
 robot_active = False # Start paused, wait for button press
 execute_ball_catch = False
 arm_is_up = True     # Track arm state (True=UP, False=DOWN)
+unreachable_target = False # Flag set if the ball is blocked by an obstacle
 
 # Sensor Readings (Shared)
 latest_L = 999
@@ -185,7 +191,7 @@ def robot_spin_search():
     # Spin slowly to find ball.
     if ser:
         print(f"Spin SEARCHING | Sensors - L:{latest_L} C:{latest_C} R:{latest_R}")
-        set_speed(2) # Increased to speed(2) to ensure motors have enough torque to rotate
+        set_speed(1) # Increased to speed(2) to ensure motors have enough torque to rotate
         ser.write(b'R\n')
 
 # --- THREAD 1: SENSOR READER ---
@@ -209,7 +215,7 @@ def update_sensors():
 
 # --- THREAD 2: CAMERA & YOLO ---
 def camera_yolo_loop():
-    global running, robot_active, execute_ball_catch, arm_is_up, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm
+    global running, robot_active, execute_ball_catch, arm_is_up, ball_visible, ball_x, ball_y, ball_w, ball_h, ball_distance_cm, unreachable_target
     
     show_grid = False
 
@@ -311,9 +317,9 @@ def camera_yolo_loop():
                         aspect_ratio = w_f / h_f if h_f > 0 else 0
                         area = w_f * h_f
                         
-                        # Filter by wildly relaxed aspect ratio (handle wide/tall boxes from grouped balls)
-                        # Two balls side-by-side easily exceeds a 2.0 aspect ratio due to bounding box margins
-                        if 0.2 <= aspect_ratio <= 5.0:
+                        # Filter by strict aspect ratio (close to 1:1) to avoid partial views
+                        # This avoids targeting partial balls at the edge of the frame
+                        if 0.8 <= aspect_ratio <= 1.2:
                             candidate_boxes.append((float(x), float(y), w_f, h_f, area))
 
             # Advanced target stabilization and debouncing
@@ -486,13 +492,19 @@ def camera_yolo_loop():
                 running = False
                 break
             elif key == ord('y') and not robot_active:
-                if not arm_is_up and ser:
-                    print("\n>>> Arm is DOWN. Moving Arm UP before starting... <<<")
-                    ser.write(b'A\n')
-                    arm_is_up = True
-                    time.sleep(1.0)  # Wait for the arm to raise
-                robot_active = True
-                print("\n>>> ACTIVE: Robot Started by 'y' key. Searching for ball... <<<")
+                if ball_visible and ball_distance_cm <= TARGET_REACHED_CM and (latest_L < 50 or latest_C < 50 or latest_R < 50):
+                    unreachable_target = True
+                    robot_active = True
+                    print("\n>>> ACTIVE: Target unreachable (Too close to wall). Initiating spin search for NEW target... <<<")
+                else:
+                    unreachable_target = False  # Clear it when starting normally
+                    if not arm_is_up and ser:
+                        print("\n>>> Arm is DOWN. Moving Arm UP before starting... <<<")
+                        ser.write(b'A\n')
+                        arm_is_up = True
+                        time.sleep(1.0)  # Wait for the arm to raise
+                    robot_active = True
+                    print("\n>>> ACTIVE: Robot Started by 'y' key. Searching for ball... <<<")
             elif key == ord('b') or key == ord('B'):
                 execute_ball_catch = True
                 print("\n>>> Ball Catch Manoeuvre Initialized by 'B' key. <<<")
@@ -525,32 +537,34 @@ def picamera_tag_loop():
     try:
         picam2 = Picamera2()
         config = picam2.create_video_configuration(
-            main={"size": (320, 240), "format": "RGB888"},
+            main={"size": (TAG_CAPTURE_WIDTH, TAG_CAPTURE_HEIGHT), "format": "RGB888"},
             transform=Transform(hflip=1, vflip=1),
             controls={"FrameRate": 30},
             buffer_count=2
         )
         picam2.configure(config)
         picam2.start()
-        print("PiCamera for Tags Started (320x240).")
+        print(f"PiCamera for Tags Started ({TAG_CAPTURE_WIDTH}x{TAG_CAPTURE_HEIGHT}).")
     except Exception as e:
         print(f"PiCamera Tag Initialize Error: {e}")
         return
 
     try:
-        apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=1.0) # Down from 2.0 because image is already smaller
+        apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=2.0) # 2.0 is good for 640x480
     except Exception as e:
         print(f"Failed to initialize PoseDetector: {e}")
         if picam2: picam2.stop()
         return
 
-    # Scaled down by half since resolution is 320x240 instead of 640x480
+    # Calibration parameters tuned for 640x480
     orig_params = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
-    CAMERA_PARAMS = (orig_params[0] / 2.0, orig_params[1] / 2.0, orig_params[2] / 2.0, orig_params[3] / 2.0)
+    scale_x = TAG_CAPTURE_WIDTH / 640.0
+    scale_y = TAG_CAPTURE_HEIGHT / 480.0
+    CAMERA_PARAMS = (orig_params[0] * scale_x, orig_params[1] * scale_y, orig_params[2] * scale_x, orig_params[3] * scale_y)
     TAG_SIZE = 0.10
     SCALE = 3.0
 
-    frame_skip = 3
+    frame_skip = TAG_SKIP_FRAMES
     frame_count = 0
 
     while running:
@@ -597,20 +611,22 @@ def picamera_tag_loop():
 
 # --- THREAD 4: ROBOT CONTROL ---
 def robot_control_loop():
-    global running, robot_active, execute_ball_catch, arm_is_up
+    global running, robot_active, execute_ball_catch, arm_is_up, unreachable_target
     global latest_L, latest_C, latest_R
     global ball_visible, ball_x, ball_distance_cm
     global tag_visible, tag_distance_cm, tag_yaw_deg
     
     print("Robot Control Loop Started.")
     obstacle_streak = 0
+    loop_start_time = time.time()
     
     while running:
         if execute_ball_catch and ser:
             execute_ball_catch = False
             
             if latest_L < 50 or latest_C < 50 or latest_R < 50:
-                print(f"Too close to an obstacle, can not lower the arm (L:{latest_L} C:{latest_C} R:{latest_R})")
+                print(f"Too close to an obstacle, can not lower the arm (L:{latest_L} C:{latest_C} R:{latest_R}). Flagging as unreachable!")
+                unreachable_target = True  # Flag target as unreachable
                 continue
                 
             was_active = robot_active
@@ -718,7 +734,7 @@ def robot_control_loop():
                         log_motion_action("Turn LEFT (Avoid)", latest_L, latest_C, latest_R)
                         robot_left()
                         
-                    time.sleep(0.6) # Turn slowly to avoid obstacle
+                    time.sleep(0.3) # Turn slowly to avoid obstacle
                     robot_stop()
                     time.sleep(0.5) # Allow camera and sensors to stabilize before searching again
                     continue # Skip rest of loop to re-evaluate sensors
@@ -759,7 +775,7 @@ def robot_control_loop():
             # ----------------------------------
             # PRIORITY 2: BALL TRACKING
             # ----------------------------------
-            if ball_visible:
+            if ball_visible and not unreachable_target:
                 # Calculate error from center
                 # ball_x is 0..320. Center is 160.
                 error = ball_x - CENTER_X
@@ -799,23 +815,48 @@ def robot_control_loop():
                     time.sleep(0.1)      # Brief stabilization
 
             # ----------------------------------
-            # PRIORITY 3: SEARCHING (NO BALL)
+            # PRIORITY 3: SEARCHING (NO BALL OR UNREACHABLE TIMEOUT)
             # ----------------------------------
             else:
-                # No ball seen? Stop and go back to searching mode.
-                print("Target lost. Stopping and waiting to re-acquire...")
-                robot_stop()
-                robot_active = False
+                if unreachable_target:
+                    print("Target unreachable. Spinning to find a NEW target...")
+                    log_motion_action("Turn SEARCH (Unreachable)", latest_L, latest_C, latest_R)
+                    robot_spin_search()
+                    time.sleep(0.15) # Shorter spin to avoid missing nearby targets
+                    robot_stop()
+                    time.sleep(0.5)
+                    # We have completed a small spin. Clear the flag to see if we see a new target.
+                    unreachable_target = False
+                    print("Small spin completed. Resetting unreachable flag.")
+                else:
+                    # No ball seen? Stop and go back to searching mode.
+                    print("Target lost. Stopping and waiting to re-acquire...")
+                    robot_stop()
+                    robot_active = False
 
         else:
             # If not active, but we don't see a ball, spin and search slowly
             if not execute_ball_catch:
                 if not ball_visible:
+                    # Give camera and YOLO a few seconds on startup to find balls in current pose
+                    if time.time() - loop_start_time < 8.0:
+                        time.sleep(0.1)
+                        continue
+
                     # Use slightly larger rotation so it doesn't get stuck barely moving
                     robot_spin_search()
                     time.sleep(0.3)
                     robot_stop()
                     time.sleep(0.6) # Stop and let camera frame update
+                elif unreachable_target:
+                    # Even if inactive, if instructed to discard target via 'y', do spin
+                    robot_spin_search()
+                    time.sleep(0.15) # Shorter spin to avoid missing nearby targets
+                    robot_stop()
+                    time.sleep(0.5)
+                    # We have completed a small spin. Clear the flag to see if we see a new target.
+                    unreachable_target = False
+                    print("Small spin completed. Resetting unreachable flag.")
                 else:
                     # Ball is visible but robot is not active yet. Just wait.
                     time.sleep(0.1)
