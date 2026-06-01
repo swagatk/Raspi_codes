@@ -64,16 +64,31 @@ def check_button_thread():
                     mission_running = False  # emergency stop
 
 def save_annotated_frame(vision, filename):
-    if vision.frame is not None:
+    if hasattr(vision, 'active_frame') and vision.active_frame is not None:
+        annotated = vision.active_frame.copy()
+    elif vision.frame is not None:
         annotated = vision.frame.copy()
-        if vision.ball_detected:
-            cv2.putText(annotated, f"Dist: {vision.ball_distance:.1f}cm", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-        try:
-            full_path = os.path.join(LOG_DIR, filename)
-            cv2.imwrite(full_path, annotated)
-        except Exception as e:
-            logging.error(f"Failed to save image {full_path}: {e}")
+    else:
+        return
+        
+    if vision.ball_detected and hasattr(vision, 'ball_box') and vision.ball_box:
+        x, y, w, h = vision.ball_box
+        x1 = int(x - w / 2)
+        y1 = int(y - h / 2)
+        x2 = int(x + w / 2)
+        y2 = int(y + h / 2)
+        cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(annotated, f"Dist: {vision.ball_distance:.1f}cm | Area: {w*h:.1f}", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+    elif vision.ball_detected:
+        cv2.putText(annotated, f"Dist: {vision.ball_distance:.1f}cm", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    
+    try:
+        full_path = os.path.join(LOG_DIR, filename)
+        cv2.imwrite(full_path, annotated)
+    except Exception as e:
+        logging.error(f"Failed to save image {full_path}: {e}")
 
 def global_progress_thread():
     TOTAL_DUR = 180
@@ -97,15 +112,26 @@ def main():
     robot.start_sensors()
     vision.start()
     
-    # Simple check for camera start
+    # Check individual camera statuses
     time.sleep(2)
-    if vision.frame is None:
-        logging.error("Camera status: FAILED to capture frames. Exiting.")
-        robot.stop()
-        vision.stop()
-        sys.exit(1)
+    usb_ok = getattr(vision, 'frame', None) is not None
+    picam_ok = getattr(vision, 'picam_frame', None) is not None
+    
+    if usb_ok:
+        logging.info("USB Camera status: OK")
     else:
-        logging.info("Camera status: OK")
+        logging.error("USB Camera status: FAILED to capture frames.")
+        
+    if picam_ok:
+        logging.info("PiCamera status: OK")
+    else:
+        logging.error("PiCamera status: FAILED to capture frames.")
+        
+    if not usb_ok and not picam_ok:
+        logging.error("Both cameras FAILED to initialize. Exiting.")
+        sys.exit(1)
+    elif not usb_ok or not picam_ok:
+        logging.warning("Proceeding with partial camera capabilities.")
         
     # Assuming ultrasonic is returning valid numbers
     if robot.latest_C == 999 and robot.latest_L == 999:
@@ -115,6 +141,8 @@ def main():
 
     logging.info("Moving ARM to UP pose.")
     robot.arm_up()
+    if 'vision' in globals() and vision:
+        vision.update_active_camera(True)
     time.sleep(1)
     
     threading.Thread(target=check_button_thread, daemon=True).start()
@@ -155,8 +183,6 @@ def main():
             
     if not home_confirmed:
         logging.error("Home tags not detected within time limit. Exiting mission.")
-        robot.stop()
-        vision.stop()
         sys.exit(1)
         
     logging.info("Step 2 completed successfully.")
@@ -246,8 +272,14 @@ def main():
                 
         # 3. Grab the ball
         if reached:
+            if robot.latest_L < 50 or robot.latest_C < 50 or robot.latest_R < 50:
+                logging.warning("Safety limits breached during catch! Aborting!")
+                reached = False
+                continue
             logging.info("Grabbing the ball...")
             robot.arm_down()
+            if 'vision' in globals() and vision:
+                vision.update_active_camera(False)
             time.sleep(2.0)
             robot.gripper_open()
             time.sleep(1.0)
@@ -284,6 +316,8 @@ def main():
             time.sleep(0.5)
             
             robot.arm_up()
+            if 'vision' in globals() and vision:
+                vision.update_active_camera(True)
             time.sleep(2)
             logging.info("Ball grab complete.")
             
@@ -305,8 +339,8 @@ def main():
     
     while mission_running and (time.time() - home_start < 40.0):
         # Try to estimate pose until successful
-        if not pose_estimated and vision.frame is not None:
-            pose = estimate_robot_pose(vision.frame, ARENA_MAP)
+        if not pose_estimated and vision.active_frame is not None:
+            pose = estimate_robot_pose(vision.active_frame, getattr(vision, "active_camera_params", vision.usb_camera_params), ARENA_MAP)
             if pose:
                 rx, ry, heading = pose
                 logging.info(f"Robot Pose: x={rx:.2f}, y={ry:.2f}, heading={heading:.1f}")
@@ -359,6 +393,8 @@ def main():
     time.sleep(1)
     
     robot.arm_down()
+    if 'vision' in globals() and vision:
+        vision.update_active_camera(False)
     robot.halt()
     logging.info("Mission sequence finalized. Entering rest pose and shutting down.")
 
@@ -378,6 +414,8 @@ if __name__ == "__main__":
             logging.info("Moving ARM to DOWN pose before exit.")
             try:
                 robot.arm_down()
+                if 'vision' in globals() and vision:
+                    vision.update_active_camera(False)
                 time.sleep(1)
             except:
                 pass

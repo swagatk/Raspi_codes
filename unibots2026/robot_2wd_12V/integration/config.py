@@ -1,7 +1,6 @@
 import os
 
 # Hardware & Connections
-CAMERA_TYPE = "usb"  # 'picamera' or 'usb'
 CAPTURE_WIDTH = 320
 CAPTURE_HEIGHT = 240
 SKIP_FRAMES = 3

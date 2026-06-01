@@ -28,9 +28,9 @@ the following activities should take place. If the button is pressed again, the 
 - Search for orange ball
 - Approach the ball
 - Grab the ball
-- Avoid obstacle while moving
+- Avoid obstacle while moving. Make sure it does not bump into the walls.
 - repeat the above 3 steps until the time is completed.
-- save images along with target annotations as`./log/ball_detect_{time}.jpg` showing distance as pixel area as we have done in `go_to_ball.py`. 
+- save images along with target annotations as`./log/ball_detect_{time}.jpg` showing distance as pixel area as we have done in `go_to_ball.py`. Also, show the target ball bounding box.
 - Print relevant messages such as "searching for ball", "approaching the ball", "Grabbing the ball" etc
 - Use `go_to_ball.py` for information.
 - Print a messaage "Completion of Step 4"
@@ -42,5 +42,12 @@ the following activities should take place. If the button is pressed again, the 
 - Stop the robot when it reaches close to home wall (using the ultrasonic sensor stop_distance threshold.)
 - Drop the ball.
 - Go to arm down pose before exiting. 
+
+
+## Aditional points to be taken into account
+- The bottom USB camera is primarily used for detecting balls and tags whenever the arm is in UP pose.
+- If the arm is in down pose, please use the Picamera to detect tags and compute distance from the wall. 
+- If the arm is in UP pose, please use the USB camera to detect balls and april tags - to be used for navigation, searching purposes. 
+- All user-defined variables should be provided in the single file `config.py`.
 
 
