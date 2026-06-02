@@ -1,6 +1,7 @@
 import cv2
 import time
 import threading
+import logging
 from pupil_apriltags import Detector
 from ultralytics import YOLO
 import glob
@@ -12,8 +13,30 @@ try:
 except ImportError:
     Picamera2 = None
 
+logger = logging.getLogger(__name__)
+
+def _open_capture_for_device(dev):
+    # Some OpenCV builds fail for '/dev/videoX' strings with CAP_V4L2; try numeric index too.
+    cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
+    if cap is not None and cap.isOpened():
+        return cap
+    if cap is not None:
+        cap.release()
+
+    try:
+        idx = int(dev.replace('/dev/video', ''))
+    except ValueError:
+        return None
+
+    cap = cv2.VideoCapture(idx, cv2.CAP_V4L2)
+    if cap is not None and cap.isOpened():
+        return cap
+    if cap is not None:
+        cap.release()
+    return None
+
 def find_usb_camera():
-    video_devices = sorted(glob.glob('/dev/video*'))
+    video_devices = sorted(glob.glob('/dev/video[0-9]*'))
     for dev in video_devices:
         try:
             num = int(dev.replace('/dev/video', ''))
@@ -21,13 +44,14 @@ def find_usb_camera():
                 continue
         except ValueError:
             continue
-        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
-        if cap.isOpened():
+
+        cap = _open_capture_for_device(dev)
+        if cap is not None and cap.isOpened():
             ret, _ = cap.read()
             cap.release()
             if ret:
                 return dev
-    return "/dev/video2"
+    return None
 
 class VisionModule:
     def __init__(self):
@@ -45,6 +69,8 @@ class VisionModule:
         
         self.ball_detected = False
         self.ball_box = None
+        self.ball_candidates = []
+        self.selected_ball = None
         self.ball_x = 0
         self.ball_distance = 999.0
         self.arm_is_up = True
@@ -55,9 +81,25 @@ class VisionModule:
 
     def start(self):
         self.running = True
-        self.cap = cv2.VideoCapture(self.camera_path, cv2.CAP_V4L2)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT)
+
+        # USB camera can enumerate a bit late on boot; retry discovery/open briefly.
+        self.cap = None
+        for attempt in range(6):
+            if not self.camera_path:
+                self.camera_path = find_usb_camera()
+            if self.camera_path:
+                self.cap = _open_capture_for_device(self.camera_path)
+            if self.cap is not None and self.cap.isOpened():
+                break
+            time.sleep(0.5)
+            self.camera_path = find_usb_camera()
+
+        if self.cap is not None:
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT)
+        else:
+            logger.error("USB camera open failed after retries.")
+
         threading.Thread(target=self._usb_capture_loop, daemon=True).start()
         
         if Picamera2 is not None:
@@ -72,9 +114,9 @@ class VisionModule:
                 self.picam2.configure(config)
                 self.picam2.start()
                 threading.Thread(target=self._picam_capture_loop, daemon=True).start()
-                print("PiCamera Started.")
+                logger.info("PiCamera started.")
             except Exception as e:
-                print(f"PiCamera Init Error: {e}")
+                logger.error(f"PiCamera init error: {e}")
 
     def stop(self):
         self.running = False
@@ -85,6 +127,7 @@ class VisionModule:
 
     def _usb_capture_loop(self):
         frame_idx = 0
+        consecutive_read_failures = 0
         consecutive_detections = 0
         consecutive_misses = 0
         CONFIRM_FRAMES = 3
@@ -92,10 +135,28 @@ class VisionModule:
         current_target_box = None
         
         while self.running:
-            ret, frame = self.cap.read()
-            if not ret:
+            if self.cap is None or not self.cap.isOpened():
                 time.sleep(0.1)
                 continue
+
+            ret, frame = self.cap.read()
+            if not ret:
+                consecutive_read_failures += 1
+                if consecutive_read_failures >= 10:
+                    logger.warning("USB camera read failures detected. Attempting reopen.")
+                    try:
+                        self.cap.release()
+                    except Exception:
+                        pass
+                    self.camera_path = find_usb_camera() or self.camera_path
+                    self.cap = _open_capture_for_device(self.camera_path) if self.camera_path else None
+                    if self.cap is not None:
+                        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH)
+                        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT)
+                    consecutive_read_failures = 0
+                time.sleep(0.1)
+                continue
+            consecutive_read_failures = 0
             
             self.frame = frame
             frame_idx += 1
@@ -114,13 +175,15 @@ class VisionModule:
                         if 0.8 <= aspect_ratio <= 1.2:
                             candidate_boxes.append((float(x), float(y), w_f, h_f, area))
 
+                self.ball_candidates = list(candidate_boxes)
+
                 best_match = None
                 if candidate_boxes:
                     largest_candidate = max(candidate_boxes, key=lambda b: b[4])
                     closest_candidate = None
                     if current_target_box:
                         cx, cy = current_target_box[0], current_target_box[1]
-                        best_dist = 80
+                        best_dist = TARGET_MATCH_MAX_DIST_PX
                         for b in candidate_boxes:
                             dist = ((b[0] - cx)**2 + (b[1] - cy)**2)**0.5
                             if dist < best_dist:
@@ -128,7 +191,8 @@ class VisionModule:
                                 closest_candidate = b
                     
                     if current_target_box and closest_candidate:
-                        if largest_candidate[4] > closest_candidate[4] * 1.5:
+                        # Keep lock on the same target unless a much larger candidate appears.
+                        if largest_candidate[4] > closest_candidate[4] * TARGET_SWITCH_AREA_GAIN:
                             best_match = largest_candidate
                             consecutive_detections = 1
                         else:
@@ -170,9 +234,11 @@ class VisionModule:
                     pixel_diam = min(largest_box[2], largest_box[3])
                     self.ball_distance = (BALL_DIAMETER_CM * self.focal_length_x) / pixel_diam if pixel_diam > 0 else 999.0
                     self.ball_box = largest_box
+                    self.selected_ball = largest_box
                 else:
                     self.ball_detected = False
                     self.ball_box = None
+                    self.selected_ball = None
 
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 try:
@@ -184,6 +250,8 @@ class VisionModule:
 
     def _picam_capture_loop(self):
         frame_idx = 0
+        last_error_log = 0.0
+
         while self.running:
             try:
                 frame_bgr = self.picam2.capture_array()
@@ -201,6 +269,10 @@ class VisionModule:
                     self.picam_tags = []
                     
             except Exception as e:
+                now = time.time()
+                if now - last_error_log >= PICAM_ERROR_LOG_INTERVAL_S:
+                    logger.warning(f"PiCamera capture warning: {e}")
+                    last_error_log = now
                 time.sleep(0.01)
             time.sleep(0.01)
 
