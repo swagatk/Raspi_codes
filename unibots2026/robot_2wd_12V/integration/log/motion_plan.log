@@ -1,388 +1,441 @@
-2026-06-02 14:49:35,297 [INFO] --- Step 1: Initialization phase ---
-2026-06-02 14:49:49,650 [INFO] Motor status: OK
-2026-06-02 14:49:50,209 [INFO] Initialization successful.
-2026-06-02 14:49:50,212 [INFO] Camera now open.
-2026-06-02 14:49:50,230 [INFO] Camera configuration has been adjusted!
-2026-06-02 14:49:50,235 [INFO] Configuration successful!
-2026-06-02 14:49:50,279 [INFO] Camera started
-2026-06-02 14:49:50,281 [INFO] PiCamera started.
-2026-06-02 14:49:52,348 [INFO] USB Camera status: OK
-2026-06-02 14:49:52,350 [INFO] PiCamera status: OK
-2026-06-02 14:49:52,351 [INFO] Ultrasonic sensor status: OK (L:7 C:62 R:11)
-2026-06-02 14:49:52,355 [INFO] Button status: Listener running (press 'y' to start/stop).
-2026-06-02 14:49:52,356 [INFO] Moving ARM to UP pose.
-2026-06-02 14:49:53,524 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
-2026-06-02 14:49:58,442 [INFO] Start command received via 'y' key.
-2026-06-02 14:50:00,176 [INFO] Button pressed. Mission Started!
-2026-06-02 14:50:00,181 [INFO] --- Step 2: Confirm Home Location ---
-2026-06-02 14:50:00,449 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:01,791 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:03,531 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:04,883 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:06,221 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:07,541 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:09,309 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:11,778 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:14,300 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:15,590 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:17,160 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:18,623 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:20,089 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:50:21,161 [ERROR] Home tags not detected within time limit. Exiting mission.
-2026-06-02 14:50:21,168 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-02 14:50:22,252 [INFO] Camera stopped
-2026-06-02 14:50:22,658 [INFO] Camera closed successfully.
-2026-06-02 14:51:21,267 [INFO] --- Step 1: Initialization phase ---
-2026-06-02 14:51:35,482 [INFO] Motor status: OK
-2026-06-02 14:51:36,046 [INFO] Initialization successful.
-2026-06-02 14:51:36,047 [INFO] Camera now open.
-2026-06-02 14:51:36,065 [INFO] Camera configuration has been adjusted!
-2026-06-02 14:51:36,070 [INFO] Configuration successful!
-2026-06-02 14:51:36,117 [INFO] Camera started
-2026-06-02 14:51:36,121 [INFO] PiCamera started.
-2026-06-02 14:51:38,192 [INFO] USB Camera status: OK
-2026-06-02 14:51:38,195 [ERROR] PiCamera status: FAILED to capture frames.
-2026-06-02 14:51:38,197 [ERROR] One or more cameras failed to initialize. Exiting as per mission requirement.
-2026-06-02 14:51:38,200 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-02 14:51:39,349 [INFO] Camera stopped
-2026-06-02 14:51:39,754 [INFO] Camera closed successfully.
-2026-06-02 14:52:06,858 [INFO] --- Step 1: Initialization phase ---
-2026-06-02 14:52:21,148 [INFO] Motor status: OK
-2026-06-02 14:52:21,706 [INFO] Initialization successful.
-2026-06-02 14:52:21,708 [INFO] Camera now open.
-2026-06-02 14:52:21,726 [INFO] Camera configuration has been adjusted!
-2026-06-02 14:52:21,731 [INFO] Configuration successful!
-2026-06-02 14:52:21,774 [INFO] Camera started
-2026-06-02 14:52:21,777 [INFO] PiCamera started.
-2026-06-02 14:52:23,880 [INFO] USB Camera status: OK
-2026-06-02 14:52:23,882 [INFO] PiCamera status: OK
-2026-06-02 14:52:23,887 [INFO] Ultrasonic sensor status: OK (L:7 C:44 R:11)
-2026-06-02 14:52:23,889 [INFO] Button status: Listener running (press 'y' to start/stop).
-2026-06-02 14:52:23,893 [INFO] Moving ARM to UP pose.
-2026-06-02 14:52:25,062 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
-2026-06-02 14:52:30,750 [INFO] Start command received via 'y' key.
-2026-06-02 14:52:31,011 [INFO] Button pressed. Mission Started!
-2026-06-02 14:52:31,019 [INFO] --- Step 2: Confirm Home Location ---
-2026-06-02 14:52:31,306 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:52:32,820 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:52:34,482 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:52:35,997 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 14:52:37,338 [INFO] Home tag(s) [15] confirmed!
-2026-06-02 14:52:37,356 [INFO] Step 2 completed successfully.
-2026-06-02 14:52:37,358 [INFO] --- Step 3: Ready to Explore ---
-2026-06-02 14:52:39,544 [INFO] Completion of Step 3
-2026-06-02 14:52:39,552 [INFO] --- Step 4: Search and Approach balls ---
-2026-06-02 14:52:39,557 [INFO] Searching for ball...
-2026-06-02 14:52:41,318 [INFO] Ball candidate confirmation 1/2 (dist=57.4cm, x=284.4)
-2026-06-02 14:52:41,629 [INFO] Ball candidate confirmation 2/2 (dist=56.8cm, x=276.5)
-2026-06-02 14:52:41,639 [INFO] Target confirmed at 56.8cm! Saving image.
-2026-06-02 14:52:41,660 [INFO] Approaching the ball...
-2026-06-02 14:52:43,940 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 14:52:59,256 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 14:53:02,054 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-02 14:53:02,060 [INFO] Grabbing the ball...
-2026-06-02 14:53:05,364 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=8.0cm < 35.0cm. Aborting this capture attempt.
-2026-06-02 14:53:06,541 [INFO] Searching for ball...
-2026-06-02 14:53:06,547 [INFO] Ball candidate confirmation 1/2 (dist=21.0cm, x=161.3)
-2026-06-02 14:53:06,888 [INFO] Ball confirmation reset due to missed frame.
-2026-06-02 14:53:08,984 [INFO] Ball candidate confirmation 1/2 (dist=28.4cm, x=260.4)
-2026-06-02 14:53:09,259 [INFO] Ball candidate confirmation 2/2 (dist=28.5cm, x=246.2)
-2026-06-02 14:53:09,263 [INFO] Target confirmed at 28.5cm! Saving image.
-2026-06-02 14:53:09,285 [INFO] Approaching the ball...
-2026-06-02 14:53:10,605 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-02 14:53:10,614 [INFO] Grabbing the ball...
-2026-06-02 14:53:12,862 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=104.0cm.
-2026-06-02 14:53:13,921 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
-2026-06-02 14:53:20,307 [INFO] Ball grab complete.
-2026-06-02 14:53:20,309 [INFO] Searching for ball...
-2026-06-02 14:53:26,569 [INFO] Ball candidate confirmation 1/2 (dist=48.7cm, x=204.3)
-2026-06-02 14:53:26,844 [INFO] Ball candidate confirmation 2/2 (dist=48.9cm, x=190.4)
-2026-06-02 14:53:26,850 [INFO] Target confirmed at 48.9cm! Saving image.
-2026-06-02 14:53:26,869 [INFO] Approaching the ball...
-2026-06-02 14:53:52,076 [INFO] Searching for ball...
-2026-06-02 14:53:52,084 [INFO] Ball candidate confirmation 1/2 (dist=30.4cm, x=104.2)
-2026-06-02 14:53:52,346 [INFO] Ball candidate confirmation 2/2 (dist=30.3cm, x=93.7)
-2026-06-02 14:53:52,352 [INFO] Target confirmed at 30.3cm! Saving image.
-2026-06-02 14:53:52,373 [INFO] Approaching the ball...
-2026-06-02 14:53:54,627 [INFO] Target briefly lost near pickup threshold (28.4cm). Proceeding to grab.
-2026-06-02 14:53:54,639 [WARNING] Safety limits breached during catch! Aborting!
-2026-06-02 14:53:54,644 [INFO] Searching for ball...
-2026-06-02 14:53:55,246 [INFO] Ball candidate confirmation 1/2 (dist=36.9cm, x=147.3)
-2026-06-02 14:53:55,519 [INFO] Ball candidate confirmation 2/2 (dist=42.5cm, x=111.1)
-2026-06-02 14:53:55,531 [INFO] Target confirmed at 42.5cm! Saving image.
-2026-06-02 14:53:55,551 [INFO] Approaching the ball...
-2026-06-02 14:53:58,008 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-02 14:53:58,018 [WARNING] Safety limits breached during catch! Aborting!
-2026-06-02 14:53:58,022 [INFO] Searching for ball...
-2026-06-02 14:53:58,026 [INFO] Ball candidate confirmation 1/2 (dist=28.7cm, x=159.8)
-2026-06-02 14:53:58,294 [INFO] Ball candidate confirmation 2/2 (dist=28.8cm, x=146.8)
-2026-06-02 14:53:58,302 [INFO] Target confirmed at 28.8cm! Saving image.
-2026-06-02 14:53:58,325 [INFO] Approaching the ball...
-2026-06-02 14:53:58,328 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-02 14:53:58,331 [WARNING] Safety limits breached during catch! Aborting!
-2026-06-02 14:53:58,334 [INFO] Searching for ball...
-2026-06-02 14:53:58,338 [INFO] Ball candidate confirmation 1/2 (dist=28.5cm, x=129.7)
-2026-06-02 14:53:58,597 [INFO] Ball candidate confirmation 2/2 (dist=28.5cm, x=129.7)
-2026-06-02 14:53:58,603 [INFO] Target confirmed at 28.5cm! Saving image.
-2026-06-02 14:53:58,625 [INFO] Approaching the ball...
-2026-06-02 14:53:58,629 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-02 14:53:58,636 [WARNING] Safety limits breached during catch! Aborting!
-2026-06-02 14:53:58,639 [INFO] Searching for ball...
-2026-06-02 14:53:58,643 [INFO] Ball candidate confirmation 1/2 (dist=28.3cm, x=121.1)
-2026-06-02 14:53:58,935 [INFO] Ball candidate confirmation 2/2 (dist=28.3cm, x=121.1)
-2026-06-02 14:53:58,941 [INFO] Target confirmed at 28.3cm! Saving image.
-2026-06-02 14:53:58,960 [INFO] Approaching the ball...
-2026-06-02 14:54:05,966 [WARNING] Obstacle detected (L:37 C:39 R:1) -> evasive maneuver
-2026-06-02 14:54:07,556 [WARNING] Obstacle detected (L:43 C:39 R:0) -> evasive maneuver
-2026-06-02 14:54:08,920 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 14:54:10,953 [WARNING] Target lost beyond local reacquire window. Returning to search.
-2026-06-02 14:54:10,960 [INFO] Searching for ball...
-2026-06-02 14:54:10,966 [INFO] Ball candidate confirmation 1/2 (dist=45.9cm, x=130.8)
-2026-06-02 14:54:11,271 [INFO] Ball candidate confirmation 2/2 (dist=45.5cm, x=137.7)
-2026-06-02 14:54:11,275 [INFO] Target confirmed at 45.5cm! Saving image.
-2026-06-02 14:54:11,297 [INFO] Approaching the ball...
-2026-06-02 14:54:31,570 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 14:54:36,239 [WARNING] Obstacle detected (L:96 C:999 R:5) -> evasive maneuver
-2026-06-02 14:54:37,110 [INFO] Searching for ball...
-2026-06-02 14:54:37,116 [INFO] Ball candidate confirmation 1/2 (dist=42.9cm, x=60.9)
-2026-06-02 14:54:37,385 [INFO] Ball candidate confirmation 2/2 (dist=43.6cm, x=65.7)
-2026-06-02 14:54:37,390 [INFO] Target confirmed at 43.6cm! Saving image.
-2026-06-02 14:54:37,411 [INFO] Approaching the ball...
-2026-06-02 14:54:45,471 [WARNING] Obstacle detected (L:143 C:99 R:7) -> evasive maneuver
-2026-06-02 14:54:51,558 [INFO] Completion of Step 4
-2026-06-02 14:54:51,563 [INFO] --- Step 5: Returning home ---
-2026-06-02 14:54:56,151 [INFO] Moving to Home tag
-2026-06-02 14:54:56,157 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:54:56,193 [INFO] Robot Pose: x=0.03, y=0.79, heading=320.2 (camera=usb)
-2026-06-02 14:54:58,782 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145456.jpg
-2026-06-02 14:54:59,081 [INFO] Computed to-home command: rotation=+91.2deg, linear_distance=1.55m
-2026-06-02 14:54:59,683 [INFO] Aligning to home heading: error=+91.2deg -> turn L
-2026-06-02 14:54:59,688 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:54:59,714 [INFO] Robot Pose: x=0.00, y=0.08, heading=343.1 (camera=usb)
-2026-06-02 14:55:02,207 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145459.jpg
-2026-06-02 14:55:02,209 [INFO] Computed to-home command: rotation=+79.4deg, linear_distance=2.17m
-2026-06-02 14:55:03,089 [INFO] Aligning to home heading: error=+79.4deg -> turn L
-2026-06-02 14:55:03,098 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:03,144 [INFO] Robot Pose: x=0.09, y=0.82, heading=321.9 (camera=usb)
-2026-06-02 14:55:05,756 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145503.jpg
-2026-06-02 14:55:05,763 [INFO] Computed to-home command: rotation=+90.5deg, linear_distance=1.49m
-2026-06-02 14:55:06,365 [INFO] Aligning to home heading: error=+90.5deg -> turn L
-2026-06-02 14:55:06,370 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:06,423 [INFO] Robot Pose: x=0.11, y=0.82, heading=323.5 (camera=usb)
-2026-06-02 14:55:08,376 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145506.jpg
-2026-06-02 14:55:08,378 [INFO] Computed to-home command: rotation=+89.7deg, linear_distance=1.48m
-2026-06-02 14:55:09,536 [INFO] Aligning to home heading: error=+89.7deg -> turn L
-2026-06-02 14:55:09,548 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:09,596 [INFO] Robot Pose: x=0.16, y=0.83, heading=324.0 (camera=usb)
-2026-06-02 14:55:11,809 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145509.jpg
-2026-06-02 14:55:11,814 [INFO] Computed to-home command: rotation=+90.4deg, linear_distance=1.44m
-2026-06-02 14:55:12,639 [INFO] Aligning to home heading: error=+90.4deg -> turn L
-2026-06-02 14:55:12,643 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:12,687 [INFO] Robot Pose: x=0.00, y=0.01, heading=353.3 (camera=usb)
-2026-06-02 14:55:14,942 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145512.jpg
-2026-06-02 14:55:14,945 [INFO] Computed to-home command: rotation=+69.9deg, linear_distance=2.22m
-2026-06-02 14:55:15,966 [INFO] Aligning to home heading: error=+69.9deg -> turn L
-2026-06-02 14:55:15,974 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:16,007 [INFO] Robot Pose: x=0.00, y=0.92, heading=330.3 (camera=usb)
-2026-06-02 14:55:18,489 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145516.jpg
-2026-06-02 14:55:18,495 [INFO] Computed to-home command: rotation=+77.1deg, linear_distance=1.47m
-2026-06-02 14:55:19,079 [INFO] Aligning to home heading: error=+77.1deg -> turn L
-2026-06-02 14:55:19,087 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:19,133 [INFO] Robot Pose: x=0.00, y=1.55, heading=317.9 (camera=usb)
-2026-06-02 14:55:21,263 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145519.jpg
-2026-06-02 14:55:21,271 [INFO] Computed to-home command: rotation=+66.3deg, linear_distance=1.10m
-2026-06-02 14:55:21,882 [INFO] Aligning to home heading: error=+66.3deg -> turn L
-2026-06-02 14:55:21,889 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:21,936 [INFO] Robot Pose: x=0.00, y=0.73, heading=339.9 (camera=usb)
-2026-06-02 14:55:24,140 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145521.jpg
-2026-06-02 14:55:24,148 [INFO] Computed to-home command: rotation=+71.8deg, linear_distance=1.61m
-2026-06-02 14:55:25,024 [INFO] Aligning to home heading: error=+71.8deg -> turn L
-2026-06-02 14:55:25,032 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:25,079 [INFO] Robot Pose: x=0.00, y=0.00, heading=2.1 (camera=usb)
-2026-06-02 14:55:27,302 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145525.jpg
-2026-06-02 14:55:27,305 [INFO] Computed to-home command: rotation=+61.3deg, linear_distance=2.24m
-2026-06-02 14:55:28,128 [INFO] Aligning to home heading: error=+61.3deg -> turn L
-2026-06-02 14:55:28,136 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:28,186 [INFO] Robot Pose: x=0.00, y=0.33, heading=1.7 (camera=usb)
-2026-06-02 14:55:29,962 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145528.jpg
-2026-06-02 14:55:29,965 [INFO] Computed to-home command: rotation=+57.4deg, linear_distance=1.95m
-2026-06-02 14:55:31,278 [INFO] Aligning to home heading: error=+57.4deg -> turn L
-2026-06-02 14:55:31,288 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:31,344 [INFO] Robot Pose: x=0.00, y=0.72, heading=353.4 (camera=usb)
-2026-06-02 14:55:33,463 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145531.jpg
-2026-06-02 14:55:33,469 [INFO] Computed to-home command: rotation=+58.7deg, linear_distance=1.63m
-2026-06-02 14:55:34,038 [INFO] Aligning to home heading: error=+58.7deg -> turn L
-2026-06-02 14:55:34,043 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:34,097 [INFO] Robot Pose: x=0.00, y=1.37, heading=343.4 (camera=usb)
-2026-06-02 14:55:36,094 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145534.jpg
-2026-06-02 14:55:36,098 [INFO] Computed to-home command: rotation=+48.9deg, linear_distance=1.18m
-2026-06-02 14:55:37,027 [INFO] Aligning to home heading: error=+48.9deg -> turn L
-2026-06-02 14:55:37,034 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:37,068 [INFO] Robot Pose: x=0.00, y=1.09, heading=348.5 (camera=usb)
-2026-06-02 14:55:39,101 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145537.jpg
-2026-06-02 14:55:39,105 [INFO] Computed to-home command: rotation=+53.7deg, linear_distance=1.35m
-2026-06-02 14:55:39,908 [INFO] Aligning to home heading: error=+53.7deg -> turn L
-2026-06-02 14:55:39,911 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 14:55:39,949 [INFO] Robot Pose: x=0.00, y=0.25, heading=19.8 (camera=usb)
-2026-06-02 14:55:42,289 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_145539.jpg
-2026-06-02 14:55:42,296 [INFO] Computed to-home command: rotation=+40.4deg, linear_distance=2.01m
-2026-06-02 14:55:42,983 [INFO] Aligning to home heading: error=+40.4deg -> turn L
-2026-06-02 14:55:42,990 [INFO] Executing Ball drop...
-2026-06-02 14:55:46,367 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
-2026-06-02 14:55:46,372 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-02 14:55:47,502 [INFO] Camera stopped
-2026-06-02 14:55:47,911 [INFO] Camera closed successfully.
-2026-06-02 15:04:58,751 [INFO] --- Step 1: Initialization phase ---
-2026-06-02 15:05:13,008 [INFO] Motor status: OK
-2026-06-02 15:05:13,568 [INFO] Initialization successful.
-2026-06-02 15:05:13,571 [INFO] Camera now open.
-2026-06-02 15:05:13,589 [INFO] Camera configuration has been adjusted!
-2026-06-02 15:05:13,595 [INFO] Configuration successful!
-2026-06-02 15:05:13,642 [INFO] Camera started
-2026-06-02 15:05:13,645 [INFO] PiCamera started.
-2026-06-02 15:05:15,647 [INFO] USB Camera status: OK
-2026-06-02 15:05:15,649 [INFO] PiCamera status: OK
-2026-06-02 15:05:15,651 [INFO] Ultrasonic sensor status: OK (L:7 C:36 R:10)
-2026-06-02 15:05:15,653 [INFO] Button status: Listener running (press 'y' to start/stop).
-2026-06-02 15:05:15,656 [INFO] Moving ARM to UP pose.
-2026-06-02 15:05:16,669 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
-2026-06-02 15:05:28,582 [INFO] Start command received via 'y' key.
-2026-06-02 15:05:28,841 [INFO] Button pressed. Mission Started!
-2026-06-02 15:05:28,850 [INFO] --- Step 2: Confirm Home Location ---
-2026-06-02 15:05:29,121 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:30,876 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:32,116 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:33,438 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:34,888 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:36,636 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:38,169 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:39,470 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:40,651 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:42,404 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:43,718 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:45,098 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:46,443 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:47,922 [INFO] Home tags not visible. Adjusting view backwards...
-2026-06-02 15:05:49,014 [ERROR] Home tags not detected within time limit. Exiting mission.
-2026-06-02 15:05:49,020 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-02 15:05:50,197 [INFO] Camera stopped
-2026-06-02 15:05:50,603 [INFO] Camera closed successfully.
-2026-06-02 15:12:14,057 [INFO] --- Step 1: Initialization phase ---
-2026-06-02 15:12:28,389 [INFO] Motor status: OK
-2026-06-02 15:12:28,948 [INFO] Initialization successful.
-2026-06-02 15:12:28,950 [INFO] Camera now open.
-2026-06-02 15:12:28,967 [INFO] Camera configuration has been adjusted!
-2026-06-02 15:12:28,973 [INFO] Configuration successful!
-2026-06-02 15:12:29,018 [INFO] Camera started
-2026-06-02 15:12:29,021 [INFO] PiCamera started.
-2026-06-02 15:12:31,107 [INFO] USB Camera status: OK
-2026-06-02 15:12:31,112 [ERROR] PiCamera status: FAILED to capture frames.
-2026-06-02 15:12:31,114 [ERROR] One or more cameras failed to initialize. Exiting as per mission requirement.
-2026-06-02 15:12:31,119 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-02 15:12:32,359 [INFO] Camera stopped
-2026-06-02 15:12:32,768 [INFO] Camera closed successfully.
-2026-06-02 15:13:05,145 [INFO] --- Step 1: Initialization phase ---
-2026-06-02 15:13:19,503 [INFO] Motor status: OK
-2026-06-02 15:13:20,063 [INFO] Initialization successful.
-2026-06-02 15:13:20,065 [INFO] Camera now open.
-2026-06-02 15:13:20,082 [INFO] Camera configuration has been adjusted!
-2026-06-02 15:13:20,088 [INFO] Configuration successful!
-2026-06-02 15:13:20,132 [INFO] Camera started
-2026-06-02 15:13:20,135 [INFO] PiCamera started.
-2026-06-02 15:13:22,267 [INFO] USB Camera status: OK
-2026-06-02 15:13:22,271 [INFO] PiCamera status: OK
-2026-06-02 15:13:22,274 [INFO] Ultrasonic sensor status: OK (L:7 C:62 R:10)
-2026-06-02 15:13:22,276 [INFO] Button status: Listener running (press 'y' to start/stop).
-2026-06-02 15:13:22,278 [INFO] Moving ARM to UP pose.
-2026-06-02 15:13:23,507 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
-2026-06-02 15:13:31,087 [INFO] Start command received via 'y' key.
-2026-06-02 15:13:31,363 [INFO] Button pressed. Mission Started!
-2026-06-02 15:13:31,367 [INFO] --- Step 2: Confirm Home Location ---
-2026-06-02 15:13:31,649 [INFO] USB did not detect configured home tags. Using PiCamera fallback for Step 2.
-2026-06-02 15:13:31,658 [INFO] Home tag(s) [15] confirmed via PiCamera camera.
-2026-06-02 15:13:31,702 [INFO] Step 2 completed successfully.
-2026-06-02 15:13:31,704 [INFO] --- Step 3: Ready to Explore ---
-2026-06-02 15:13:33,925 [INFO] Completion of Step 3
-2026-06-02 15:13:33,927 [INFO] --- Step 4: Search and Approach balls ---
-2026-06-02 15:13:33,930 [INFO] Searching for ball...
-2026-06-02 15:13:35,758 [INFO] Ball candidate confirmation 1/2 (dist=57.9cm, x=237.2)
-2026-06-02 15:13:36,036 [INFO] Ball candidate confirmation 2/2 (dist=57.8cm, x=229.6)
-2026-06-02 15:13:36,042 [INFO] Target confirmed at 57.8cm! Saving image.
-2026-06-02 15:13:36,063 [INFO] Approaching the ball...
-2026-06-02 15:13:39,894 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 15:13:41,528 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 15:13:56,107 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 15:13:59,136 [INFO] Target briefly lost near pickup threshold (34.2cm). Proceeding to grab.
-2026-06-02 15:13:59,143 [WARNING] Safety limits breached during catch! Aborting!
-2026-06-02 15:13:59,151 [INFO] Searching for ball...
-2026-06-02 15:13:59,992 [INFO] Ball candidate confirmation 1/2 (dist=37.7cm, x=105.6)
-2026-06-02 15:14:00,293 [INFO] Ball candidate confirmation 2/2 (dist=38.3cm, x=117.9)
-2026-06-02 15:14:00,298 [INFO] Target confirmed at 38.3cm! Saving image.
-2026-06-02 15:14:00,321 [INFO] Approaching the ball...
-2026-06-02 15:14:02,120 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 15:14:04,696 [WARNING] Obstacle detected (L:99 C:160 R:13) -> evasive maneuver
-2026-06-02 15:14:07,932 [INFO] Target briefly lost near pickup threshold (33.4cm). Proceeding to grab.
-2026-06-02 15:14:07,936 [INFO] Grabbing the ball...
-2026-06-02 15:14:10,887 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=137.0cm.
-2026-06-02 15:14:11,928 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
-2026-06-02 15:14:18,327 [INFO] Ball grab complete.
-2026-06-02 15:14:18,329 [INFO] Searching for ball...
-2026-06-02 15:14:20,556 [INFO] Ball candidate confirmation 1/2 (dist=16.4cm, x=81.7)
-2026-06-02 15:14:20,825 [INFO] Ball candidate confirmation 1/2 (dist=25.7cm, x=179.9)
-2026-06-02 15:14:21,351 [INFO] Ball candidate confirmation 2/2 (dist=37.6cm, x=187.9)
-2026-06-02 15:14:21,359 [INFO] Target confirmed at 37.6cm! Saving image.
-2026-06-02 15:14:21,377 [INFO] Approaching the ball...
-2026-06-02 15:14:46,496 [INFO] Searching for ball...
-2026-06-02 15:14:46,507 [INFO] Ball candidate confirmation 1/2 (dist=52.2cm, x=77.7)
-2026-06-02 15:14:46,774 [INFO] Ball candidate confirmation 2/2 (dist=52.2cm, x=56.7)
-2026-06-02 15:14:46,779 [INFO] Target confirmed at 52.2cm! Saving image.
-2026-06-02 15:14:46,798 [INFO] Approaching the ball...
-2026-06-02 15:15:12,439 [INFO] Searching for ball...
-2026-06-02 15:15:12,445 [INFO] Ball candidate confirmation 1/2 (dist=38.2cm, x=76.3)
-2026-06-02 15:15:12,720 [INFO] Ball candidate confirmation 2/2 (dist=37.9cm, x=57.4)
-2026-06-02 15:15:12,726 [INFO] Target confirmed at 37.9cm! Saving image.
-2026-06-02 15:15:12,749 [INFO] Approaching the ball...
-2026-06-02 15:15:25,223 [WARNING] Obstacle detected (L:36 C:37 R:137) -> evasive maneuver
-2026-06-02 15:15:27,923 [WARNING] Obstacle detected (L:73 C:37 R:143) -> evasive maneuver
-2026-06-02 15:15:32,101 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-02 15:15:33,005 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-02 15:15:33,020 [INFO] Grabbing the ball...
-2026-06-02 15:15:36,438 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=162.0cm.
-2026-06-02 15:15:37,547 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
-2026-06-02 15:15:37,609 [WARNING] Obstacle detected during capture move (C:33cm). Backing up and continuing gripper cycles.
-2026-06-02 15:15:44,149 [INFO] Ball grab complete.
-2026-06-02 15:15:44,154 [INFO] Completion of Step 4
-2026-06-02 15:15:44,161 [INFO] --- Step 5: Returning home ---
-2026-06-02 15:15:49,596 [INFO] Moving to Home tag
-2026-06-02 15:15:49,602 [INFO] State: tag spotted .. estimating robot pose
-2026-06-02 15:15:50,641 [INFO] Robot Pose (2-frame confirmed): x=0.83, y=0.00, heading=72.5 (camera=usb)
-2026-06-02 15:15:56,128 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_151550.jpg
-2026-06-02 15:15:56,131 [INFO] Computed to-home command: rotation=+12.5deg, linear_distance=2.01m
-2026-06-02 15:15:58,706 [INFO] Aligning to home heading in larger step: error=+12.5deg -> turn L
-2026-06-02 15:15:58,721 [INFO] Home tag spotted. Approaching...
-2026-06-02 15:15:58,738 [INFO] Course approach: advancing 30.0cm toward home.
-2026-06-02 15:16:02,303 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 15:16:03,158 [INFO] Robot Pose (2-frame confirmed): x=1.68, y=0.73, heading=166.9 (camera=usb)
-2026-06-02 15:16:05,346 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_151603.jpg
-2026-06-02 15:16:05,354 [INFO] Computed to-home command: rotation=-48.9deg, linear_distance=1.44m
-2026-06-02 15:16:06,326 [INFO] Aligning to home heading in larger step: error=-48.9deg -> turn R
-2026-06-02 15:16:06,335 [INFO] Home tag spotted. Approaching...
-2026-06-02 15:16:06,343 [INFO] Course approach: advancing 30.0cm toward home.
-2026-06-02 15:16:10,013 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
-2026-06-02 15:16:10,369 [INFO] Robot Pose (2-frame confirmed): x=0.95, y=0.54, heading=138.1 (camera=usb)
-2026-06-02 15:16:13,762 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260602_151610.jpg
-2026-06-02 15:16:13,768 [INFO] Computed to-home command: rotation=-50.0deg, linear_distance=1.46m
-2026-06-02 15:16:14,421 [INFO] Aligning to home heading in larger step: error=-50.0deg -> turn R
-2026-06-02 15:16:14,432 [INFO] Home tag spotted. Approaching...
-2026-06-02 15:16:14,438 [INFO] Course approach: advancing 30.0cm toward home.
-2026-06-02 15:16:18,420 [WARNING] Obstacle detected (L:10 C:82 R:85) -> evasive maneuver
-2026-06-02 15:16:19,561 [WARNING] Obstacle detected (L:11 C:999 R:83) -> evasive maneuver
-2026-06-02 15:16:20,636 [INFO] Home wall proximity check 1/2: C=16.0cm <= 40.0cm
-2026-06-02 15:16:20,644 [WARNING] Obstacle detected (L:14 C:15 R:209) -> evasive maneuver
-2026-06-02 15:16:21,791 [INFO] Home wall proximity check 2/2: C=19.0cm <= 40.0cm
-2026-06-02 15:16:21,800 [INFO] Arrived close to home wall.
-2026-06-02 15:16:21,807 [INFO] Executing Ball drop...
-2026-06-02 15:16:24,996 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
-2026-06-02 15:16:25,001 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-02 15:16:26,147 [INFO] Camera stopped
-2026-06-02 15:16:26,576 [INFO] Camera closed successfully.
+2026-06-04 14:01:25,636 [INFO] --- Step 1: Initialization phase ---
+2026-06-04 14:01:29,033 [INFO] Motor status: OK
+2026-06-04 14:01:29,584 [INFO] Initialization successful.
+2026-06-04 14:01:29,586 [INFO] Camera now open.
+2026-06-04 14:01:29,592 [INFO] Camera configuration has been adjusted!
+2026-06-04 14:01:29,595 [INFO] Configuration successful!
+2026-06-04 14:01:29,620 [INFO] Camera started
+2026-06-04 14:01:31,054 [INFO] PiCamera started.
+2026-06-04 14:01:33,138 [INFO] USB Camera status: OK
+2026-06-04 14:01:33,141 [INFO] PiCamera status: OK
+2026-06-04 14:01:33,144 [INFO] Ultrasonic sensor status: OK (L:7 C:24 R:11)
+2026-06-04 14:01:33,148 [INFO] Button status: Listener running (press 'y' to start/stop).
+2026-06-04 14:01:33,150 [INFO] Moving ARM to UP pose.
+2026-06-04 14:01:34,243 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
+2026-06-04 14:01:57,428 [INFO] Start command received via 'y' key.
+2026-06-04 14:01:57,707 [INFO] Button pressed. Mission Started!
+2026-06-04 14:01:57,713 [INFO] --- Step 2: Confirm Home Location ---
+2026-06-04 14:01:58,004 [INFO] Home tag(s) [14] confirmed via USB camera.
+2026-06-04 14:01:58,025 [INFO] Step 2 completed successfully.
+2026-06-04 14:01:58,027 [INFO] --- Step 3: Ready to Explore ---
+2026-06-04 14:02:00,905 [INFO] Completion of Step 3
+2026-06-04 14:02:00,917 [INFO] --- Step 4: Search and Approach balls ---
+2026-06-04 14:02:00,925 [INFO] Searching for ball...
+2026-06-04 14:02:01,477 [INFO] Target detected (dist=64.2cm, x=50.0). Switching immediately to approach.
+2026-06-04 14:02:01,501 [INFO] Approaching the ball...
+2026-06-04 14:02:27,263 [INFO] Searching for ball...
+2026-06-04 14:02:27,271 [INFO] Target detected (dist=58.6cm, x=135.7). Switching immediately to approach.
+2026-06-04 14:02:27,291 [INFO] Approaching the ball...
+2026-06-04 14:02:38,680 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-04 14:02:40,958 [WARNING] Target lost beyond local reacquire window. Returning to search.
+2026-06-04 14:02:40,968 [INFO] Searching for ball...
+2026-06-04 14:02:50,149 [INFO] Target detected (dist=88.2cm, x=274.4). Switching immediately to approach.
+2026-06-04 14:02:50,177 [INFO] Approaching the ball...
+2026-06-04 14:02:54,573 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-04 14:02:56,678 [WARNING] Target lost beyond local reacquire window. Returning to search.
+2026-06-04 14:02:56,687 [INFO] Searching for ball...
+2026-06-04 14:03:10,896 [INFO] Target detected (dist=59.7cm, x=269.2). Switching immediately to approach.
+2026-06-04 14:03:10,919 [INFO] Approaching the ball...
+2026-06-04 14:03:32,658 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-04 14:03:34,936 [WARNING] Target lost beyond local reacquire window. Returning to search.
+2026-06-04 14:03:34,945 [INFO] Searching for ball...
+2026-06-04 14:03:36,080 [INFO] Target detected (dist=83.7cm, x=299.1). Switching immediately to approach.
+2026-06-04 14:03:36,103 [INFO] Approaching the ball...
+2026-06-04 14:03:40,259 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:03:40,267 [INFO] Grabbing the ball...
+2026-06-04 14:03:43,346 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=115.0cm.
+2026-06-04 14:03:44,487 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:03:50,422 [INFO] Ball grab complete.
+2026-06-04 14:03:50,424 [INFO] Searching for ball...
+2026-06-04 14:03:50,431 [INFO] Target detected (dist=52.0cm, x=277.7). Switching immediately to approach.
+2026-06-04 14:03:50,688 [INFO] Approaching the ball...
+2026-06-04 14:03:50,694 [WARNING] Obstacle detected (L:7 C:84 R:12) -> evasive maneuver
+2026-06-04 14:04:06,152 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:04:06,159 [INFO] Grabbing the ball...
+2026-06-04 14:04:08,242 [INFO] PiCamera wall distance during arm-down capture: 59.2cm
+2026-06-04 14:04:09,313 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:04:15,795 [INFO] Ball grab complete.
+2026-06-04 14:04:15,801 [INFO] Completion of Step 4
+2026-06-04 14:04:15,806 [INFO] --- Step 5: Returning home ---
+2026-06-04 14:04:20,862 [INFO] Moving to Home tag
+2026-06-04 14:04:20,865 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:21,144 [WARNING] Localization failed on USB and PiCamera. Backing up and retrying.
+2026-06-04 14:04:22,478 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:25,256 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140422.jpg
+2026-06-04 14:04:25,258 [INFO] Robot Pose: x=0.40, y=0.48, heading=211.1 (camera=picam), dist_to_home=162.9cm
+2026-06-04 14:04:25,261 [INFO] Computed to-home command: rotation=-142.5deg, linear_distance=1.63m
+2026-06-04 14:04:26,078 [INFO] Aligning to home heading: error=-142.5deg -> turn R
+2026-06-04 14:04:26,089 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:29,705 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140427.jpg
+2026-06-04 14:04:29,711 [INFO] Robot Pose: x=0.76, y=0.67, heading=186.0 (camera=usb), dist_to_home=135.4cm
+2026-06-04 14:04:29,718 [INFO] Computed to-home command: rotation=-106.1deg, linear_distance=1.35m
+2026-06-04 14:04:30,588 [INFO] Aligning to home heading: error=-106.1deg -> turn R
+2026-06-04 14:04:30,594 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:33,449 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140430.jpg
+2026-06-04 14:04:33,453 [INFO] Robot Pose: x=0.78, y=0.69, heading=184.3 (camera=usb), dist_to_home=132.6cm
+2026-06-04 14:04:33,457 [INFO] Computed to-home command: rotation=-103.8deg, linear_distance=1.33m
+2026-06-04 14:04:34,375 [INFO] Aligning to home heading: error=-103.8deg -> turn R
+2026-06-04 14:04:34,379 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:37,084 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140434.jpg
+2026-06-04 14:04:37,086 [INFO] Robot Pose: x=0.80, y=0.69, heading=182.4 (camera=usb), dist_to_home=132.2cm
+2026-06-04 14:04:37,091 [INFO] Computed to-home command: rotation=-101.3deg, linear_distance=1.32m
+2026-06-04 14:04:38,196 [INFO] Aligning to home heading: error=-101.3deg -> turn R
+2026-06-04 14:04:38,200 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:41,266 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140438.jpg
+2026-06-04 14:04:41,268 [INFO] Robot Pose: x=0.81, y=0.69, heading=177.8 (camera=usb), dist_to_home=132.7cm
+2026-06-04 14:04:41,270 [INFO] Computed to-home command: rotation=-95.9deg, linear_distance=1.33m
+2026-06-04 14:04:42,106 [INFO] Aligning to home heading: error=-95.9deg -> turn R
+2026-06-04 14:04:42,114 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:45,714 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140442.jpg
+2026-06-04 14:04:45,723 [INFO] Robot Pose: x=0.82, y=0.22, heading=144.0 (camera=usb), dist_to_home=178.5cm
+2026-06-04 14:04:45,733 [INFO] Computed to-home command: rotation=-59.9deg, linear_distance=1.78m
+2026-06-04 14:04:46,623 [INFO] Aligning to home heading: error=-59.9deg -> turn R
+2026-06-04 14:04:46,628 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:49,959 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140447.jpg
+2026-06-04 14:04:49,967 [INFO] Robot Pose: x=0.43, y=0.59, heading=164.4 (camera=picam), dist_to_home=152.0cm
+2026-06-04 14:04:50,253 [INFO] Computed to-home command: rotation=-96.3deg, linear_distance=1.52m
+2026-06-04 14:04:50,848 [INFO] Aligning to home heading: error=-96.3deg -> turn R
+2026-06-04 14:04:50,854 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:54,842 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140452.jpg
+2026-06-04 14:04:54,851 [INFO] Robot Pose: x=0.44, y=0.60, heading=159.6 (camera=picam), dist_to_home=150.9cm
+2026-06-04 14:04:54,856 [INFO] Computed to-home command: rotation=-91.3deg, linear_distance=1.51m
+2026-06-04 14:04:55,463 [INFO] Aligning to home heading: error=-91.3deg -> turn R
+2026-06-04 14:04:55,471 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:04:59,267 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140456.jpg
+2026-06-04 14:04:59,275 [INFO] Robot Pose: x=0.44, y=0.60, heading=153.4 (camera=picam), dist_to_home=150.7cm
+2026-06-04 14:04:59,282 [INFO] Computed to-home command: rotation=-85.1deg, linear_distance=1.51m
+2026-06-04 14:04:59,895 [INFO] Aligning to home heading: error=-85.1deg -> turn R
+2026-06-04 14:04:59,903 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:05:03,743 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140500.jpg
+2026-06-04 14:05:03,755 [INFO] Robot Pose: x=0.81, y=0.12, heading=123.7 (camera=usb), dist_to_home=189.2cm
+2026-06-04 14:05:03,760 [INFO] Computed to-home command: rotation=-39.4deg, linear_distance=1.89m
+2026-06-04 14:05:04,339 [INFO] Aligning to home heading: error=-39.4deg -> turn R
+2026-06-04 14:05:04,347 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:05:07,079 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140504.jpg
+2026-06-04 14:05:07,084 [INFO] Robot Pose: x=0.83, y=0.07, heading=120.7 (camera=usb), dist_to_home=193.4cm
+2026-06-04 14:05:07,096 [INFO] Computed to-home command: rotation=-35.9deg, linear_distance=1.93m
+2026-06-04 14:05:07,913 [INFO] Aligning to home heading: error=-35.9deg -> turn R
+2026-06-04 14:05:07,922 [INFO] Executing Ball drop...
+2026-06-04 14:05:10,963 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
+2026-06-04 14:05:10,970 [INFO] Moving ARM to DOWN pose before exit.
+2026-06-04 14:05:12,298 [INFO] Camera stopped
+2026-06-04 14:05:12,506 [INFO] Camera closed successfully.
+2026-06-04 14:06:36,783 [INFO] --- Step 1: Initialization phase ---
+2026-06-04 14:06:40,816 [INFO] Motor status: OK
+2026-06-04 14:06:41,370 [INFO] Initialization successful.
+2026-06-04 14:06:41,372 [INFO] Camera now open.
+2026-06-04 14:06:41,391 [INFO] Camera configuration has been adjusted!
+2026-06-04 14:06:41,397 [INFO] Configuration successful!
+2026-06-04 14:06:41,446 [INFO] Camera started
+2026-06-04 14:06:42,817 [INFO] PiCamera started.
+2026-06-04 14:06:44,845 [INFO] USB Camera status: OK
+2026-06-04 14:06:44,846 [INFO] PiCamera status: OK
+2026-06-04 14:06:44,850 [INFO] Ultrasonic sensor status: OK (L:7 C:31 R:172)
+2026-06-04 14:06:44,854 [INFO] Button status: Listener running (press 'y' to start/stop).
+2026-06-04 14:06:44,856 [INFO] Moving ARM to UP pose.
+2026-06-04 14:06:45,912 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
+2026-06-04 14:06:56,769 [INFO] Start command received via 'y' key.
+2026-06-04 14:06:57,053 [INFO] Button pressed. Mission Started!
+2026-06-04 14:06:57,058 [INFO] --- Step 2: Confirm Home Location ---
+2026-06-04 14:06:57,339 [INFO] Home tags not visible. Adjusting view backwards...
+2026-06-04 14:06:59,045 [INFO] Home tag(s) [14] confirmed via USB camera.
+2026-06-04 14:06:59,073 [INFO] Step 2 completed successfully.
+2026-06-04 14:06:59,076 [INFO] --- Step 3: Ready to Explore ---
+2026-06-04 14:07:01,815 [INFO] Completion of Step 3
+2026-06-04 14:07:01,821 [INFO] --- Step 4: Search and Approach balls ---
+2026-06-04 14:07:01,829 [INFO] Searching for ball...
+2026-06-04 14:07:02,382 [INFO] Target detected (dist=57.0cm, x=244.3). Switching immediately to approach.
+2026-06-04 14:07:02,403 [INFO] Approaching the ball...
+2026-06-04 14:07:28,101 [INFO] Searching for ball...
+2026-06-04 14:07:28,108 [INFO] Target detected (dist=34.4cm, x=125.1). Switching immediately to approach.
+2026-06-04 14:07:28,129 [INFO] Approaching the ball...
+2026-06-04 14:07:31,371 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:07:31,383 [INFO] Grabbing the ball...
+2026-06-04 14:07:34,296 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=94.0cm.
+2026-06-04 14:07:35,336 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:07:41,531 [INFO] Ball grab complete.
+2026-06-04 14:07:41,752 [INFO] Searching for ball...
+2026-06-04 14:07:42,525 [INFO] Target detected (dist=32.4cm, x=190.2). Switching immediately to approach.
+2026-06-04 14:07:42,554 [INFO] Approaching the ball...
+2026-06-04 14:07:48,084 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:07:48,090 [INFO] Grabbing the ball...
+2026-06-04 14:07:50,350 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=38.0cm.
+2026-06-04 14:07:51,522 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:07:52,122 [WARNING] Obstacle detected during capture move (C:34cm). Backing up and continuing gripper cycles.
+2026-06-04 14:07:58,052 [INFO] Ball grab complete.
+2026-06-04 14:07:58,060 [INFO] Searching for ball...
+2026-06-04 14:07:58,064 [INFO] Target detected (dist=25.2cm, x=269.1). Switching immediately to approach.
+2026-06-04 14:07:58,083 [INFO] Approaching the ball...
+2026-06-04 14:07:58,087 [WARNING] Obstacle detected (L:7 C:34 R:11) -> evasive maneuver
+2026-06-04 14:07:59,190 [WARNING] Obstacle detected (L:999 C:38 R:9) -> evasive maneuver
+2026-06-04 14:08:01,903 [INFO] Target briefly lost near pickup threshold (31.8cm). Proceeding to grab.
+2026-06-04 14:08:01,910 [INFO] Grabbing the ball...
+2026-06-04 14:08:04,382 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=999.0cm.
+2026-06-04 14:08:05,444 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:08:11,826 [INFO] Ball grab complete.
+2026-06-04 14:08:11,830 [INFO] Searching for ball...
+2026-06-04 14:08:15,185 [INFO] Target detected (dist=19.9cm, x=241.3). Switching immediately to approach.
+2026-06-04 14:08:15,204 [INFO] Approaching the ball...
+2026-06-04 14:08:15,207 [WARNING] Obstacle detected (L:29 C:32 R:197) -> evasive maneuver
+2026-06-04 14:08:16,586 [WARNING] Obstacle detected (L:999 C:32 R:33) -> evasive maneuver
+2026-06-04 14:08:17,728 [WARNING] Obstacle detected (L:82 C:37 R:34) -> evasive maneuver
+2026-06-04 14:08:18,954 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-04 14:08:20,308 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:08:20,313 [INFO] Grabbing the ball...
+2026-06-04 14:08:22,531 [INFO] PiCamera wall distance during arm-down capture: 87.5cm
+2026-06-04 14:08:24,160 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:08:30,381 [INFO] Ball grab complete.
+2026-06-04 14:08:30,383 [INFO] Searching for ball...
+2026-06-04 14:08:30,386 [INFO] Target detected (dist=30.6cm, x=294.0). Switching immediately to approach.
+2026-06-04 14:08:30,399 [INFO] Approaching the ball...
+2026-06-04 14:08:30,401 [WARNING] Obstacle detected (L:7 C:37 R:11) -> evasive maneuver
+2026-06-04 14:08:35,146 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:08:35,152 [INFO] Grabbing the ball...
+2026-06-04 14:08:37,307 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=999.0cm.
+2026-06-04 14:08:38,447 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:08:45,188 [INFO] Ball grab complete.
+2026-06-04 14:08:45,194 [INFO] Searching for ball...
+2026-06-04 14:08:45,748 [INFO] Target detected (dist=37.1cm, x=25.5). Switching immediately to approach.
+2026-06-04 14:08:45,770 [INFO] Approaching the ball...
+2026-06-04 14:08:48,861 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-04 14:08:51,040 [WARNING] Target lost beyond local reacquire window. Returning to search.
+2026-06-04 14:08:51,048 [INFO] Searching for ball...
+2026-06-04 14:08:57,438 [INFO] Target detected (dist=42.7cm, x=288.0). Switching immediately to approach.
+2026-06-04 14:08:57,458 [INFO] Approaching the ball...
+2026-06-04 14:09:07,594 [INFO] Completion of Step 4
+2026-06-04 14:09:07,988 [INFO] --- Step 5: Returning home ---
+2026-06-04 14:09:12,484 [INFO] Moving to Home tag
+2026-06-04 14:09:12,488 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:15,681 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140913.jpg
+2026-06-04 14:09:15,686 [INFO] Robot Pose: x=1.09, y=0.51, heading=320.2 (camera=usb), dist_to_home=148.9cm
+2026-06-04 14:09:15,689 [INFO] Computed to-home command: rotation=+133.2deg, linear_distance=1.49m
+2026-06-04 14:09:16,484 [INFO] Aligning to home heading: error=+133.2deg -> turn L
+2026-06-04 14:09:16,489 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:19,148 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140916.jpg
+2026-06-04 14:09:19,150 [INFO] Robot Pose: x=1.09, y=0.41, heading=336.2 (camera=usb), dist_to_home=159.0cm
+2026-06-04 14:09:19,153 [INFO] Computed to-home command: rotation=+116.9deg, linear_distance=1.59m
+2026-06-04 14:09:20,145 [INFO] Aligning to home heading: error=+116.9deg -> turn L
+2026-06-04 14:09:20,159 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:23,067 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140920.jpg
+2026-06-04 14:09:23,074 [INFO] Robot Pose: x=1.11, y=0.61, heading=333.2 (camera=usb), dist_to_home=139.1cm
+2026-06-04 14:09:23,080 [INFO] Computed to-home command: rotation=+121.4deg, linear_distance=1.39m
+2026-06-04 14:09:23,671 [INFO] Aligning to home heading: error=+121.4deg -> turn L
+2026-06-04 14:09:23,674 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:26,674 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140923.jpg
+2026-06-04 14:09:26,677 [INFO] Robot Pose: x=1.18, y=0.29, heading=1.2 (camera=usb), dist_to_home=172.0cm
+2026-06-04 14:09:26,679 [INFO] Computed to-home command: rotation=+94.8deg, linear_distance=1.72m
+2026-06-04 14:09:27,532 [INFO] Aligning to home heading: error=+94.8deg -> turn L
+2026-06-04 14:09:27,538 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:30,175 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140927.jpg
+2026-06-04 14:09:30,181 [INFO] Robot Pose: x=1.05, y=0.12, heading=15.2 (camera=usb), dist_to_home=188.5cm
+2026-06-04 14:09:30,185 [INFO] Computed to-home command: rotation=+76.4deg, linear_distance=1.88m
+2026-06-04 14:09:31,350 [INFO] Aligning to home heading: error=+76.4deg -> turn L
+2026-06-04 14:09:31,357 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:34,446 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140932.jpg
+2026-06-04 14:09:34,457 [INFO] Robot Pose: x=0.93, y=0.10, heading=45.4 (camera=usb), dist_to_home=190.6cm
+2026-06-04 14:09:34,463 [INFO] Computed to-home command: rotation=+42.5deg, linear_distance=1.91m
+2026-06-04 14:09:35,031 [INFO] Aligning to home heading: error=+42.5deg -> turn L
+2026-06-04 14:09:35,034 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:39,034 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140935.jpg
+2026-06-04 14:09:39,037 [INFO] Robot Pose: x=0.69, y=0.03, heading=50.2 (camera=usb), dist_to_home=199.0cm
+2026-06-04 14:09:39,258 [INFO] Computed to-home command: rotation=+30.8deg, linear_distance=1.99m
+2026-06-04 14:09:39,831 [INFO] Aligning to home heading: error=+30.8deg -> turn L
+2026-06-04 14:09:39,837 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:09:42,564 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140940.jpg
+2026-06-04 14:09:42,570 [INFO] Robot Pose: x=2.00, y=0.00, heading=90.5 (camera=usb), dist_to_home=223.6cm
+2026-06-04 14:09:42,578 [INFO] Computed to-home command: rotation=+26.1deg, linear_distance=2.24m
+2026-06-04 14:09:43,444 [INFO] Aligning to home heading: error=+26.1deg -> turn L
+2026-06-04 14:09:43,466 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:09:46,398 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140943.jpg
+2026-06-04 14:09:46,403 [INFO] Robot Pose: x=1.21, y=0.00, heading=85.2 (camera=usb), dist_to_home=201.1cm
+2026-06-04 14:09:46,407 [INFO] Computed to-home command: rotation=+10.7deg, linear_distance=2.01m
+2026-06-04 14:09:46,413 [INFO] Course approach: distance=201.1cm. Moving fast at speed 2 for 2.00s.
+2026-06-04 14:09:48,878 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:09:51,796 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140949.jpg
+2026-06-04 14:09:51,802 [INFO] Robot Pose: x=2.00, y=0.22, heading=127.3 (camera=usb), dist_to_home=203.9cm
+2026-06-04 14:09:51,812 [INFO] Computed to-home command: rotation=-7.9deg, linear_distance=2.04m
+2026-06-04 14:09:51,825 [INFO] Course approach: distance=203.9cm. Moving fast at speed 2 for 2.00s.
+2026-06-04 14:09:54,426 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:09:56,729 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140954.jpg
+2026-06-04 14:09:56,733 [INFO] Robot Pose: x=1.54, y=0.49, heading=139.7 (camera=usb), dist_to_home=160.4cm
+2026-06-04 14:09:56,737 [INFO] Computed to-home command: rotation=-30.1deg, linear_distance=1.60m
+2026-06-04 14:09:57,554 [INFO] Aligning to home heading: error=-30.1deg -> turn R
+2026-06-04 14:09:57,559 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:10:00,314 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_140958.jpg
+2026-06-04 14:10:00,321 [INFO] Robot Pose: x=1.55, y=0.63, heading=138.8 (camera=usb), dist_to_home=147.2cm
+2026-06-04 14:10:00,325 [INFO] Computed to-home command: rotation=-27.0deg, linear_distance=1.47m
+2026-06-04 14:10:00,913 [INFO] Aligning to home heading: error=-27.0deg -> turn R
+2026-06-04 14:10:00,920 [INFO] Executing Ball drop...
+2026-06-04 14:10:04,288 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
+2026-06-04 14:10:04,292 [INFO] Moving ARM to DOWN pose before exit.
+2026-06-04 14:10:05,391 [INFO] Camera stopped
+2026-06-04 14:10:05,798 [INFO] Camera closed successfully.
+2026-06-04 14:45:23,610 [INFO] --- Step 1: Initialization phase ---
+2026-06-04 14:45:27,765 [INFO] Motor status: OK
+2026-06-04 14:45:28,316 [INFO] Initialization successful.
+2026-06-04 14:45:28,317 [INFO] Camera now open.
+2026-06-04 14:45:28,323 [INFO] Camera configuration has been adjusted!
+2026-06-04 14:45:28,326 [INFO] Configuration successful!
+2026-06-04 14:45:28,354 [INFO] Camera started
+2026-06-04 14:45:30,212 [INFO] PiCamera started.
+2026-06-04 14:45:32,345 [INFO] USB Camera status: OK
+2026-06-04 14:45:32,348 [INFO] PiCamera status: OK
+2026-06-04 14:45:32,351 [INFO] Ultrasonic sensor status: OK (L:7 C:26 R:243)
+2026-06-04 14:45:32,354 [INFO] Button status: Listener running (press 'y' to start/stop).
+2026-06-04 14:45:32,355 [INFO] Moving ARM to UP pose.
+2026-06-04 14:45:33,446 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
+2026-06-04 14:45:39,230 [INFO] Start command received via 'y' key.
+2026-06-04 14:45:39,541 [INFO] Button pressed. Mission Started!
+2026-06-04 14:45:39,549 [INFO] --- Step 2: Confirm Home Location ---
+2026-06-04 14:45:39,833 [INFO] Home tag(s) [14] confirmed via USB camera.
+2026-06-04 14:45:39,858 [INFO] Step 2 completed successfully.
+2026-06-04 14:45:39,861 [INFO] --- Step 3: Ready to Explore ---
+2026-06-04 14:45:42,691 [INFO] Completion of Step 3
+2026-06-04 14:45:42,696 [INFO] --- Step 4: Search and Approach balls ---
+2026-06-04 14:45:42,710 [INFO] Searching for ball...
+2026-06-04 14:45:43,291 [INFO] Target detected (dist=46.4cm, x=244.5). Switching immediately to approach.
+2026-06-04 14:45:43,318 [INFO] Approaching the ball...
+2026-06-04 14:46:01,898 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:46:01,904 [INFO] Grabbing the ball...
+2026-06-04 14:46:05,015 [INFO] PiCamera wall distance during arm-down capture: 115.0cm
+2026-06-04 14:46:06,151 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:46:12,812 [INFO] Ball grab complete.
+2026-06-04 14:46:12,816 [INFO] Searching for ball...
+2026-06-04 14:46:13,354 [INFO] Target detected (dist=44.8cm, x=281.1). Switching immediately to approach.
+2026-06-04 14:46:13,375 [INFO] Approaching the ball...
+2026-06-04 14:46:13,378 [WARNING] Obstacle detected (L:7 C:59 R:10) -> evasive maneuver
+2026-06-04 14:46:20,759 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:46:20,768 [INFO] Grabbing the ball...
+2026-06-04 14:46:23,039 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=140.0cm.
+2026-06-04 14:46:24,042 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:46:30,509 [INFO] Ball grab complete.
+2026-06-04 14:46:30,514 [INFO] Searching for ball...
+2026-06-04 14:46:32,116 [INFO] Target detected (dist=37.4cm, x=295.1). Switching immediately to approach.
+2026-06-04 14:46:32,139 [INFO] Approaching the ball...
+2026-06-04 14:46:40,778 [WARNING] Obstacle detected (L:23 C:92 R:89) -> evasive maneuver
+2026-06-04 14:46:42,425 [WARNING] Obstacle detected (L:25 C:100 R:90) -> evasive maneuver
+2026-06-04 14:46:44,079 [WARNING] Obstacle detected (L:26 C:999 R:101) -> evasive maneuver
+2026-06-04 14:46:44,968 [WARNING] Obstacle detected (L:27 C:999 R:999) -> evasive maneuver
+2026-06-04 14:46:45,883 [WARNING] Obstacle detected (L:31 C:33 R:999) -> evasive maneuver
+2026-06-04 14:46:46,980 [WARNING] Obstacle detected (L:38 C:34 R:35) -> evasive maneuver
+2026-06-04 14:46:48,079 [WARNING] Obstacle detected (L:79 C:36 R:35) -> evasive maneuver
+2026-06-04 14:46:49,342 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-04 14:46:50,675 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:46:50,681 [INFO] Grabbing the ball...
+2026-06-04 14:46:52,858 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=84.0cm.
+2026-06-04 14:46:53,874 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:47:00,454 [INFO] Ball grab complete.
+2026-06-04 14:47:00,459 [INFO] Searching for ball...
+2026-06-04 14:47:11,330 [INFO] Target detected (dist=41.7cm, x=248.8). Switching immediately to approach.
+2026-06-04 14:47:11,350 [INFO] Approaching the ball...
+2026-06-04 14:47:22,176 [WARNING] Obstacle detected (L:39 C:38 R:47) -> evasive maneuver
+2026-06-04 14:47:23,259 [WARNING] Obstacle detected (L:45 C:38 R:41) -> evasive maneuver
+2026-06-04 14:47:24,473 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-04 14:47:24,478 [INFO] Grabbing the ball...
+2026-06-04 14:47:26,941 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=48.0cm.
+2026-06-04 14:47:28,009 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-04 14:47:34,549 [INFO] Ball grab complete.
+2026-06-04 14:47:34,553 [INFO] Searching for ball...
+2026-06-04 14:47:45,805 [INFO] Target detected (dist=18.5cm, x=279.9). Switching immediately to approach.
+2026-06-04 14:47:45,828 [INFO] Approaching the ball...
+2026-06-04 14:47:45,830 [WARNING] Obstacle detected (L:14 C:999 R:58) -> evasive maneuver
+2026-06-04 14:47:46,854 [WARNING] Obstacle detected (L:13 C:999 R:999) -> evasive maneuver
+2026-06-04 14:47:48,167 [WARNING] Obstacle detected (L:252 C:39 R:999) -> evasive maneuver
+2026-06-04 14:47:49,300 [WARNING] Obstacle detected (L:250 C:22 R:999) -> evasive maneuver
+2026-06-04 14:47:50,468 [INFO] Completion of Step 4
+2026-06-04 14:47:50,477 [INFO] --- Step 5: Returning home ---
+2026-06-04 14:47:55,937 [INFO] Moving to Home tag
+2026-06-04 14:47:55,941 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:02,920 [WARNING] Localization failed on USB and PiCamera. Backing up and retrying.
+2026-06-04 14:48:04,577 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:08,167 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144805.jpg
+2026-06-04 14:48:08,171 [INFO] Robot Pose: x=1.38, y=0.34, heading=36.1 (camera=usb), dist_to_home=170.4cm
+2026-06-04 14:48:08,426 [INFO] Computed to-home command: rotation=+66.9deg, linear_distance=1.70m
+2026-06-04 14:48:09,311 [INFO] Aligning to home heading: error=+66.9deg -> turn L
+2026-06-04 14:48:09,316 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:13,300 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144810.jpg
+2026-06-04 14:48:13,305 [INFO] Robot Pose: x=1.33, y=0.45, heading=46.6 (camera=usb), dist_to_home=158.2cm
+2026-06-04 14:48:13,312 [INFO] Computed to-home command: rotation=+55.4deg, linear_distance=1.58m
+2026-06-04 14:48:14,168 [INFO] Aligning to home heading: error=+55.4deg -> turn L
+2026-06-04 14:48:14,177 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:17,858 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144815.jpg
+2026-06-04 14:48:17,864 [INFO] Robot Pose: x=1.44, y=0.00, heading=72.3 (camera=usb), dist_to_home=204.7cm
+2026-06-04 14:48:17,868 [INFO] Computed to-home command: rotation=+30.0deg, linear_distance=2.05m
+2026-06-04 14:48:18,441 [INFO] Aligning to home heading: error=+30.0deg -> turn L
+2026-06-04 14:48:18,449 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:48:22,491 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144820.jpg
+2026-06-04 14:48:22,499 [INFO] Robot Pose: x=1.63, y=0.00, heading=81.0 (camera=usb), dist_to_home=209.5cm
+2026-06-04 14:48:22,505 [INFO] Computed to-home command: rotation=+26.3deg, linear_distance=2.10m
+2026-06-04 14:48:23,083 [INFO] Aligning to home heading: error=+26.3deg -> turn L
+2026-06-04 14:48:23,086 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:48:26,514 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144823.jpg
+2026-06-04 14:48:26,520 [INFO] Robot Pose: x=1.91, y=0.00, heading=94.7 (camera=usb), dist_to_home=219.6cm
+2026-06-04 14:48:26,525 [INFO] Computed to-home command: rotation=+19.8deg, linear_distance=2.20m
+2026-06-04 14:48:26,995 [INFO] Aligning to home heading: error=+19.8deg -> turn L
+2026-06-04 14:48:27,002 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:48:30,911 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144828.jpg
+2026-06-04 14:48:30,914 [INFO] Robot Pose: x=1.94, y=0.00, heading=96.5 (camera=usb), dist_to_home=220.8cm
+2026-06-04 14:48:30,916 [INFO] Computed to-home command: rotation=+18.6deg, linear_distance=2.21m
+2026-06-04 14:48:32,002 [INFO] Aligning to home heading: error=+18.6deg -> turn L
+2026-06-04 14:48:32,012 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:48:34,751 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144832.jpg
+2026-06-04 14:48:34,756 [INFO] Robot Pose: x=1.70, y=0.00, heading=99.3 (camera=usb), dist_to_home=212.0cm
+2026-06-04 14:48:34,764 [INFO] Computed to-home command: rotation=+10.1deg, linear_distance=2.12m
+2026-06-04 14:48:34,768 [INFO] Course approach: distance=212.0cm. Moving fast at speed 2 for 2.00s.
+2026-06-04 14:48:37,285 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:48:40,552 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144838.jpg
+2026-06-04 14:48:40,554 [INFO] Robot Pose: x=1.86, y=0.12, heading=124.3 (camera=usb), dist_to_home=206.8cm
+2026-06-04 14:48:40,782 [INFO] Computed to-home command: rotation=-9.8deg, linear_distance=2.07m
+2026-06-04 14:48:40,790 [INFO] Course approach: distance=206.8cm. Moving fast at speed 2 for 2.00s.
+2026-06-04 14:48:43,317 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:46,919 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144844.jpg
+2026-06-04 14:48:46,921 [INFO] Robot Pose: x=1.53, y=1.57, heading=187.4 (camera=usb), dist_to_home=68.3cm
+2026-06-04 14:48:46,924 [INFO] Computed to-home command: rotation=-46.0deg, linear_distance=0.68m
+2026-06-04 14:48:47,935 [INFO] Aligning to home heading: error=-46.0deg -> turn R
+2026-06-04 14:48:47,940 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:51,574 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144849.jpg
+2026-06-04 14:48:51,580 [INFO] Robot Pose: x=1.70, y=0.80, heading=142.3 (camera=usb), dist_to_home=139.5cm
+2026-06-04 14:48:51,586 [INFO] Computed to-home command: rotation=-22.0deg, linear_distance=1.39m
+2026-06-04 14:48:52,171 [INFO] Aligning to home heading: error=-22.0deg -> turn R
+2026-06-04 14:48:52,182 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:55,562 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144853.jpg
+2026-06-04 14:48:55,567 [INFO] Robot Pose: x=1.78, y=0.75, heading=138.1 (camera=usb), dist_to_home=147.7cm
+2026-06-04 14:48:55,574 [INFO] Computed to-home command: rotation=-16.0deg, linear_distance=1.48m
+2026-06-04 14:48:56,159 [INFO] Aligning to home heading: error=-16.0deg -> turn R
+2026-06-04 14:48:56,169 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:48:59,234 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144857.jpg
+2026-06-04 14:48:59,240 [INFO] Robot Pose: x=1.15, y=0.44, heading=114.3 (camera=usb), dist_to_home=156.3cm
+2026-06-04 14:48:59,247 [INFO] Computed to-home command: rotation=-18.6deg, linear_distance=1.56m
+2026-06-04 14:48:59,825 [INFO] Aligning to home heading: error=-18.6deg -> turn R
+2026-06-04 14:48:59,833 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:49:03,006 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144900.jpg
+2026-06-04 14:49:03,015 [INFO] Robot Pose: x=1.32, y=0.41, heading=114.2 (camera=usb), dist_to_home=162.0cm
+2026-06-04 14:49:03,020 [INFO] Computed to-home command: rotation=-12.7deg, linear_distance=1.62m
+2026-06-04 14:49:03,868 [INFO] Aligning to home heading: error=-12.7deg -> turn R
+2026-06-04 14:49:03,871 [INFO] State: estimating robot pose (USB first, then PiCamera fallback)
+2026-06-04 14:49:06,999 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144904.jpg
+2026-06-04 14:49:07,005 [INFO] Robot Pose: x=1.08, y=0.53, heading=97.9 (camera=usb), dist_to_home=147.2cm
+2026-06-04 14:49:07,020 [INFO] Computed to-home command: rotation=-4.7deg, linear_distance=1.47m
+2026-06-04 14:49:07,022 [INFO] Course approach: distance=147.2cm. Moving fast at speed 2 for 2.00s.
+2026-06-04 14:49:09,622 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:49:13,079 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144910.jpg
+2026-06-04 14:49:13,085 [INFO] Robot Pose: x=0.77, y=1.48, heading=96.0 (camera=picam), dist_to_home=57.1cm
+2026-06-04 14:49:13,090 [INFO] Computed to-home command: rotation=-29.5deg, linear_distance=0.57m
+2026-06-04 14:49:13,677 [INFO] Aligning to home heading: error=-29.5deg -> turn R
+2026-06-04 14:49:13,685 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:49:16,873 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144914.jpg
+2026-06-04 14:49:16,879 [INFO] Robot Pose: x=0.78, y=1.47, heading=84.6 (camera=picam), dist_to_home=57.3cm
+2026-06-04 14:49:16,884 [INFO] Computed to-home command: rotation=-16.7deg, linear_distance=0.57m
+2026-06-04 14:49:17,432 [INFO] Aligning to home heading: error=-16.7deg -> turn R
+2026-06-04 14:49:17,436 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:49:23,234 [WARNING] Localization failed on USB and PiCamera. Backing up and retrying.
+2026-06-04 14:49:24,492 [INFO] State: tag spotted .. estimating robot pose
+2026-06-04 14:49:28,822 [INFO] Saved layout visualization to /home/pi/Raspi_codes/unibots2026/robot_2wd_12V/integration/log/localize_20260604_144926.jpg
+2026-06-04 14:49:29,038 [INFO] Robot Pose: x=1.00, y=0.77, heading=83.3 (camera=usb), dist_to_home=123.0cm
+2026-06-04 14:49:29,042 [INFO] Computed to-home command: rotation=+6.9deg, linear_distance=1.23m
+2026-06-04 14:49:29,046 [INFO] Course approach: distance=123.0cm. Moving fast at speed 2 for 2.00s.
+2026-06-04 14:49:31,445 [ERROR] Failed to reach home within time limit. Skipping drop sequence.
+2026-06-04 14:49:31,453 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
+2026-06-04 14:49:31,459 [INFO] Moving ARM to DOWN pose before exit.
+2026-06-04 14:49:32,529 [INFO] Camera stopped
+2026-06-04 14:49:32,936 [INFO] Camera closed successfully.

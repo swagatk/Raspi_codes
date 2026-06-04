@@ -56,6 +56,7 @@ def find_usb_camera():
 class VisionModule:
     def __init__(self):
         self.running = False
+        self._state_lock = threading.Lock()
         self.camera_path = find_usb_camera()
         self.cap = None
         self.picam2 = None
@@ -71,6 +72,7 @@ class VisionModule:
         self.ball_box = None
         self.ball_candidates = []
         self.selected_ball = None
+        self.detection_frame = None
         self.ball_x = 0
         self.ball_distance = 999.0
         self.arm_is_up = True
@@ -113,6 +115,23 @@ class VisionModule:
                 )
                 self.picam2.configure(config)
                 self.picam2.start()
+
+                # Seed an initial PiCamera frame before the background loop starts.
+                # This avoids false init failures when startup takes slightly longer.
+                seeded = False
+                for _ in range(25):
+                    try:
+                        frame_bgr = self.picam2.capture_array()
+                        with self._state_lock:
+                            self.picam_frame = frame_bgr.copy()
+                        seeded = True
+                        break
+                    except Exception:
+                        time.sleep(0.08)
+
+                if not seeded:
+                    logger.warning("PiCamera started but initial frame was not available during warmup window.")
+
                 threading.Thread(target=self._picam_capture_loop, daemon=True).start()
                 logger.info("PiCamera started.")
             except Exception as e:
@@ -128,10 +147,6 @@ class VisionModule:
     def _usb_capture_loop(self):
         frame_idx = 0
         consecutive_read_failures = 0
-        consecutive_detections = 0
-        consecutive_misses = 0
-        CONFIRM_FRAMES = 3
-        MISS_FRAMES_TOLERANCE = 5
         current_target_box = None
         
         while self.running:
@@ -158,7 +173,8 @@ class VisionModule:
                 continue
             consecutive_read_failures = 0
             
-            self.frame = frame
+            with self._state_lock:
+                self.frame = frame
             frame_idx += 1
             
             if frame_idx % SKIP_FRAMES == 0:
@@ -174,8 +190,6 @@ class VisionModule:
                         
                         if 0.8 <= aspect_ratio <= 1.2:
                             candidate_boxes.append((float(x), float(y), w_f, h_f, area))
-
-                self.ball_candidates = list(candidate_boxes)
 
                 best_match = None
                 if candidate_boxes:
@@ -194,7 +208,6 @@ class VisionModule:
                         # Keep lock on the same target unless a much larger candidate appears.
                         if largest_candidate[4] > closest_candidate[4] * TARGET_SWITCH_AREA_GAIN:
                             best_match = largest_candidate
-                            consecutive_detections = 1
                         else:
                             best_match = closest_candidate
                     else:
@@ -202,9 +215,6 @@ class VisionModule:
 
                 largest_box = None
                 if best_match:
-                    consecutive_misses = 0
-                    consecutive_detections += 1
-                    
                     if current_target_box is None:
                         current_target_box = (best_match[0], best_match[1], best_match[2], best_match[3])
                     else:
@@ -215,30 +225,34 @@ class VisionModule:
                             alpha * best_match[2] + (1 - alpha) * current_target_box[2],
                             alpha * best_match[3] + (1 - alpha) * current_target_box[3]
                         )
-
-                    if consecutive_detections >= CONFIRM_FRAMES:
-                        largest_box = current_target_box
+                    largest_box = current_target_box
                 else:
-                    consecutive_misses += 1
-                    if consecutive_misses > MISS_FRAMES_TOLERANCE:
-                        current_target_box = None
-                        consecutive_detections = 0
-                        largest_box = None
-                    else:
-                        if consecutive_detections >= CONFIRM_FRAMES:
-                            largest_box = current_target_box
+                    current_target_box = None
+                    largest_box = None
                 
                 if largest_box:
-                    self.ball_detected = True
-                    self.ball_x = largest_box[0]
+                    ball_detected = True
+                    ball_x = largest_box[0]
                     pixel_diam = min(largest_box[2], largest_box[3])
-                    self.ball_distance = (BALL_DIAMETER_CM * self.focal_length_x) / pixel_diam if pixel_diam > 0 else 999.0
-                    self.ball_box = largest_box
-                    self.selected_ball = largest_box
+                    ball_distance = (BALL_DIAMETER_CM * self.focal_length_x) / pixel_diam if pixel_diam > 0 else 999.0
+                    ball_box = largest_box
+                    selected_ball = largest_box
                 else:
-                    self.ball_detected = False
-                    self.ball_box = None
-                    self.selected_ball = None
+                    ball_detected = False
+                    ball_x = 0
+                    ball_distance = 999.0
+                    ball_box = None
+                    selected_ball = None
+
+                with self._state_lock:
+                    self.ball_candidates = list(candidate_boxes)
+                    self.ball_detected = ball_detected
+                    self.ball_x = ball_x
+                    self.ball_distance = ball_distance
+                    self.ball_box = ball_box
+                    self.selected_ball = selected_ball
+                    # Keep the exact frame used by the current YOLO inference to avoid box/frame drift.
+                    self.detection_frame = frame.copy()
 
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 try:
@@ -260,7 +274,8 @@ class VisionModule:
                     time.sleep(0.01)
                     continue
                     
-                self.picam_frame = frame_bgr.copy()
+                with self._state_lock:
+                    self.picam_frame = frame_bgr.copy()
                 
                 gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
                 try:
@@ -277,15 +292,38 @@ class VisionModule:
             time.sleep(0.01)
 
     def update_active_camera(self, arm_is_up):
-        self.arm_is_up = arm_is_up
+        with self._state_lock:
+            self.arm_is_up = arm_is_up
+
+    def get_ball_overlay_snapshot(self):
+        with self._state_lock:
+            frame = None
+            if self.detection_frame is not None:
+                frame = self.detection_frame.copy()
+            elif self.frame is not None:
+                frame = self.frame.copy()
+
+            return {
+                'frame': frame,
+                'ball_detected': bool(self.ball_detected),
+                'ball_candidates': list(self.ball_candidates),
+                'selected_ball': self.selected_ball,
+                'ball_box': self.ball_box,
+                'ball_distance': float(self.ball_distance),
+            }
         
     @property
     def active_camera_params(self):
-        return self.usb_camera_params if getattr(self, 'arm_is_up', True) else getattr(self, 'picam_camera_params', self.usb_camera_params)
+        with self._state_lock:
+            arm_is_up = getattr(self, 'arm_is_up', True)
+        return self.usb_camera_params if arm_is_up else getattr(self, 'picam_camera_params', self.usb_camera_params)
         
     @property
     def active_frame(self):
-        return self.frame if getattr(self, 'arm_is_up', True) else self.picam_frame
+        with self._state_lock:
+            arm_is_up = getattr(self, 'arm_is_up', True)
+            frame = self.frame if arm_is_up else self.picam_frame
+            return frame.copy() if frame is not None else None
         
     @property
     def tags(self):

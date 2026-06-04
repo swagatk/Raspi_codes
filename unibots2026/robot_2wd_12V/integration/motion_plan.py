@@ -133,8 +133,43 @@ def rotate_towards_heading(current_heading_deg, desired_heading_deg):
     return False, heading_error, turn_dir
 
 def execute_course_step_forward():
-    step_duration = COURSE_FWD_MOTION_DIST_CM / max(COURSE_SPEED_CM_S, 1e-6)
-    return execute_burst('F', COURSE_FORWARD_SPEED, step_duration, APPROACH_FORWARD_SETTLE_S)
+    step_duration = STEP5_STEADY_FORWARD_BURST_S
+    return execute_forward_with_sensor_guard(
+        STEP5_STEADY_FORWARD_SPEED,
+        step_duration,
+        STEP5_STEADY_FORWARD_SETTLE_S,
+        "course approach",
+    )
+
+
+def execute_forward_with_sensor_guard(speed, run_s, settle_s=0.0, context_label="forward move"):
+    if not can_continue():
+        return False
+
+    robot.move('F', speed)
+    blocked = False
+    end_t = time.time() + max(0.0, run_s)
+    while can_continue() and time.time() < end_t:
+        # Continuously poll all ultrasonic sensors while moving forward.
+        if obstacle_detected(robot):
+            blocked = True
+            break
+        time.sleep(min(0.02, end_t - time.time()))
+
+    robot.halt()
+    if not can_continue():
+        return False
+
+    if blocked:
+        logging.warning(
+            f"{context_label}: obstacle detected during forward motion "
+            f"(L:{robot.latest_L} C:{robot.latest_C} R:{robot.latest_R})."
+        )
+        return False
+
+    if settle_s > 0 and not wait_with_abort(settle_s):
+        return False
+    return True
 
 def run_obstacle_avoidance(robot):
     logging.warning(
@@ -207,14 +242,30 @@ def estimate_wall_distance_cm_from_picam(vision):
         return None
 
 def save_annotated_frame(vision, filename):
-    if hasattr(vision, 'active_frame') and vision.active_frame is not None:
-        annotated = vision.active_frame.copy()
-    elif vision.frame is not None:
-        annotated = vision.frame.copy()
+    snapshot = None
+    if hasattr(vision, 'get_ball_overlay_snapshot'):
+        snapshot = vision.get_ball_overlay_snapshot()
+
+    if snapshot and snapshot.get('frame') is not None:
+        annotated = snapshot['frame']
+        ball_candidates = snapshot.get('ball_candidates', [])
+        target_box = snapshot.get('selected_ball') or snapshot.get('ball_box')
+        ball_detected = snapshot.get('ball_detected', False)
+        ball_distance = snapshot.get('ball_distance', 999.0)
     else:
-        return
+        if hasattr(vision, 'active_frame') and vision.active_frame is not None:
+            annotated = vision.active_frame.copy()
+        elif vision.frame is not None:
+            annotated = vision.frame.copy()
+        else:
+            return
+        ball_candidates = getattr(vision, 'ball_candidates', [])
+        target_box = getattr(vision, 'selected_ball', None) or getattr(vision, 'ball_box', None)
+        ball_detected = vision.ball_detected
+        ball_distance = vision.ball_distance
+
     # Draw all valid detections in blue, and selected target in cyan.
-    for cand in getattr(vision, 'ball_candidates', []):
+    for cand in ball_candidates:
         cx, cy, w, h, _ = cand
         x1 = int(cx - w / 2)
         y1 = int(cy - h / 2)
@@ -222,18 +273,17 @@ def save_annotated_frame(vision, filename):
         y2 = int(cy + h / 2)
         cv2.rectangle(annotated, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
-    target_box = getattr(vision, 'selected_ball', None) or getattr(vision, 'ball_box', None)
-    if vision.ball_detected and target_box:
+    if ball_detected and target_box:
         x, y, w, h = target_box[:4]
         x1 = int(x - w / 2)
         y1 = int(y - h / 2)
         x2 = int(x + w / 2)
         y2 = int(y + h / 2)
         cv2.rectangle(annotated, (x1, y1), (x2, y2), (255, 255, 0), 3)
-        cv2.putText(annotated, f"TARGET Dist: {vision.ball_distance:.1f}cm | Area: {w*h:.1f}", (10, 30),
+        cv2.putText(annotated, f"TARGET Dist: {ball_distance:.1f}cm | Area: {w*h:.1f}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 0), 2)
-    elif vision.ball_detected:
-        cv2.putText(annotated, f"Dist: {vision.ball_distance:.1f}cm", (10, 30),
+    elif ball_detected:
+        cv2.putText(annotated, f"Dist: {ball_distance:.1f}cm", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     
     try:
@@ -302,10 +352,16 @@ def get_confirmed_pose_with_camera_fallback(vision, arena_map, estimate_robot_po
     last_pose = None
     last_cam = None
 
-    while mission_running and confirmed_count < STEP5_POSE_CONFIRM_FRAMES:
+    # Track how many attempts we've made to get a stable pose
+    max_attempts = 12
+    attempts = 0
+
+    while mission_running and confirmed_count < STEP5_POSE_CONFIRM_FRAMES and attempts < max_attempts:
+        attempts += 1
         pose, pose_cam = get_pose_with_camera_fallback(vision, arena_map, estimate_robot_pose_func)
         if not pose:
-            return None, None
+            time.sleep(STEP5_POSE_CONFIRM_INTERVAL_S)
+            continue
 
         if last_pose is None:
             confirmed_count = 1
@@ -322,15 +378,18 @@ def get_confirmed_pose_with_camera_fallback(vision, arena_map, estimate_robot_po
             ):
                 confirmed_count += 1
             else:
+                # Reset if the jump is too large
                 confirmed_count = 1
-
+            
             last_pose = pose
             last_cam = pose_cam
 
         if confirmed_count < STEP5_POSE_CONFIRM_FRAMES:
             time.sleep(STEP5_POSE_CONFIRM_INTERVAL_S)
 
-    return last_pose, last_cam
+    if confirmed_count >= STEP5_POSE_CONFIRM_FRAMES:
+        return last_pose, last_cam
+    return None, None
 
 def get_home_tag_center_error_px(vision):
     # Prefer USB tags when available, otherwise PiCamera tags.
@@ -511,90 +570,18 @@ def main():
         # 1. Search for target
         logging.info("Searching for ball...")
         ball_found = False
-        confirm_count = 0
-        last_confirm_x = None
-        last_confirm_dist = None
         search_start = time.time()
         
         while mission_running and (time.time() - search_start < BALL_SEARCH_WINDOW_S) and (time.time() - exploration_start < step4_budget_s):
             if vision.ball_detected:
                 robot.halt()
-                current_x = float(vision.ball_x)
-                current_dist = float(vision.ball_distance)
-
-                stable_with_previous = (
-                    last_confirm_x is None
-                    or (
-                        abs(current_x - last_confirm_x) <= STEP4_BALL_CONFIRM_MAX_X_JUMP_PX
-                        and abs(current_dist - last_confirm_dist) <= STEP4_BALL_CONFIRM_MAX_DIST_JUMP_CM
-                    )
-                )
-
-                if stable_with_previous:
-                    confirm_count += 1
-                else:
-                    confirm_count = 1
-
-                last_confirm_x = current_x
-                last_confirm_dist = current_dist
-
                 logging.info(
-                    f"Ball candidate confirmation {confirm_count}/{STEP4_BALL_CONFIRM_FRAMES} "
-                    f"(dist={current_dist:.1f}cm, x={current_x:.1f})"
+                    f"Target detected (dist={vision.ball_distance:.1f}cm, x={vision.ball_x:.1f}). "
+                    "Switching immediately to approach."
                 )
-
-                # Keep robot stationary during confirmation checks.
-                confirm_deadline = time.time() + 1.2
-                while (
-                    mission_running
-                    and confirm_count < STEP4_BALL_CONFIRM_FRAMES
-                    and time.time() < confirm_deadline
-                    and (time.time() - search_start < BALL_SEARCH_WINDOW_S)
-                    and (time.time() - exploration_start < step4_budget_s)
-                ):
-                    time.sleep(0.12)
-                    if not vision.ball_detected:
-                        logging.info("Ball confirmation reset due to missed frame.")
-                        confirm_count = 0
-                        last_confirm_x = None
-                        last_confirm_dist = None
-                        break
-
-                    current_x = float(vision.ball_x)
-                    current_dist = float(vision.ball_distance)
-                    stable_with_previous = (
-                        last_confirm_x is None
-                        or (
-                            abs(current_x - last_confirm_x) <= STEP4_BALL_CONFIRM_MAX_X_JUMP_PX
-                            and abs(current_dist - last_confirm_dist) <= STEP4_BALL_CONFIRM_MAX_DIST_JUMP_CM
-                        )
-                    )
-
-                    if stable_with_previous:
-                        confirm_count += 1
-                    else:
-                        # Target likely changed; restart confirmation from this stationary frame.
-                        confirm_count = 1
-
-                    last_confirm_x = current_x
-                    last_confirm_dist = current_dist
-
-                    logging.info(
-                        f"Ball candidate confirmation {confirm_count}/{STEP4_BALL_CONFIRM_FRAMES} "
-                        f"(dist={current_dist:.1f}cm, x={current_x:.1f})"
-                    )
-
-                if confirm_count >= STEP4_BALL_CONFIRM_FRAMES:
-                    logging.info(f"Target confirmed at {vision.ball_distance:.1f}cm! Saving image.")
-                    save_annotated_frame(vision, f"ball_target_{time.strftime('%Y%m%d_%H%M%S')}.jpg")
-                    ball_found = True
-                    break
-            else:
-                if confirm_count > 0:
-                    logging.info("Ball confirmation reset due to missed frame.")
-                confirm_count = 0
-                last_confirm_x = None
-                last_confirm_dist = None
+                save_annotated_frame(vision, f"ball_target_{time.strftime('%Y%m%d_%H%M%S')}.jpg")
+                ball_found = True
+                break
             # Rotate by a slightly larger amount to search faster
             if not execute_burst(SEARCH_TURN_DIR, SEARCH_TURN_SPEED, SEARCH_TURN_DURATION_S, SEARCH_TURN_SETTLE_S):
                 break
@@ -623,14 +610,14 @@ def main():
                 last_seen_error = error
                 last_seen_ts = time.time()
                 last_seen_distance = vision.ball_distance
-                if abs(error) >= CENTER_TOLERANCE:
-                    # Bring target to center slowly before forward advance.
-                    if error < 0:
-                        moved = execute_burst('L', CENTERING_TURN_SPEED, CENTERING_TURN_BURST_S, CENTERING_SETTLE_S)
-                    else:
-                        moved = execute_burst('R', CENTERING_TURN_SPEED, CENTERING_TURN_BURST_S, CENTERING_SETTLE_S)
-                    if not moved:
+
+                # Use a small hysteresis band so tiny detector jitter does not flip the turn direction.
+                if abs(error) > CENTER_TOLERANCE + 8:
+                    turn_dir = 'L' if error < 0 else 'R'
+                    logging.debug(f"Centering ball: error={error:+.1f}px -> turn {turn_dir}")
+                    if not execute_burst(turn_dir, CENTERING_TURN_SPEED, CENTERING_TURN_BURST_S, CENTERING_SETTLE_S):
                         break
+                    continue
                 else:
                     if vision.ball_distance <= BALL_PICK_DISTANCE:
                         logging.info(f"Target reached BALL_PICK_DISTANCE ({BALL_PICK_DISTANCE:.1f}cm).")
@@ -841,25 +828,9 @@ def main():
     
     logging.info("Moving to Home tag")
     
+    arrived_at_home = False
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
-        if is_valid_distance_cm(robot.latest_C) and robot.latest_C <= HOME_WALL_STOP_DISTANCE:
-            near_home_confirm += 1
-            logging.info(
-                f"Home wall proximity check {near_home_confirm}/{HOME_WALL_STOP_CONFIRM_COUNT}: "
-                f"C={robot.latest_C:.1f}cm <= {HOME_WALL_STOP_DISTANCE:.1f}cm"
-            )
-            if near_home_confirm >= HOME_WALL_STOP_CONFIRM_COUNT:
-                logging.info("Arrived close to home wall.")
-                robot.halt()
-                break
-        else:
-            near_home_confirm = 0
-
-        if obstacle_detected(robot):
-            if not run_obstacle_avoidance(robot):
-                break
-            continue
-
+        # 1. Estimate robot pose first to know distance to home target.
         visible_home_tags = any(
             getattr(tag, 'tag_id', None) in HOME_TAG_IDS
             for tag in (list(getattr(vision, 'usb_tags', [])) + list(getattr(vision, 'picam_tags', [])))
@@ -868,6 +839,7 @@ def main():
             logging.info("State: tag spotted .. estimating robot pose")
         else:
             logging.info("State: estimating robot pose (USB first, then PiCamera fallback)")
+            
         pose, pose_cam = get_confirmed_pose_with_camera_fallback(vision, ARENA_MAP, estimate_robot_pose)
 
         if not pose:
@@ -888,11 +860,37 @@ def main():
             continue
 
         failed_localize_cycles = 0
-
         rx, ry, heading = pose
-        logging.info(
-            f"Robot Pose (2-frame confirmed): x={rx:.2f}, y={ry:.2f}, heading={heading:.1f} (camera={pose_cam})"
+        desired_heading, rotation_deg, linear_distance_m = compute_heading_and_distance_to_home(
+            rx, ry, heading, home_target_xy
         )
+        dist_to_home_cm = linear_distance_m * 100.0
+
+        # 2. Check if we arrived near home wall.
+        home_wall_close = any(
+            is_valid_distance_cm(v) and v <= HOME_WALL_STOP_DISTANCE
+            for v in (robot.latest_L, robot.latest_C, robot.latest_R)
+        )
+        # Only accept wall-stop if we are actually close to the home zone (within 60cm of target).
+        if home_wall_close and dist_to_home_cm < 60.0:
+            near_home_confirm += 1
+            logging.info(
+                f"Home wall proximity check {near_home_confirm}/{HOME_WALL_STOP_CONFIRM_COUNT}: "
+                f"L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f} "
+                f"<= {HOME_WALL_STOP_DISTANCE:.1f}cm (dist_to_home={dist_to_home_cm:.1f}cm)"
+            )
+            if near_home_confirm >= HOME_WALL_STOP_CONFIRM_COUNT:
+                logging.info("Arrived close to home wall.")
+                robot.halt()
+                arrived_at_home = True
+                break
+        else:
+            near_home_confirm = 0
+
+        if obstacle_detected(robot):
+            if not run_obstacle_avoidance(robot):
+                break
+            continue
 
         now = time.time()
         if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
@@ -901,8 +899,8 @@ def main():
             logging.info(f"Saved layout visualization to {save_path}")
             last_localize_save_ts = now
 
-        desired_heading, rotation_deg, linear_distance_m = compute_heading_and_distance_to_home(
-            rx, ry, heading, home_target_xy
+        logging.info(
+            f"Robot Pose: x={rx:.2f}, y={ry:.2f}, heading={heading:.1f} (camera={pose_cam}), dist_to_home={dist_to_home_cm:.1f}cm"
         )
         logging.info(
             f"Computed to-home command: rotation={rotation_deg:+.1f}deg, "
@@ -913,16 +911,14 @@ def main():
             break
         if not aligned:
             logging.info(
-                f"Aligning to home heading in larger step: error={heading_error:+.1f}deg -> turn {turn_dir}"
+                f"Aligning to home heading: error={heading_error:+.1f}deg -> turn {turn_dir}"
             )
-            if abs(heading_error) > STEP5_FORWARD_AFTER_TURN_MAX_ERROR_DEG:
-                logging.info(
-                    f"Heading error still large ({heading_error:+.1f}deg). Skipping forward motion this cycle."
-                )
-                continue
+            # Re-localize after each turn burst; do not drive forward until heading is aligned.
+            continue
 
-        logging.info("Home tag spotted. Approaching...")
-        if is_valid_distance_cm(robot.latest_C) and robot.latest_C < FINE_TUNING_HOME_DIST_CM:
+        # 3. Move towards home
+        if dist_to_home_cm < FINE_TUNING_HOME_DIST_CM:
+            logging.info(f"Home zone reached ({dist_to_home_cm:.1f}cm). Performing fine approach.")
             tag_error_px = get_home_tag_center_error_px(vision)
             if tag_error_px is not None and abs(tag_error_px) > CENTER_TOLERANCE:
                 turn_dir = 'L' if tag_error_px < 0 else 'R'
@@ -932,25 +928,54 @@ def main():
                 if not execute_burst(turn_dir, CENTERING_TURN_SPEED, 0.04, CENTERING_SETTLE_S):
                     break
             else:
-                logging.info("Fine tuning near wall: moving forward cautiously.")
-                if not execute_burst('F', APPROACH_FORWARD_SPEED, 0.10, APPROACH_FORWARD_SETTLE_S):
+                logging.info("Fine tuning near wall: moving forward slowly.")
+                moved = execute_forward_with_sensor_guard(
+                    STEP5_STEADY_FORWARD_SPEED,
+                    STEP5_STEADY_FORWARD_BURST_S,
+                    STEP5_STEADY_FORWARD_SETTLE_S,
+                    "fine tuning",
+                )
+                if not moved:
+                    if obstacle_detected(robot):
+                        if not run_obstacle_avoidance(robot):
+                            break
+                        continue
                     break
         else:
+            # Coarse movement: Move faster and with longer duration when far away (> 50cm)
+            # Cap the movement to roughly 30cm if the distance is large, otherwise close the gap to fine-tuning threshold.
+            target_move_dist = min(COURSE_FWD_MOTION_DIST_CM, dist_to_home_cm - (FINE_TUNING_HOME_DIST_CM - 10.0))
+            course_burst_s = max(0.4, min(2.0, target_move_dist / COURSE_SPEED_CM_S))
+            
             logging.info(
-                f"Course approach: advancing {COURSE_FWD_MOTION_DIST_CM:.1f}cm toward home."
+                f"Course approach: distance={dist_to_home_cm:.1f}cm. "
+                f"Moving fast at speed {COURSE_FORWARD_SPEED} for {course_burst_s:.2f}s."
             )
-            if not execute_course_step_forward():
+            moved = execute_forward_with_sensor_guard(
+                COURSE_FORWARD_SPEED,
+                course_burst_s,
+                STEP5_STEADY_FORWARD_SETTLE_S,
+                "course approach",
+            )
+            if not moved:
+                if obstacle_detected(robot):
+                    if not run_obstacle_avoidance(robot):
+                        break
+                    continue
                 break
 
     if not mission_running:
         logging.info("Mission stopped before drop sequence.")
         return
 
-    logging.info("Executing Ball drop...")
-    robot.arm_drop()
-    wait_with_abort(2)
-    robot.gripper_open()
-    wait_with_abort(1)
+    if arrived_at_home:
+        logging.info("Executing Ball drop...")
+        robot.arm_drop()
+        wait_with_abort(2)
+        robot.gripper_open()
+        wait_with_abort(1)
+    else:
+        logging.error("Failed to reach home within time limit. Skipping drop sequence.")
 
     robot.arm_down()
     if 'vision' in globals() and vision:
