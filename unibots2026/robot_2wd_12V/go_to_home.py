@@ -1,3 +1,8 @@
+import os
+
+# SSH/X11 forwarding often breaks Qt shared-memory paths. Disable MIT-SHM for stability.
+os.environ.setdefault("QT_X11_NO_MITSHM", "1")
+
 import cv2
 import numpy as np
 from pupil_apriltags import Detector
@@ -59,6 +64,13 @@ SEARCH_TIMEOUT = 0.7       # If tag unseen for 0.7 seconds, start scanning for i
 FRAME_SKIP = 3             # Only run detection every Nth frame
 AUTO_START_ON_LOCALIZATION = True
 
+# Qt-backed OpenCV windows are unstable on some Pi setups when used from threads.
+# Enable GUI by default for local runs. If no display is available, auto-fallback to headless.
+ENABLE_GUI = os.environ.get("GO_HOME_GUI", "1") == "1"
+if ENABLE_GUI and not os.environ.get("DISPLAY"):
+    print("GUI requested but DISPLAY is not set; falling back to headless mode.")
+    ENABLE_GUI = False
+
 # --- ABSOLUTE MAP (The "GPS" Coordinates) ---
 # 'wall_base_angle' is the compass heading the robot would have if it 
 # was staring perfectly straight at that specific wall.
@@ -105,8 +117,9 @@ ARENA_MAP = {
 # --- HOME SETTINGS ---
 HOME_TAGS = [14, 15 ]
 FINAL_STOP_DISTANCE_CM = 40
+HOME_REACHED_DISTANCE_THRESHOLD_M = 0.25
 TAG_REACQUIRE_BACKUP_DISTANCE_CM = 80
-TAG_REACQUIRE_BACKUP_DURATION_S = 0.15
+TAG_REACQUIRE_BACKUP_DURATION_S = 0.3
 TAG_REACQUIRE_BACKUP_COOLDOWN_S = 0.8
 ROUTE_HEADING_TOL_DEG = 10.0
 ROUTE_COARSE_TURN_THRESHOLD_DEG = 40.0
@@ -358,12 +371,140 @@ capture_thread = threading.Thread(target=camera_capture_thread)
 capture_thread.daemon = True
 capture_thread.start()
 
-# --- OPTIMIZED VIDEO DISPLAY THREAD ---
-show_vision = False
+# --- GUI STATE ---
+show_vision = ENABLE_GUI
 display_frame = None
-start_motion = False
+start_motion = not ENABLE_GUI
 robot_x, robot_y, robot_heading = 0.0, 0.0, 0.0
 is_localized = False
+
+gui_initialized = False
+gui_paused_frame = None
+fig = None
+canvas = None
+ax = None
+last_map_update = 0.0
+
+
+def init_gui_once():
+    global gui_initialized, gui_paused_frame, fig, canvas, ax
+    if gui_initialized or not ENABLE_GUI:
+        return
+
+    cv2.namedWindow("Robot Vision", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Robot Vision", 320, 240)
+
+    cv2.namedWindow("Arena Map", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Arena Map", 800, 600)
+
+    fig = Figure(figsize=(8, 6), dpi=100)
+    canvas = FigureCanvasAgg(fig)
+    ax = fig.add_axes([0.1, 0.1, 0.6, 0.8])
+
+    gui_paused_frame = np.zeros((240, 320, 3), dtype=np.uint8)
+    cv2.putText(gui_paused_frame, "Vision Paused", (60, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(gui_paused_frame, "Press 'C' to toggle", (60, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+    gui_initialized = True
+
+
+def update_gui():
+    global running, show_vision, start_motion, last_map_update
+    if not ENABLE_GUI:
+        return
+
+    if not gui_initialized:
+        try:
+            init_gui_once()
+        except Exception as e:
+            print(f"GUI init failed: {e}. Falling back to headless mode.")
+            return
+
+    if show_vision and display_frame is not None:
+        try:
+            small_frame = cv2.resize(display_frame, (320, 240))
+            bgr = cv2.cvtColor(small_frame, cv2.COLOR_RGB2BGR)
+            cv2.imshow("Robot Vision", bgr)
+        except Exception as e:
+            print(f"Vision error: {e}")
+    else:
+        cv2.imshow("Robot Vision", gui_paused_frame)
+
+    now = time.time()
+    if now - last_map_update > 0.2:
+        last_map_update = now
+        ax.clear()
+        ax.set_xlim(-0.2, 2.2)
+        ax.set_ylim(-0.2, 2.2)
+        ax.set_aspect('equal')
+        ax.set_title("Robot Arena")
+        ax.grid(True)
+
+        for tid, tinfo in ARENA_MAP.items():
+            tx = tinfo["x"]
+            ty = tinfo["y"]
+            is_home = (tid in HOME_TAGS)
+            c = 'blue' if is_home else 'black'
+
+            label = 'Home Tag' if (is_home and tid == HOME_TAGS[0]) else ('Arena Tag' if (not is_home and tid == 0) else "")
+
+            if label:
+                ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None', label=label)
+            else:
+                ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None')
+
+            ax.text(tx, ty, f' {tid}', color=c, fontsize=9, verticalalignment='bottom')
+
+        ax.plot(HOME_X, HOME_Y, marker='x', color='dodgerblue', markersize=10, linestyle='None', label='Home Target')
+
+        if is_localized:
+            ax.plot(robot_x, robot_y, marker='o', color='red', markersize=12, linestyle='None', label='Robot')
+
+            rad = math.radians(robot_heading)
+            dx_head = 0.2 * math.cos(rad)
+            dy_head = 0.2 * math.sin(rad)
+            ax.arrow(robot_x, robot_y, dx_head, dy_head,
+                     head_width=0.04, head_length=0.06, fc='red', ec='red')
+
+            dx_t = HOME_X - robot_x
+            dy_t = HOME_Y - robot_y
+            t_angle = heading_from_vector(dx_t, dy_t)
+            turn_angle = normalize_rotation(t_angle - robot_heading)
+
+            ax.arrow(robot_x, robot_y, dx_t, dy_t,
+                     head_width=0.03, head_length=0.05, fc='green', ec='green',
+                     linestyle='--', length_includes_head=True, alpha=0.7, label='Target Path')
+
+            dist = math.hypot(dx_t, dy_t)
+            info_text = (f"=== TELEMETRY ===\n\n"
+                         f"Pos X: {robot_x:.2f} m\n"
+                         f"Pos Y: {robot_y:.2f} m\n"
+                         f"Heading: {robot_heading:.1f}*\n\n"
+                         f"--- ROUTE ---\n"
+                         f"Dist: {dist:.2f} m\n"
+                         f"Angle: {t_angle:.1f}*\n"
+                         f"Turn: {turn_angle:+.1f}*")
+
+            fig.text(0.75, 0.5, info_text, transform=fig.transFigure,
+                     fontsize=12, ha='left', va='center', family='monospace',
+                     bbox=dict(facecolor='white', alpha=0.9, edgecolor='black', boxstyle='round,pad=1'))
+
+        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+
+        canvas.draw()
+        buf = canvas.buffer_rgba()
+        map_img = np.asarray(buf)
+        map_bgr = cv2.cvtColor(map_img, cv2.COLOR_RGBA2BGR)
+        cv2.imshow("Arena Map", map_bgr)
+
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q') or key == ord('Q'):
+        running = False
+    elif key == ord('s') or key == ord('S') or key == 13:
+        start_motion = True
+    elif key == ord('c') or key == ord('C'):
+        show_vision = not show_vision
+        print(f"\n[Camera View Toggled: {'ON' if show_vision else 'OFF'}]\n")
 
 def video_display_thread():
     global display_frame, show_vision, running, start_motion
@@ -483,9 +624,7 @@ def video_display_thread():
             show_vision = not show_vision
             print(f"\n[Camera View Toggled: {'ON' if show_vision else 'OFF'}]\n")
 
-display_t = threading.Thread(target=video_display_thread)
-display_t.daemon = True
-display_t.start()
+# NOTE: GUI is intentionally driven from the main thread via update_gui().
 
 def stop_robot():
     send_cmd('S', force=True)
@@ -616,6 +755,8 @@ send_cmd('1')
 
 try:
     while running:
+        update_gui()
+
         frame = raw_frame
         if frame is None:
             time.sleep(0.01)
@@ -718,6 +859,7 @@ try:
                 search_dir = 'R' if last_known_side > 0 else 'L'
                 print(f"Searching for tags ({get_ultrasonic_status()}) -> turning {search_dir}")
                 pulse_turn(search_dir, duration=0.08, speed='1')
+                update_gui()
             continue
 
         if state == "BLIND_FORWARD":
@@ -727,26 +869,35 @@ try:
                 state = "DONE"
                 continue
             drive_forward('1')  # Move blindly
+            update_gui()
             continue
 
         if state == "NAVIGATING":
             camera_z_cm = (home_measurement[1] * 100) if home_measurement else 999
+            near_home_by_pose = (
+                distance_to_home is not None and distance_to_home <= HOME_REACHED_DISTANCE_THRESHOLD_M
+            )
+            near_wall_ahead = latest_C < FINAL_STOP_DISTANCE_CM
 
             # Check stopping distance first (camera explicitly sees we are close, or ultrasonics detect a close wall when near home)
-            if camera_z_cm < FINAL_STOP_DISTANCE_CM or (
-                distance_to_home is not None and distance_to_home <= ONE_SHOT_DISTANCE_THRESHOLD and
-                (latest_C < FINAL_STOP_DISTANCE_CM or latest_L < FINAL_STOP_DISTANCE_CM or latest_R < FINAL_STOP_DISTANCE_CM)
-            ):
+            if camera_z_cm < FINAL_STOP_DISTANCE_CM or (near_home_by_pose and near_wall_ahead):
                 stop_robot()
-                print(f"HOME REACHED: Wall detected within {FINAL_STOP_DISTANCE_CM}cm (L:{latest_L} C:{latest_C} R:{latest_R} Z:{camera_z_cm:.1f})")
+                print(
+                    f"HOME REACHED: stop confirmed "
+                    f"(Dist:{distance_to_home:.2f}m <= {HOME_REACHED_DISTANCE_THRESHOLD_M:.2f}m, "
+                    f"C:{latest_C:.1f}cm, Z:{camera_z_cm:.1f}cm)"
+                )
                 state = "DONE"
                 continue
             
             # Obstacle avoidance if not near home:
             elif latest_C < STOP_DIST:
-                stop_robot()
-                print(f"Obstacle in the way: {latest_C}cm. Rerouting...")
+                print(f"Obstacle in the way: {latest_C:.1f}cm. Rerouting...")
+                handled, last_known_side = handle_obstacle(last_known_side, allow_side_nudges=False)
+                if not handled:
+                    stop_robot()
                 state = "SEARCHING"
+                last_nav_motion = None
                 continue
 
             # Fallback if we lose tags for a fraction of a second but know we are close to home
@@ -809,17 +960,31 @@ try:
                 )
                 last_nav_motion = motion_signature
             drive_forward(forward_speed)
+            update_gui()
             continue
 
         if state == "DONE":
             break
 
+        update_gui()
         time.sleep(0.01)
 
 except KeyboardInterrupt:
     print("\nEmergency Stop Triggered.")
 finally:
     running = False
+
+    # Let worker threads observe the shutdown flag before resource teardown.
+    time.sleep(0.05)
+
+    # Join threads to avoid C++ backend teardown while workers still use OpenCV/camera handles.
+    try:
+        if 'capture_thread' in globals() and capture_thread.is_alive():
+            capture_thread.join(timeout=1.0)
+        if 't' in globals() and t.is_alive():
+            t.join(timeout=1.0)
+    except Exception as e:
+        print(f"Thread shutdown warning: {e}")
     
     # Tell the robot to lower the arm when shutting down
     print("Sending ARM DOWN command...")
@@ -828,10 +993,22 @@ finally:
     
     stop_robot()
     time.sleep(0.1)
+
+    if ENABLE_GUI:
+        try:
+            cv2.destroyAllWindows()
+        except Exception:
+            pass
     
     if CAMERA_TYPE == "picamera" and picam2:
         picam2.stop()
     elif CAMERA_TYPE == "usb" and cap:
         cap.release()
+
+    if ser:
+        try:
+            ser.close()
+        except Exception:
+            pass
         
     print("Clean exit.")
