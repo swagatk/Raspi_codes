@@ -8,8 +8,9 @@ Please execute the following steps in a sequence
 - Check ultrasonic sensor status
 - Move the ARM to UP pose.
 - Exit if any error is encountered in starting any of the above sensors/actuators.
-- If there is no error in initialization, Wait for button press, 'y' to start.
-- Once 'y' button is pressed, start timer to keep track of 3 minute (180 second) interval of autonomous operation.
+- If there is no error in initialization, Wait for physical button press to start. see the file `../button_test.py`. Run a parallel thread to check button press.
+- Once button is pressed, start timer to keep track of 3 minute (180 second) interval of autonomous operation.
+- Once button is pressed, second press should exit the program - stopping the motors, going to down pose etc.
 
 
 ## Step 2: Confirm Home Location ~ 10 second
@@ -58,8 +59,8 @@ Please execute the following steps in a sequence
 
 - Localize: Estimate robot pose using the `map.py` file. Save the robot localization map as we did in `../go_to_home.py` file as `./log/localize_{datetime}.jpg`. 
 - Approach the home tag:
-    - Rotate by the angle as obtained from above step.
-    - Move linear towards the target with a `COURSE_FWD_MOTION_DIST_CM=30` 
+    - Rotate incrementally by small angles until robot direction aligns with home_tag direction.   
+    - Move linearly towards the target by short distances if there are no obstacles ahead. If there are obstacles, avoid obstacle and recalculate the pose.
 - Repeat above steps: localize --> approach until home wall is reached.  If linear distance to wall less than `FINE_TUNING_HOME_DIST_CM=50`, move cautiously adjusting robot angle and forward motion, so that the detected home tag remains in the center of the camera view. 
 - Stop the robot when it reaches close to home wall (using the ultrasonic sensor stop_distance threshold.) Use the `HOME_WALL_STOP_DISTANCE` to stop.
 - Once the wall is reached, drop the ball using `drop pose`.

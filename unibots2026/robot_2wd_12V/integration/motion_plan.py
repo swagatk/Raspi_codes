@@ -1133,9 +1133,14 @@ def main():
             else:
                 near_home_confirm = 0
 
-            if is_valid_distance_cm(robot.latest_C) and robot.latest_C < STOP_DIST:
+            if obstacle_detected(robot):
+                logging.warning(
+                    f"Obstacle ahead during NAVIGATING (L:{robot.latest_L:.1f} "
+                    f"C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid + relocalize"
+                )
+                run_obstacle_avoidance(robot)
                 robot.halt()
-                logging.warning(f"Obstacle ahead during NAVIGATING: C={robot.latest_C:.1f}cm -> SEARCHING")
+                last_nav_motion = None
                 last_stable_pose = None
                 active_nav_camera = None
                 state = "SEARCHING"
@@ -1210,15 +1215,50 @@ def main():
                 )
                 continue
 
-            forward_speed = COURSE_FORWARD_SPEED if linear_distance_m > one_shot_distance_threshold_m else '2'
+            forward_speed = (
+                COURSE_FORWARD_SPEED
+                if linear_distance_m > one_shot_distance_threshold_m
+                else STEP5_STEADY_FORWARD_SPEED
+            )
             motion_signature = ("FORWARD", forward_speed)
             if last_nav_motion != motion_signature:
                 logging.info(
                     f"Heading aligned (tol={STEP5_HEADING_TOL_DEG:.1f}deg). Driving forward speed={forward_speed}."
                 )
                 last_nav_motion = motion_signature
-            robot.move('F', forward_speed)
-            time.sleep(0.05)
+
+            logging.info(
+                f"Step 5 forward step: speed={forward_speed}, "
+                f"L={robot.latest_L:.1f}cm C={robot.latest_C:.1f}cm R={robot.latest_R:.1f}cm"
+            )
+            moved = execute_forward_with_sensor_guard(
+                forward_speed,
+                STEP5_STEADY_FORWARD_BURST_S,
+                STEP5_STEADY_FORWARD_SETTLE_S,
+                "Step 5 forward step",
+            )
+
+            if not moved:
+                if obstacle_detected(robot):
+                    logging.warning(
+                        f"Obstacle encountered during Step 5 forward step "
+                        f"(L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid + relocalize"
+                    )
+                    run_obstacle_avoidance(robot)
+                    robot.halt()
+                    last_nav_motion = None
+                    last_stable_pose = None
+                    active_nav_camera = None
+                    state = "SEARCHING"
+                    continue
+                if not mission_running:
+                    break
+                # Non-obstacle interruption: force a fresh localization cycle.
+                last_nav_motion = None
+                last_stable_pose = None
+                active_nav_camera = None
+                state = "SEARCHING"
+                continue
             continue
 
         time.sleep(0.01)

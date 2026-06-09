@@ -1,150 +1,262 @@
-2026-06-05 11:28:54,511 [INFO] --- Step 1: Initialization phase ---
-2026-06-05 11:29:08,785 [INFO] Motor status: OK
-2026-06-05 11:29:09,346 [INFO] Initialization successful.
-2026-06-05 11:29:09,347 [INFO] Camera now open.
-2026-06-05 11:29:09,366 [INFO] Camera configuration has been adjusted!
-2026-06-05 11:29:09,372 [INFO] Configuration successful!
-2026-06-05 11:29:09,418 [INFO] Camera started
-2026-06-05 11:29:11,079 [INFO] PiCamera started.
-2026-06-05 11:29:13,116 [INFO] USB Camera status: OK
-2026-06-05 11:29:13,121 [INFO] PiCamera status: OK
-2026-06-05 11:29:13,126 [INFO] Ultrasonic sensor status: OK (L:7 C:37 R:264)
-2026-06-05 11:29:13,127 [INFO] Button status: Listener running (press 'y' to start/stop).
-2026-06-05 11:29:13,128 [INFO] Moving ARM to UP pose.
-2026-06-05 11:29:14,224 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
-2026-06-05 11:29:35,077 [INFO] Start command received via 'y' key.
-2026-06-05 11:29:35,350 [INFO] Button pressed. Mission Started!
-2026-06-05 11:29:35,357 [INFO] --- Step 2: Confirm Home Location ---
-2026-06-05 11:29:35,656 [INFO] USB did not detect configured home tags. Using PiCamera fallback for Step 2.
-2026-06-05 11:29:35,663 [INFO] Home tag(s) [15] confirmed via PiCamera camera.
-2026-06-05 11:29:35,709 [INFO] Step 2 completed successfully.
-2026-06-05 11:29:35,712 [INFO] --- Step 3: Ready to Explore ---
-2026-06-05 11:29:38,486 [INFO] Completion of Step 3
-2026-06-05 11:29:38,491 [INFO] --- Step 4: Search and Approach balls ---
-2026-06-05 11:29:38,497 [INFO] Searching for ball...
-2026-06-05 11:29:38,504 [INFO] Target detected (dist=47.8cm, x=210.8). Switching immediately to approach.
-2026-06-05 11:29:38,519 [INFO] Approaching the ball...
-2026-06-05 11:29:55,904 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-05 11:29:55,910 [INFO] Grabbing the ball...
-2026-06-05 11:29:58,954 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=163.0cm.
-2026-06-05 11:29:59,993 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
-2026-06-05 11:30:06,534 [INFO] Ball grab complete.
-2026-06-05 11:30:06,538 [INFO] Searching for ball...
-2026-06-05 11:30:07,094 [INFO] Target detected (dist=60.7cm, x=153.6). Switching immediately to approach.
-2026-06-05 11:30:07,113 [INFO] Approaching the ball...
-2026-06-05 11:30:12,689 [WARNING] Obstacle detected (L:34 C:76 R:64) -> evasive maneuver
-2026-06-05 11:30:14,596 [WARNING] Obstacle detected (L:37 C:37 R:77) -> evasive maneuver
-2026-06-05 11:30:15,831 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
-2026-06-05 11:30:18,071 [WARNING] Target lost beyond local reacquire window. Returning to search.
-2026-06-05 11:30:18,078 [INFO] Searching for ball...
-2026-06-05 11:30:18,085 [INFO] Target detected (dist=17.7cm, x=72.1). Switching immediately to approach.
-2026-06-05 11:30:18,105 [INFO] Approaching the ball...
-2026-06-05 11:30:19,852 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-05 11:30:19,866 [INFO] Grabbing the ball...
-2026-06-05 11:30:22,123 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=123.0cm.
-2026-06-05 11:30:23,257 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
-2026-06-05 11:30:23,316 [WARNING] Obstacle detected during capture move (C:8cm). Backing up and continuing gripper cycles.
-2026-06-05 11:30:29,809 [INFO] Ball grab complete.
-2026-06-05 11:30:29,822 [INFO] Searching for ball...
-2026-06-05 11:30:29,832 [INFO] Target detected (dist=15.9cm, x=49.0). Switching immediately to approach.
-2026-06-05 11:30:29,854 [INFO] Approaching the ball...
-2026-06-05 11:30:29,857 [WARNING] Obstacle detected (L:7 C:999 R:9) -> evasive maneuver
-2026-06-05 11:30:32,233 [INFO] Target briefly lost near pickup threshold (17.2cm). Proceeding to grab.
-2026-06-05 11:30:32,240 [INFO] Grabbing the ball...
-2026-06-05 11:30:34,415 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=999.0cm.
-2026-06-05 11:30:35,754 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
-2026-06-05 11:30:41,819 [INFO] Ball grab complete.
-2026-06-05 11:30:41,824 [INFO] Searching for ball...
-2026-06-05 11:30:52,485 [INFO] Target detected (dist=45.1cm, x=277.3). Switching immediately to approach.
-2026-06-05 11:30:52,505 [INFO] Approaching the ball...
-2026-06-05 11:30:56,341 [INFO] Completion of Step 4
-2026-06-05 11:30:56,346 [INFO] --- Step 5: Returning home ---
-2026-06-05 11:31:00,982 [INFO] Moving to Home tag
-2026-06-05 11:31:03,259 [INFO] Robot Pose: x=0.57, y=1.72, heading=298.6 (camera=usb), dist_to_home=51.5cm
-2026-06-05 11:31:03,261 [INFO] Route: desired=32.8deg, turn=+94.2deg, dist=0.52m
-2026-06-05 11:31:03,265 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:31:03,502 [INFO] Robot Pose: x=0.57, y=1.72, heading=298.5 (camera=usb), dist_to_home=51.1cm
-2026-06-05 11:31:03,505 [INFO] Route: desired=33.4deg, turn=+94.8deg, dist=0.51m
-2026-06-05 11:31:03,509 [INFO] Coarse turn L: desired=33.4deg, error=+94.8deg (attempt 1/3)
-2026-06-05 11:31:06,480 [INFO] Robot Pose: x=0.59, y=1.72, heading=298.1 (camera=usb), dist_to_home=49.3cm
-2026-06-05 11:31:06,486 [INFO] Route: desired=34.6deg, turn=+96.5deg, dist=0.49m
-2026-06-05 11:31:07,317 [WARNING] Step 5 pose jump rejected: dpos=0.55m dhead=33.3deg (camera=usb)
-2026-06-05 11:31:07,323 [WARNING] Localization lost in NAVIGATING -> SEARCHING
-2026-06-05 11:31:09,790 [INFO] Robot Pose: x=0.55, y=1.17, heading=331.4 (camera=usb), dist_to_home=94.7cm
-2026-06-05 11:31:10,340 [INFO] Route: desired=61.4deg, turn=+90.1deg, dist=0.95m
-2026-06-05 11:31:10,354 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:31:12,819 [INFO] Robot Pose: x=0.56, y=0.98, heading=345.1 (camera=usb), dist_to_home=110.8cm
-2026-06-05 11:31:12,828 [INFO] Route: desired=66.4deg, turn=+81.2deg, dist=1.11m
-2026-06-05 11:31:12,831 [INFO] Coarse turn L: desired=66.4deg, error=+81.2deg (attempt 1/3)
-2026-06-05 11:31:13,448 [WARNING] Step 5 pose jump rejected: dpos=0.42m dhead=16.6deg (camera=usb)
-2026-06-05 11:31:13,451 [WARNING] Localization lost in NAVIGATING -> SEARCHING
-2026-06-05 11:31:15,919 [INFO] Robot Pose: x=0.55, y=0.79, heading=353.0 (camera=usb), dist_to_home=129.2cm
-2026-06-05 11:31:15,924 [INFO] Route: desired=69.5deg, turn=+76.5deg, dist=1.29m
-2026-06-05 11:31:15,935 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:31:15,966 [INFO] Robot Pose: x=0.78, y=0.84, heading=11.4 (camera=usb), dist_to_home=118.0cm
-2026-06-05 11:31:15,969 [INFO] Route: desired=79.1deg, turn=+67.6deg, dist=1.18m
-2026-06-05 11:31:15,972 [INFO] Coarse turn L: desired=79.1deg, error=+67.6deg (attempt 1/3)
-2026-06-05 11:31:19,312 [INFO] Robot Pose: x=0.77, y=0.89, heading=9.5 (camera=usb), dist_to_home=113.5cm
-2026-06-05 11:31:19,317 [INFO] Route: desired=78.2deg, turn=+68.7deg, dist=1.13m
-2026-06-05 11:31:23,232 [INFO] Robot Pose: x=0.61, y=0.88, heading=15.0 (camera=usb), dist_to_home=118.4cm
-2026-06-05 11:31:23,486 [INFO] Route: desired=70.9deg, turn=+55.9deg, dist=1.18m
-2026-06-05 11:31:26,463 [INFO] Robot Pose: x=0.71, y=1.07, heading=18.7 (camera=usb), dist_to_home=97.6cm
-2026-06-05 11:31:26,466 [INFO] Route: desired=72.8deg, turn=+54.1deg, dist=0.98m
-2026-06-05 11:31:27,368 [WARNING] Step 5 pose jump rejected: dpos=0.74m dhead=30.6deg (camera=usb)
-2026-06-05 11:31:27,370 [WARNING] Localization lost in NAVIGATING -> SEARCHING
-2026-06-05 11:31:30,089 [INFO] Robot Pose: x=1.30, y=1.16, heading=69.5 (camera=picam), dist_to_home=89.1cm
-2026-06-05 11:31:30,092 [INFO] Route: desired=109.8deg, turn=+40.3deg, dist=0.89m
-2026-06-05 11:31:30,315 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:31:30,611 [INFO] Robot Pose: x=1.21, y=1.19, heading=64.8 (camera=picam), dist_to_home=83.9cm
-2026-06-05 11:31:30,614 [INFO] Route: desired=104.8deg, turn=+39.9deg, dist=0.84m
-2026-06-05 11:31:30,618 [INFO] Fine turn L: desired=104.8deg, error=+39.9deg (attempt 2/3)
-2026-06-05 11:31:34,437 [INFO] Robot Pose: x=1.21, y=1.19, heading=64.8 (camera=picam), dist_to_home=83.8cm
-2026-06-05 11:31:34,443 [INFO] Route: desired=104.7deg, turn=+39.9deg, dist=0.84m
-2026-06-05 11:31:35,332 [INFO] Robot Pose: x=1.16, y=1.19, heading=89.5 (camera=picam), dist_to_home=82.4cm
-2026-06-05 11:31:35,337 [INFO] Route: desired=101.1deg, turn=+11.6deg, dist=0.82m
-2026-06-05 11:31:35,340 [INFO] Heading aligned (tol=12.0deg). Driving forward speed=2.
-2026-06-05 11:31:35,720 [WARNING] Step 5 pose jump rejected: dpos=0.25m dhead=3.1deg (camera=picam)
-2026-06-05 11:31:35,728 [WARNING] Localization lost in NAVIGATING -> SEARCHING
-2026-06-05 11:31:38,214 [INFO] Robot Pose: x=1.43, y=0.64, heading=94.2 (camera=usb), dist_to_home=142.4cm
-2026-06-05 11:31:38,221 [INFO] Route: desired=107.7deg, turn=+13.5deg, dist=1.42m
-2026-06-05 11:31:38,226 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:31:38,254 [INFO] Robot Pose: x=1.51, y=0.78, heading=99.7 (camera=usb), dist_to_home=132.0cm
-2026-06-05 11:31:38,256 [INFO] Route: desired=112.5deg, turn=+12.8deg, dist=1.32m
-2026-06-05 11:31:38,258 [INFO] Fine turn L: desired=112.5deg, error=+12.8deg (attempt 2/3)
-2026-06-05 11:31:39,355 [WARNING] Localization lost in NAVIGATING -> SEARCHING
-2026-06-05 11:31:42,599 [INFO] Robot Pose: x=0.88, y=1.19, heading=102.2 (camera=picam), dist_to_home=81.5cm
-2026-06-05 11:31:42,610 [INFO] Route: desired=81.5deg, turn=-20.7deg, dist=0.82m
-2026-06-05 11:31:42,618 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:31:45,201 [INFO] Robot Pose: x=0.89, y=1.19, heading=103.2 (camera=picam), dist_to_home=81.4cm
-2026-06-05 11:31:45,209 [INFO] Route: desired=82.1deg, turn=-21.1deg, dist=0.81m
-2026-06-05 11:31:45,215 [INFO] Fine turn R: desired=82.1deg, error=-21.1deg (attempt 3/3)
-2026-06-05 11:31:48,466 [INFO] Robot Pose: x=0.89, y=1.19, heading=103.6 (camera=picam), dist_to_home=81.2cm
-2026-06-05 11:31:48,468 [INFO] Route: desired=82.5deg, turn=-21.0deg, dist=0.81m
-2026-06-05 11:31:51,769 [INFO] Robot Pose: x=0.93, y=1.20, heading=92.7 (camera=picam), dist_to_home=80.6cm
-2026-06-05 11:31:51,774 [INFO] Route: desired=85.0deg, turn=-7.7deg, dist=0.81m
-2026-06-05 11:31:51,786 [INFO] Heading aligned (tol=12.0deg). Driving forward speed=2.
-2026-06-05 11:31:52,376 [INFO] Robot Pose: x=1.14, y=1.23, heading=94.3 (camera=picam), dist_to_home=78.7cm
-2026-06-05 11:31:52,381 [INFO] Route: desired=100.6deg, turn=+6.3deg, dist=0.79m
-2026-06-05 11:31:55,427 [INFO] Robot Pose: x=0.90, y=1.21, heading=85.4 (camera=picam), dist_to_home=79.5cm
-2026-06-05 11:31:55,430 [INFO] Route: desired=82.8deg, turn=-2.6deg, dist=0.80m
-2026-06-05 11:31:55,432 [INFO] Home wall proximity check 1/2: L=67.0 C=81.0 R=11.0 Z=77.9cm
-2026-06-05 11:31:55,967 [WARNING] Step 5 pose jump rejected: dpos=0.44m dhead=54.7deg (camera=picam)
-2026-06-05 11:31:55,969 [WARNING] Localization lost in NAVIGATING -> SEARCHING
-2026-06-05 11:31:59,302 [INFO] Robot Pose: x=0.61, y=1.65, heading=145.0 (camera=picam), dist_to_home=52.7cm
-2026-06-05 11:31:59,308 [INFO] Route: desired=41.9deg, turn=-103.1deg, dist=0.53m
-2026-06-05 11:31:59,315 [INFO] Step 5 state -> NAVIGATING (pose locked)
-2026-06-05 11:32:01,633 [INFO] Robot Pose: x=0.54, y=1.69, heading=150.0 (camera=picam), dist_to_home=55.7cm
-2026-06-05 11:32:01,636 [INFO] Route: desired=33.8deg, turn=-116.2deg, dist=0.56m
-2026-06-05 11:32:01,637 [WARNING] Final-leg turn attempts exceeded. Switching to BLIND_FORWARD.
-2026-06-05 11:32:01,905 [INFO] Robot Pose: x=0.54, y=1.69, heading=150.0 (camera=picam), dist_to_home=55.7cm
-2026-06-05 11:32:01,908 [INFO] Route: desired=33.7deg, turn=-116.2deg, dist=0.56m
-2026-06-05 11:32:02,512 [INFO] Robot Pose: x=0.54, y=1.69, heading=150.0 (camera=picam), dist_to_home=55.7cm
-2026-06-05 11:32:02,516 [INFO] Route: desired=33.7deg, turn=-116.2deg, dist=0.56m
-2026-06-05 11:32:05,861 [INFO] Robot Pose: x=0.54, y=1.69, heading=150.0 (camera=picam), dist_to_home=55.7cm
-2026-06-05 11:32:05,870 [INFO] Route: desired=33.7deg, turn=-116.3deg, dist=0.56m
-2026-06-05 11:32:05,881 [INFO] HOME REACHED (BLIND_FORWARD): L:11 C:10 R:999
-2026-06-05 11:32:05,885 [INFO] Executing Ball drop...
-2026-06-05 11:32:09,145 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
-2026-06-05 11:32:09,152 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-05 11:32:10,299 [INFO] Camera stopped
-2026-06-05 11:32:10,708 [INFO] Camera closed successfully.
+2026-06-09 10:04:29,198 [INFO] --- Step 1: Initialization phase ---
+2026-06-09 10:04:42,188 [INFO] Motor status: OK
+2026-06-09 10:05:03,924 [INFO] Initialization successful.
+2026-06-09 10:05:03,925 [INFO] Camera now open.
+2026-06-09 10:05:03,932 [INFO] Camera configuration has been adjusted!
+2026-06-09 10:05:03,935 [INFO] Configuration successful!
+2026-06-09 10:05:03,960 [INFO] Camera started
+2026-06-09 10:05:05,781 [INFO] PiCamera started.
+2026-06-09 10:05:07,844 [INFO] USB Camera status: OK
+2026-06-09 10:05:07,848 [INFO] PiCamera status: OK
+2026-06-09 10:05:07,851 [INFO] Ultrasonic sensor status: OK (L:7 C:44 R:11)
+2026-06-09 10:05:07,855 [INFO] Button status: Listener running (press 'y' to start/stop).
+2026-06-09 10:05:07,857 [INFO] Moving ARM to UP pose.
+2026-06-09 10:05:09,001 [INFO] System Online. Waiting for button press ('y' key) to start mission sequence...
+2026-06-09 10:05:22,094 [INFO] Start command received via 'y' key.
+2026-06-09 10:05:22,374 [INFO] Button pressed. Mission Started!
+2026-06-09 10:05:22,379 [INFO] --- Step 2: Confirm Home Location ---
+2026-06-09 10:05:22,655 [INFO] USB did not detect configured home tags. Using PiCamera fallback for Step 2.
+2026-06-09 10:05:22,663 [INFO] Home tag(s) [15] confirmed via PiCamera camera.
+2026-06-09 10:05:22,708 [INFO] Step 2 completed successfully.
+2026-06-09 10:05:22,710 [INFO] --- Step 3: Ready to Explore ---
+2026-06-09 10:05:25,480 [INFO] Completion of Step 3
+2026-06-09 10:05:25,490 [INFO] --- Step 4: Search and Approach balls ---
+2026-06-09 10:05:25,496 [INFO] Searching for ball...
+2026-06-09 10:05:25,500 [INFO] Target detected (dist=49.9cm, x=216.9). Switching immediately to approach.
+2026-06-09 10:05:25,520 [INFO] Approaching the ball...
+2026-06-09 10:05:29,441 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:05:29,453 [INFO] Grabbing the ball...
+2026-06-09 10:05:32,390 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=149.0cm.
+2026-06-09 10:05:33,569 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-09 10:05:39,585 [INFO] Ball grab complete.
+2026-06-09 10:05:39,589 [INFO] Searching for ball...
+2026-06-09 10:05:39,596 [INFO] Target detected (dist=48.0cm, x=59.0). Switching immediately to approach.
+2026-06-09 10:05:39,615 [INFO] Approaching the ball...
+2026-06-09 10:05:39,618 [WARNING] Obstacle detected (L:7 C:89 R:11) -> evasive maneuver
+2026-06-09 10:05:42,680 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:05:42,688 [INFO] Grabbing the ball...
+2026-06-09 10:05:44,937 [INFO] PiCamera wall distance during arm-down capture: 79.3cm
+2026-06-09 10:05:46,070 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-09 10:05:52,425 [INFO] Ball grab complete.
+2026-06-09 10:05:52,429 [INFO] Searching for ball...
+2026-06-09 10:05:56,484 [INFO] Target detected (dist=33.8cm, x=297.9). Switching immediately to approach.
+2026-06-09 10:05:56,509 [INFO] Approaching the ball...
+2026-06-09 10:05:56,513 [WARNING] Obstacle detected (L:29 C:88 R:77) -> evasive maneuver
+2026-06-09 10:05:57,629 [WARNING] Obstacle detected (L:29 C:244 R:88) -> evasive maneuver
+2026-06-09 10:05:58,706 [WARNING] Obstacle detected (L:34 C:999 R:93) -> evasive maneuver
+2026-06-09 10:05:59,780 [WARNING] Obstacle detected (L:39 C:37 R:999) -> evasive maneuver
+2026-06-09 10:06:00,937 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-09 10:06:03,389 [WARNING] Target lost beyond local reacquire window. Returning to search.
+2026-06-09 10:06:03,394 [INFO] Searching for ball...
+2026-06-09 10:06:07,332 [INFO] Target detected (dist=52.2cm, x=260.4). Switching immediately to approach.
+2026-06-09 10:06:07,349 [INFO] Approaching the ball...
+2026-06-09 10:06:21,067 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:21,077 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:21,081 [INFO] Searching for ball...
+2026-06-09 10:06:21,085 [INFO] Target detected (dist=32.2cm, x=163.0). Switching immediately to approach.
+2026-06-09 10:06:21,106 [INFO] Approaching the ball...
+2026-06-09 10:06:21,110 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:21,115 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:21,119 [INFO] Searching for ball...
+2026-06-09 10:06:21,122 [INFO] Target detected (dist=32.1cm, x=187.6). Switching immediately to approach.
+2026-06-09 10:06:21,139 [INFO] Approaching the ball...
+2026-06-09 10:06:21,141 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:21,144 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:21,150 [INFO] Searching for ball...
+2026-06-09 10:06:21,153 [INFO] Target detected (dist=32.1cm, x=187.6). Switching immediately to approach.
+2026-06-09 10:06:21,396 [INFO] Approaching the ball...
+2026-06-09 10:06:21,400 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:21,406 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:21,409 [INFO] Searching for ball...
+2026-06-09 10:06:21,414 [INFO] Target detected (dist=32.1cm, x=187.6). Switching immediately to approach.
+2026-06-09 10:06:21,438 [INFO] Approaching the ball...
+2026-06-09 10:06:23,188 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,199 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,206 [INFO] Searching for ball...
+2026-06-09 10:06:23,211 [INFO] Target detected (dist=32.6cm, x=138.1). Switching immediately to approach.
+2026-06-09 10:06:23,232 [INFO] Approaching the ball...
+2026-06-09 10:06:23,240 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,249 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,253 [INFO] Searching for ball...
+2026-06-09 10:06:23,257 [INFO] Target detected (dist=32.4cm, x=136.1). Switching immediately to approach.
+2026-06-09 10:06:23,272 [INFO] Approaching the ball...
+2026-06-09 10:06:23,275 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,278 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,280 [INFO] Searching for ball...
+2026-06-09 10:06:23,283 [INFO] Target detected (dist=32.4cm, x=136.1). Switching immediately to approach.
+2026-06-09 10:06:23,295 [INFO] Approaching the ball...
+2026-06-09 10:06:23,297 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,300 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,302 [INFO] Searching for ball...
+2026-06-09 10:06:23,593 [INFO] Target detected (dist=32.4cm, x=136.1). Switching immediately to approach.
+2026-06-09 10:06:23,614 [INFO] Approaching the ball...
+2026-06-09 10:06:23,617 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,622 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,626 [INFO] Searching for ball...
+2026-06-09 10:06:23,630 [INFO] Target detected (dist=37.9cm, x=131.4). Switching immediately to approach.
+2026-06-09 10:06:23,645 [INFO] Approaching the ball...
+2026-06-09 10:06:23,648 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,651 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,655 [INFO] Searching for ball...
+2026-06-09 10:06:23,658 [INFO] Target detected (dist=37.9cm, x=131.4). Switching immediately to approach.
+2026-06-09 10:06:23,927 [INFO] Approaching the ball...
+2026-06-09 10:06:23,934 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-09 10:06:23,941 [WARNING] Safety limits breached during catch! Aborting!
+2026-06-09 10:06:23,944 [INFO] Searching for ball...
+2026-06-09 10:06:23,948 [INFO] Target detected (dist=37.9cm, x=131.4). Switching immediately to approach.
+2026-06-09 10:06:23,971 [INFO] Approaching the ball...
+2026-06-09 10:06:26,686 [WARNING] Obstacle detected (L:33 C:82 R:79) -> evasive maneuver
+2026-06-09 10:06:27,777 [WARNING] Obstacle detected (L:31 C:34 R:81) -> evasive maneuver
+2026-06-09 10:06:28,913 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-09 10:06:31,368 [WARNING] Target lost beyond local reacquire window. Returning to search.
+2026-06-09 10:06:31,373 [INFO] Searching for ball...
+2026-06-09 10:06:36,413 [INFO] Target detected (dist=31.4cm, x=282.2). Switching immediately to approach.
+2026-06-09 10:06:36,433 [INFO] Approaching the ball...
+2026-06-09 10:06:40,630 [WARNING] Target lost beyond grace interval. Trying local reacquire before search reset.
+2026-06-09 10:06:42,653 [INFO] Completion of Step 4
+2026-06-09 10:06:42,659 [INFO] --- Step 5: Returning home ---
+2026-06-09 10:06:47,051 [INFO] Moving to Home tag
+2026-06-09 10:06:49,498 [INFO] Robot Pose: x=1.66, y=1.27, heading=241.7 (camera=usb), dist_to_home=98.2cm
+2026-06-09 10:06:49,505 [INFO] Route: desired=132.3deg, turn=-109.4deg, dist=0.98m
+2026-06-09 10:06:49,515 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:06:49,542 [INFO] Robot Pose: x=1.66, y=1.27, heading=241.6 (camera=usb), dist_to_home=98.3cm
+2026-06-09 10:06:49,549 [INFO] Route: desired=132.4deg, turn=-109.2deg, dist=0.98m
+2026-06-09 10:06:49,556 [INFO] Coarse turn R: desired=132.4deg, error=-109.2deg (attempt 0/3)
+2026-06-09 10:06:52,070 [INFO] Robot Pose: x=1.66, y=1.28, heading=241.8 (camera=usb), dist_to_home=97.9cm
+2026-06-09 10:06:52,071 [INFO] Route: desired=132.3deg, turn=-109.5deg, dist=0.98m
+2026-06-09 10:06:52,816 [INFO] Robot Pose: x=1.66, y=1.32, heading=232.5 (camera=usb), dist_to_home=95.2cm
+2026-06-09 10:06:52,825 [INFO] Route: desired=134.1deg, turn=-98.3deg, dist=0.95m
+2026-06-09 10:06:53,162 [WARNING] Step 5 pose jump rejected: dpos=0.25m dhead=16.7deg (camera=usb)
+2026-06-09 10:06:53,164 [WARNING] Localization lost in NAVIGATING -> SEARCHING
+2026-06-09 10:06:55,536 [INFO] Robot Pose: x=1.93, y=1.26, heading=215.6 (camera=usb), dist_to_home=119.3cm
+2026-06-09 10:06:55,542 [INFO] Route: desired=141.5deg, turn=-74.1deg, dist=1.19m
+2026-06-09 10:06:55,554 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:06:55,595 [INFO] Robot Pose: x=1.95, y=1.28, heading=210.9 (camera=usb), dist_to_home=119.7cm
+2026-06-09 10:06:55,598 [INFO] Route: desired=142.9deg, turn=-68.0deg, dist=1.20m
+2026-06-09 10:06:55,601 [INFO] Coarse turn R: desired=142.9deg, error=-68.0deg (attempt 0/3)
+2026-06-09 10:06:56,209 [INFO] Robot Pose: x=1.96, y=1.29, heading=211.1 (camera=usb), dist_to_home=119.1cm
+2026-06-09 10:06:56,212 [INFO] Route: desired=143.3deg, turn=-67.8deg, dist=1.19m
+2026-06-09 10:06:58,522 [INFO] Robot Pose: x=1.89, y=1.32, heading=205.2 (camera=usb), dist_to_home=112.2cm
+2026-06-09 10:06:58,525 [INFO] Route: desired=142.6deg, turn=-62.6deg, dist=1.12m
+2026-06-09 10:06:59,348 [INFO] Robot Pose: x=2.00, y=1.37, heading=197.1 (camera=usb), dist_to_home=118.0cm
+2026-06-09 10:06:59,352 [INFO] Route: desired=147.9deg, turn=-49.1deg, dist=1.18m
+2026-06-09 10:07:00,222 [WARNING] Step 5 pose jump rejected: dpos=0.91m dhead=28.7deg (camera=usb)
+2026-06-09 10:07:00,229 [WARNING] Localization lost in NAVIGATING -> SEARCHING
+2026-06-09 10:07:02,070 [INFO] Robot Pose: x=2.00, y=0.88, heading=179.7 (camera=usb), dist_to_home=150.0cm
+2026-06-09 10:07:02,071 [INFO] Route: desired=131.8deg, turn=-47.9deg, dist=1.50m
+2026-06-09 10:07:02,073 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:07:02,089 [INFO] Robot Pose: x=2.00, y=1.39, heading=171.0 (camera=usb), dist_to_home=117.0cm
+2026-06-09 10:07:02,090 [INFO] Route: desired=148.8deg, turn=-22.2deg, dist=1.17m
+2026-06-09 10:07:02,092 [INFO] Fine turn R: desired=148.8deg, error=-22.2deg (attempt 0/3)
+2026-06-09 10:07:02,939 [WARNING] Step 5 pose jump rejected: dpos=0.26m dhead=2.3deg (camera=usb)
+2026-06-09 10:07:02,943 [WARNING] Localization lost in NAVIGATING -> SEARCHING
+2026-06-09 10:07:02,966 [INFO] Robot Pose: x=2.00, y=1.13, heading=168.6 (camera=usb), dist_to_home=132.6cm
+2026-06-09 10:07:02,968 [INFO] Route: desired=138.9deg, turn=-29.7deg, dist=1.33m
+2026-06-09 10:07:02,971 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:07:03,345 [INFO] Robot Pose: x=2.00, y=0.09, heading=137.2 (camera=usb), dist_to_home=215.5cm
+2026-06-09 10:07:03,350 [INFO] Route: desired=117.6deg, turn=-19.5deg, dist=2.16m
+2026-06-09 10:07:03,356 [INFO] Fine turn R: desired=117.6deg, error=-19.5deg (attempt 0/3)
+2026-06-09 10:07:06,422 [INFO] Robot Pose: x=2.00, y=0.25, heading=138.8 (camera=usb), dist_to_home=201.4cm
+2026-06-09 10:07:06,433 [INFO] Route: desired=119.8deg, turn=-19.0deg, dist=2.01m
+2026-06-09 10:07:07,045 [WARNING] Step 5 pose jump rejected: dpos=0.25m dhead=9.0deg (camera=usb)
+2026-06-09 10:07:07,050 [WARNING] Localization lost in NAVIGATING -> SEARCHING
+2026-06-09 10:07:07,080 [INFO] Robot Pose: x=2.00, y=0.07, heading=131.5 (camera=usb), dist_to_home=217.8cm
+2026-06-09 10:07:07,301 [INFO] Route: desired=117.3deg, turn=-14.1deg, dist=2.18m
+2026-06-09 10:07:07,312 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:07:09,723 [INFO] Robot Pose: x=2.00, y=0.22, heading=128.1 (camera=usb), dist_to_home=204.4cm
+2026-06-09 10:07:09,733 [INFO] Route: desired=119.3deg, turn=-8.8deg, dist=2.04m
+2026-06-09 10:07:09,743 [INFO] Heading aligned (tol=10.0deg). Driving forward speed=2.
+2026-06-09 10:07:09,748 [INFO] Step 5 forward step: speed=2, L=143.0cm C=186.0cm R=116.0cm
+2026-06-09 10:07:12,671 [INFO] Robot Pose: x=2.00, y=0.10, heading=126.0 (camera=usb), dist_to_home=214.8cm
+2026-06-09 10:07:12,672 [INFO] Route: desired=117.7deg, turn=-8.2deg, dist=2.15m
+2026-06-09 10:07:12,673 [INFO] Step 5 forward step: speed=2, L=138.0cm C=85.0cm R=113.0cm
+2026-06-09 10:07:13,605 [INFO] Robot Pose: x=2.00, y=0.16, heading=127.4 (camera=usb), dist_to_home=209.7cm
+2026-06-09 10:07:13,609 [INFO] Route: desired=118.5deg, turn=-9.0deg, dist=2.10m
+2026-06-09 10:07:13,611 [INFO] Step 5 forward step: speed=2, L=134.0cm C=178.0cm R=109.0cm
+2026-06-09 10:07:16,649 [INFO] Robot Pose: x=2.00, y=0.00, heading=122.6 (camera=usb), dist_to_home=223.6cm
+2026-06-09 10:07:16,655 [INFO] Route: desired=116.6deg, turn=-6.0deg, dist=2.24m
+2026-06-09 10:07:16,663 [INFO] Step 5 forward step: speed=2, L=130.0cm C=170.0cm R=104.0cm
+2026-06-09 10:07:17,287 [INFO] Robot Pose: x=2.00, y=0.09, heading=123.2 (camera=usb), dist_to_home=215.5cm
+2026-06-09 10:07:17,290 [INFO] Route: desired=117.7deg, turn=-5.5deg, dist=2.15m
+2026-06-09 10:07:17,293 [INFO] Step 5 forward step: speed=2, L=170.0cm C=167.0cm R=110.0cm
+2026-06-09 10:07:20,257 [INFO] Robot Pose: x=2.00, y=0.14, heading=123.5 (camera=usb), dist_to_home=210.9cm
+2026-06-09 10:07:20,264 [INFO] Route: desired=118.3deg, turn=-5.2deg, dist=2.11m
+2026-06-09 10:07:20,271 [INFO] Step 5 forward step: speed=2, L=122.0cm C=165.0cm R=999.0cm
+2026-06-09 10:07:21,029 [INFO] Robot Pose: x=1.92, y=0.15, heading=121.9 (camera=usb), dist_to_home=206.9cm
+2026-06-09 10:07:21,034 [INFO] Route: desired=116.5deg, turn=-5.4deg, dist=2.07m
+2026-06-09 10:07:21,038 [INFO] Step 5 forward step: speed=2, L=122.0cm C=160.0cm R=102.0cm
+2026-06-09 10:07:24,364 [INFO] Robot Pose: x=1.91, y=0.22, heading=122.7 (camera=usb), dist_to_home=200.0cm
+2026-06-09 10:07:24,369 [INFO] Route: desired=117.2deg, turn=-5.5deg, dist=2.00m
+2026-06-09 10:07:24,373 [INFO] Step 5 forward step: speed=2, L=117.0cm C=155.0cm R=92.0cm
+2026-06-09 10:07:24,976 [INFO] Robot Pose: x=1.89, y=0.34, heading=123.5 (camera=usb), dist_to_home=188.0cm
+2026-06-09 10:07:24,981 [INFO] Route: desired=118.2deg, turn=-5.3deg, dist=1.88m
+2026-06-09 10:07:24,984 [INFO] Step 5 forward step: speed=2, L=117.0cm C=149.0cm R=91.0cm
+2026-06-09 10:07:28,432 [INFO] Robot Pose: x=1.82, y=0.39, heading=122.8 (camera=usb), dist_to_home=181.0cm
+2026-06-09 10:07:28,438 [INFO] Route: desired=116.9deg, turn=-5.9deg, dist=1.81m
+2026-06-09 10:07:28,445 [INFO] Step 5 forward step: speed=2, L=115.0cm C=151.0cm R=88.0cm
+2026-06-09 10:07:31,134 [INFO] Robot Pose: x=1.77, y=0.41, heading=122.1 (camera=usb), dist_to_home=176.5cm
+2026-06-09 10:07:31,139 [INFO] Route: desired=116.0deg, turn=-6.1deg, dist=1.76m
+2026-06-09 10:07:31,141 [INFO] Step 5 forward step: speed=2, L=112.0cm C=146.0cm R=86.0cm
+2026-06-09 10:07:34,790 [INFO] Robot Pose: x=1.74, y=0.49, heading=122.4 (camera=usb), dist_to_home=168.5cm
+2026-06-09 10:07:34,794 [INFO] Route: desired=116.0deg, turn=-6.4deg, dist=1.68m
+2026-06-09 10:07:34,800 [INFO] Step 5 forward step: speed=2, L=107.0cm C=137.0cm R=83.0cm
+2026-06-09 10:07:38,422 [INFO] Robot Pose: x=1.67, y=0.52, heading=121.7 (camera=usb), dist_to_home=162.5cm
+2026-06-09 10:07:38,429 [INFO] Route: desired=114.4deg, turn=-7.4deg, dist=1.63m
+2026-06-09 10:07:38,435 [INFO] Step 5 forward step: speed=2, L=107.0cm C=136.0cm R=79.0cm
+2026-06-09 10:07:41,204 [INFO] Robot Pose: x=1.62, y=0.58, heading=122.0 (camera=usb), dist_to_home=155.2cm
+2026-06-09 10:07:41,211 [INFO] Route: desired=113.6deg, turn=-8.4deg, dist=1.55m
+2026-06-09 10:07:41,218 [INFO] Step 5 forward step: speed=2, L=105.0cm C=131.0cm R=77.0cm
+2026-06-09 10:07:41,824 [WARNING] Step 5 pose jump rejected: dpos=1.62m dhead=54.0deg (camera=usb)
+2026-06-09 10:07:41,828 [WARNING] Localization lost in NAVIGATING -> SEARCHING
+2026-06-09 10:07:44,737 [INFO] Robot Pose: x=1.56, y=0.62, heading=121.5 (camera=usb), dist_to_home=148.6cm
+2026-06-09 10:07:44,750 [INFO] Route: desired=112.0deg, turn=-9.4deg, dist=1.49m
+2026-06-09 10:07:44,757 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:07:44,800 [INFO] Robot Pose: x=1.54, y=0.65, heading=121.5 (camera=usb), dist_to_home=145.5cm
+2026-06-09 10:07:44,803 [INFO] Route: desired=111.6deg, turn=-9.9deg, dist=1.46m
+2026-06-09 10:07:44,807 [INFO] Heading aligned (tol=10.0deg). Driving forward speed=2.
+2026-06-09 10:07:44,809 [INFO] Step 5 forward step: speed=2, L=102.0cm C=127.0cm R=77.0cm
+2026-06-09 10:07:47,867 [INFO] Robot Pose: x=1.52, y=0.64, heading=121.0 (camera=usb), dist_to_home=145.2cm
+2026-06-09 10:07:47,873 [INFO] Route: desired=110.9deg, turn=-10.1deg, dist=1.45m
+2026-06-09 10:07:48,173 [INFO] Fine turn R: desired=110.9deg, error=-10.1deg (attempt 0/3)
+2026-06-09 10:07:50,921 [INFO] Robot Pose: x=1.47, y=0.72, heading=121.8 (camera=usb), dist_to_home=136.5cm
+2026-06-09 10:07:50,928 [INFO] Route: desired=110.3deg, turn=-11.4deg, dist=1.37m
+2026-06-09 10:07:51,538 [WARNING] Step 5 pose jump rejected: dpos=0.60m dhead=24.9deg (camera=usb)
+2026-06-09 10:07:51,542 [WARNING] Localization lost in NAVIGATING -> SEARCHING
+2026-06-09 10:07:51,790 [INFO] Robot Pose: x=0.91, y=0.88, heading=97.6 (camera=usb), dist_to_home=112.8cm
+2026-06-09 10:07:51,794 [INFO] Route: desired=85.4deg, turn=-12.2deg, dist=1.13m
+2026-06-09 10:07:51,798 [INFO] Step 5 state -> NAVIGATING (pose locked)
+2026-06-09 10:07:54,508 [INFO] Robot Pose: x=1.01, y=0.76, heading=94.9 (camera=usb), dist_to_home=124.3cm
+2026-06-09 10:07:54,728 [INFO] Route: desired=90.4deg, turn=-4.5deg, dist=1.24m
+2026-06-09 10:07:54,739 [INFO] Heading aligned (tol=10.0deg). Driving forward speed=2.
+2026-06-09 10:07:54,747 [INFO] Step 5 forward step: speed=2, L=106.0cm C=73.0cm R=72.0cm
+2026-06-09 10:07:57,536 [INFO] Robot Pose: x=1.02, y=0.77, heading=95.3 (camera=usb), dist_to_home=123.5cm
+2026-06-09 10:07:57,542 [INFO] Route: desired=90.7deg, turn=-4.6deg, dist=1.23m
+2026-06-09 10:07:57,550 [INFO] Step 5 forward step: speed=2, L=120.0cm C=74.0cm R=70.0cm
+2026-06-09 10:08:00,689 [INFO] Robot Pose: x=0.96, y=0.83, heading=95.3 (camera=usb), dist_to_home=117.4cm
+2026-06-09 10:08:00,695 [INFO] Route: desired=88.2deg, turn=-7.1deg, dist=1.17m
+2026-06-09 10:08:00,699 [INFO] Step 5 forward step: speed=2, L=112.0cm C=63.0cm R=62.0cm
+2026-06-09 10:08:01,306 [INFO] Robot Pose: x=0.98, y=0.97, heading=95.5 (camera=usb), dist_to_home=103.0cm
+2026-06-09 10:08:01,308 [INFO] Route: desired=88.7deg, turn=-6.8deg, dist=1.03m
+2026-06-09 10:08:01,310 [INFO] Step 5 forward step: speed=2, L=110.0cm C=59.0cm R=57.0cm
+2026-06-09 10:08:04,350 [INFO] Robot Pose: x=0.97, y=1.03, heading=95.9 (camera=usb), dist_to_home=96.8cm
+2026-06-09 10:08:04,356 [INFO] Route: desired=88.4deg, turn=-7.5deg, dist=0.97m
+2026-06-09 10:08:04,362 [INFO] Step 5 forward step: speed=2, L=62.0cm C=56.0cm R=54.0cm
+2026-06-09 10:08:04,946 [INFO] Robot Pose: x=0.97, y=1.10, heading=96.4 (camera=usb), dist_to_home=89.8cm
+2026-06-09 10:08:04,949 [INFO] Route: desired=87.8deg, turn=-8.6deg, dist=0.90m
+2026-06-09 10:08:04,952 [INFO] Step 5 forward step: speed=2, L=90.0cm C=54.0cm R=52.0cm
+2026-06-09 10:08:07,901 [INFO] Robot Pose: x=0.95, y=1.16, heading=96.4 (camera=usb), dist_to_home=84.3cm
+2026-06-09 10:08:07,903 [INFO] Route: desired=86.7deg, turn=-9.7deg, dist=0.84m
+2026-06-09 10:08:07,908 [INFO] Heading aligned (tol=10.0deg). Driving forward speed=1.
+2026-06-09 10:08:07,913 [INFO] Step 5 forward step: speed=1, L=89.0cm C=53.0cm R=44.0cm
+2026-06-09 10:08:11,074 [INFO] Robot Pose: x=0.92, y=1.31, heading=95.0 (camera=usb), dist_to_home=69.9cm
+2026-06-09 10:08:11,083 [INFO] Route: desired=83.1deg, turn=-11.9deg, dist=0.70m
+2026-06-09 10:08:11,090 [INFO] Home wall proximity check 1/2: L=93.0 C=999.0 R=38.0 Z=73.7cm
+2026-06-09 10:08:11,096 [INFO] Fine turn R: desired=83.1deg, error=-11.9deg (attempt 1/3)
+2026-06-09 10:08:11,938 [INFO] Robot Pose: x=0.90, y=1.44, heading=96.3 (camera=usb), dist_to_home=56.9cm
+2026-06-09 10:08:11,941 [INFO] Route: desired=80.1deg, turn=-16.1deg, dist=0.57m
+2026-06-09 10:08:11,945 [INFO] Home wall proximity check 2/2: L=39.0 C=38.0 R=41.0 Z=61.0cm
+2026-06-09 10:08:11,948 [INFO] Executing Ball drop...
+2026-06-09 10:08:15,267 [INFO] Mission sequence finalized. Entering rest pose and shutting down.
+2026-06-09 10:08:15,274 [INFO] Moving ARM to DOWN pose before exit.
+2026-06-09 10:08:16,384 [INFO] Camera stopped
+2026-06-09 10:08:16,783 [INFO] Camera closed successfully.
