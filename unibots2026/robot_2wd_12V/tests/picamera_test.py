@@ -7,8 +7,8 @@ def main():
 
     # Configure the camera's main stream for 320x240 resolution, BGR format (native to OpenCV), and 30 FPS
     config = picam2.create_video_configuration(
-        main={"size": (320, 240), "format": "BGR888"},
-        controls={"FrameRate": 30}
+        main={"size": (320, 240), "format": "RGB888"},
+        controls={"FrameRate": 60}
     )
     picam2.configure(config)
 
@@ -19,8 +19,8 @@ def main():
 
     try:
         while True:
-            # Capture the latest frame as a numpy array directly in BGR format
-            # Using create_video_configuration with BGR888 avoids costly color conversion
+            # Capture the latest frame as a numpy array directly in RGB format
+            # Using create_video_configuration with RGB888 avoids costly color conversion
             frame_raw = picam2.capture_array()
             
             # Rotate frame by 180 degrees (flip horizontally AND vertically)

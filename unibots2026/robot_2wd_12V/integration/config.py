@@ -31,6 +31,8 @@ CENTER_TOLERANCE = 40 # pixels (wider deadband to reduce oscillation)
 
 # Emergency / operator controls
 START_STOP_KEY = 'y'
+BUTTON_PIN = 25
+BUTTON_DEBOUNCE_S = 0.2
 
 # Ball parameters
 BALL_DIAMETER_CM = 4.0
@@ -59,8 +61,8 @@ SAFE_WALL_DISTANCE = 40.0
 # Mission Timing (seconds)
 STEP2_CONFIRM_HOME_TIMEOUT_S = 10.0
 STEP3_READY_TO_EXPLORE_S = 10.0
-STEP4_SEARCH_AND_APPROACH_TIMEOUT_S = 80.0
-STEP5_RETURN_HOME_TIMEOUT_S = 80.0
+STEP4_SEARCH_AND_APPROACH_TIMEOUT_S = 60.0
+STEP5_RETURN_HOME_TIMEOUT_S = 100.0
 
 # Step 5 behavior (localize -> rotate -> coarse forward step)
 COURSE_FWD_MOTION_DIST_CM = 30.0

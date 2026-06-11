@@ -7,6 +7,7 @@ import tty
 import threading
 import select
 import subprocess
+import re
 
 # --- CAMERA CONFIGURATION ---
 # Select which script to launch when pressing 'V' for Live Video. Options: 'picamera' or 'usb'
@@ -46,17 +47,60 @@ except Exception as e:
     sys.exit()
 
 # --- BACKGROUND THREAD: READ SENSORS ---
+def parse_line_sensor_state(line):
+    cleaned = line.strip().upper()
+    if not cleaned:
+        return None
+
+    if "BLACK" in cleaned:
+        return 0
+    if "WHITE" in cleaned:
+        return 1
+    if "LOW" in cleaned:
+        return 0
+    if "HIGH" in cleaned:
+        return 1
+
+    # Accept forms like "0", "1", "LINE,0", "S:1"
+    match = re.search(r"(^|[^0-9])([01])($|[^0-9])", cleaned)
+    if match:
+        return int(match.group(2))
+
+    return None
+
+
+def print_sensor_status(left, center, right, line_state):
+    if line_state is None:
+        line_text = "-"
+    else:
+        surface = "BLACK" if line_state == 0 else "WHITE"
+        line_text = f"{line_state}({surface})"
+    sys.stdout.write(f"\rSensors -> L:{left} C:{center} R:{right} Line:{line_text}   ")
+    sys.stdout.flush()
+
+
 def listen_to_arduino():
+    last_l = "-"
+    last_c = "-"
+    last_r = "-"
+    last_line_state = None
+
     while running:
         if ser.in_waiting > 0:
             try:
                 line = ser.readline().decode('utf-8').rstrip()
                 if line.startswith("D,"):
                     parts = line.split(",")
-                    # Print over the same line (\r) to avoid scrolling mess
-                    # "end=''" prevents a new line
-                    sys.stdout.write(f"\rSensors -> L:{parts[1]} C:{parts[2]} R:{parts[3]}   ")
-                    sys.stdout.flush()
+                    if len(parts) >= 4:
+                        last_l = parts[1]
+                        last_c = parts[2]
+                        last_r = parts[3]
+                        print_sensor_status(last_l, last_c, last_r, last_line_state)
+                else:
+                    line_state = parse_line_sensor_state(line)
+                    if line_state is not None:
+                        last_line_state = line_state
+                        print_sensor_status(last_l, last_c, last_r, last_line_state)
             except:
                 pass
         time.sleep(0.05) # Small rest to save CPU

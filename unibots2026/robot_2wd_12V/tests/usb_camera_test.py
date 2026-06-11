@@ -1,21 +1,41 @@
 import cv2
 import sys
+from pathlib import Path
+
+
+def _video_device_sort_key(path_obj: Path):
+    name = path_obj.name  # e.g. video0
+    suffix = name.replace("video", "", 1)
+    return int(suffix) if suffix.isdigit() else 10_000
+
+
+def find_available_camera():
+    devices = sorted(Path("/dev").glob("video*"), key=_video_device_sort_key)
+
+    if not devices:
+        print("Error: No /dev/video* devices found.")
+        return None, None
+
+    for device in devices:
+        device_path = str(device)
+        cap = cv2.VideoCapture(device_path, cv2.CAP_V4L2)
+        if cap.isOpened():
+            return cap, device_path
+        cap.release()
+
+    print("Error: Found /dev/video* devices, but none could be opened.")
+    return None, None
 
 def main():
-    # Pass the explicit device path to avoid OpenCV falling back to /dev/video0
-    device_path = "/dev/video2" 
-    # Force the V4L2 backend which handles USB webcams much better on the Pi
-    cap = cv2.VideoCapture(device_path, cv2.CAP_V4L2)
-
-    if not cap.isOpened():
-        print(f"Error: Cannot open USB camera at {device_path}.")
-        print("Try changing the device_path to '/dev/video3' if this fails.")
+    cap, device_path = find_available_camera()
+    if cap is None:
         sys.exit(1)
 
     # Set the desired resolution: 320x240
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 
+    print(f"Using camera device: {device_path}")
     print("USB Camera Live View started.")
     print("Press 'q' inside the video window to quit.")
 

@@ -2,11 +2,13 @@ import time
 import threading
 import sys
 import math
+import termios
+import tty
+import select
 import os
 import cv2
 import logging
 import numpy as np
-from gpiozero import Button
 from tqdm import tqdm
 from robot_hardware import RobotController
 from vision_module import VisionModule
@@ -34,9 +36,39 @@ logging.basicConfig(
     ]
 )
 
+def get_key(timeout=0.1):
+    if not sys.stdin.isatty():
+        return None
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)
+        r, w, e = select.select([sys.stdin], [], [], timeout)
+        if r:
+            ch = sys.stdin.read(1)
+            # cbreak mode disables normal tty echo; echo typed control keys explicitly.
+            if ch and ch.isprintable():
+                sys.stdout.write(ch)
+                sys.stdout.flush()
+        else:
+            ch = None
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+def restore_terminal_echo():
+    if not sys.stdin.isatty():
+        return
+    fd = sys.stdin.fileno()
+    try:
+        attrs = termios.tcgetattr(fd)
+        attrs[3] |= termios.ECHO
+        termios.tcsetattr(fd, termios.TCSADRAIN, attrs)
+    except Exception:
+        pass
+
 button_pressed = False
 mission_running = False
-button = None
 
 def is_valid_distance_cm(dist):
     return SAFETY_MIN_VALID_CM <= dist <= SAFETY_MAX_VALID_CM
@@ -188,24 +220,18 @@ def request_mission_stop(reason):
             pass
 
 def check_button_thread():
-    global button_pressed, mission_running, button
-
-    if button is None:
-        logging.warning("Physical start/stop button is not available; waiting for keyboard fallback.")
-        return
-
-    last_pressed = False
+    global button_pressed, mission_running
     while True:
-        current_pressed = bool(button.is_pressed)
-        if current_pressed and not last_pressed:
-            if not mission_running:
-                button_pressed = True
-                mission_running = True
-                logging.info("Start command received via physical button on GPIO %d.", BUTTON_PIN)
-            else:
-                request_mission_stop("Stop command received via physical button on GPIO %d." % BUTTON_PIN)
-        last_pressed = current_pressed
-        time.sleep(0.05)
+        key = get_key(0.5)
+        if key:
+            key = key.lower()
+            if key == START_STOP_KEY:
+                if not mission_running:
+                    button_pressed = True
+                    mission_running = True
+                    logging.info(f"Start command received via '{START_STOP_KEY}' key.")
+                else:
+                    request_mission_stop(f"Stop command received via '{START_STOP_KEY}' key.")
 
 def estimate_wall_distance_cm_from_picam(vision):
     # Use PiCamera AprilTag pose while arm is down to estimate wall distance.
@@ -573,16 +599,7 @@ def main():
     else:
         logging.info(f"Ultrasonic sensor status: OK (L:{robot.latest_L} C:{robot.latest_C} R:{robot.latest_R})")
 
-    global button
-
-    try:
-        button = Button(BUTTON_PIN, bounce_time=BUTTON_DEBOUNCE_S)
-        logging.info("Physical start/stop button ready on GPIO %d.", BUTTON_PIN)
-    except Exception as exc:
-        logging.error("Failed to initialize physical start/stop button on GPIO %d: %s", BUTTON_PIN, exc)
-        return
-
-    logging.info("Button status: Listener running (press the physical button on GPIO %d to start/stop).", BUTTON_PIN)
+    logging.info(f"Button status: Listener running (press '{START_STOP_KEY}' to start/stop).")
 
     logging.info("Moving ARM to UP pose.")
     robot.arm_up()
@@ -591,7 +608,7 @@ def main():
     time.sleep(1)
     
     threading.Thread(target=check_button_thread, daemon=True).start()
-    logging.info("System Online. Waiting for the physical button press on GPIO %d to start the mission sequence...", BUTTON_PIN)
+    logging.info(f"System Online. Waiting for button press ('{START_STOP_KEY}' key) to start mission sequence...")
     
     while not button_pressed:
         time.sleep(0.1)
@@ -1271,12 +1288,14 @@ vision = None
 
 if __name__ == "__main__":
     try:
+        restore_terminal_echo()
         main()
     except KeyboardInterrupt:
         logging.info("Interrupted by user (Ctrl+C)")
     except Exception as e:
         logging.error(f"Mission crashed due to exception: {e}")
     finally:
+        restore_terminal_echo()
         if robot is not None:
             logging.info("Moving ARM to DOWN pose before exit.")
             try:

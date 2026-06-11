@@ -16,15 +16,16 @@ const int ENB = 11; // PWM Speed Rights
 const int IN3 = 12;
 const int IN4 = 13;
 
-// 3. Servo Motors (Using freed Digital Pins)
-const int PIN_SHOULDER_L = 2;
+// 3. Line Sensor (Digital)
+const int PIN_LINE_SENSOR = 2;
+
+// 4. Servo Motors
 const int PIN_SHOULDER_R = 4;
 const int PIN_ELBOW_L = 5;
 const int PIN_ELBOW_R = 6;
 const int PIN_WRIST = 7;
 
 // --- OBJECTS & VARIABLES ---
-Servo shoulderLeft;
 Servo shoulderRight;
 Servo elbowLeft;
 Servo elbowRight;
@@ -37,7 +38,6 @@ char command = 'S';   // Current command (S=Stop)
 unsigned long lastCommandTime = 0; // Safety timeout
 
 // Track current servo positions for smooth movement
-int currentShoulderL = 180;  // DOWN position for Left
 int currentShoulderR = 130;  // Home position for Right shoulder
 int currentElbowL = 90;      // UP position for Elbow Left
 int currentElbowR = 90;     // UP position for Elbow Right
@@ -51,6 +51,7 @@ void setup() {
   pinMode(leftTrig, OUTPUT); pinMode(leftEcho, INPUT);
   pinMode(centerTrig, OUTPUT); pinMode(centerEcho, INPUT);
   pinMode(rightTrig, OUTPUT); pinMode(rightEcho, INPUT);
+  pinMode(PIN_LINE_SENSOR, INPUT);
   
   // Motor Setup
   pinMode(ENA, OUTPUT); pinMode(ENB, OUTPUT);
@@ -59,7 +60,6 @@ void setup() {
   
   // Set initial neutral/stop positions BEFORE attaching.
   // Using writeMicroseconds(1500) gives a much more precise "center" (stop pulse at 1.5ms) 
-  shoulderLeft.writeMicroseconds(1500);
   shoulderRight.writeMicroseconds(1500);
   elbowLeft.writeMicroseconds(1500);
   elbowRight.writeMicroseconds(1500);
@@ -125,8 +125,8 @@ void moveElbowSmooth(int targetL, int targetR) {
   }
 }
 
-// Combined shoulder + elbow smooth movement (all 4 servos simultaneously)
-void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER, int delayMs = SERVO_DELAY) {
+// Combined shoulder + elbow smooth movement (installed servos simultaneously)
+void moveArmSmooth(int targetSR, int targetEL, int targetER, int delayMs = SERVO_DELAY) {
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
   if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L);
   if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R);
@@ -140,8 +140,6 @@ void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER, int d
   int totalSteps = shoulderSteps;
   if (elbowLeftSteps > totalSteps) totalSteps = elbowLeftSteps;
   if (elbowRightSteps > totalSteps) totalSteps = elbowRightSteps;
-
-  currentShoulderL = targetSL;
 
   if (totalSteps == 0) {
     return;
@@ -163,7 +161,7 @@ void moveArmSmooth(int targetSL, int targetSR, int targetEL, int targetER, int d
 }
 
 // Arm-down: keep the elbow in the safe 90->0 / 90->180 corridor and let it lead the shoulder.
-void moveArmDownLevel(int targetSL, int targetSR, int targetEL, int targetER, int delayMs = SERVO_DELAY) {
+void moveArmDownLevel(int targetSR, int targetEL, int targetER, int delayMs = SERVO_DELAY) {
   if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R);
   if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L);
   if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R);
@@ -180,8 +178,6 @@ void moveArmDownLevel(int targetSL, int targetSR, int targetEL, int targetER, in
   int totalSteps = shoulderSteps;
   if (elbowLeftSteps > totalSteps) totalSteps = elbowLeftSteps;
   if (elbowRightSteps > totalSteps) totalSteps = elbowRightSteps;
-
-  currentShoulderL = targetSL;
 
   if (totalSteps == 0) {
     return;
@@ -277,7 +273,7 @@ void loop() {
     }
     else if (command == 'g') {  // ARM DROP pose - smooth movement
       // Pass a custom delay of 45ms (3x slower than default 15ms) for a softer landing
-      moveArmSmooth(currentShoulderL, 30, 120, 60, 45); 
+      moveArmSmooth(30, 120, 60, 45); 
       // Ensure the arm has settled completely to avoid mechanical overlap
       delay(200); 
       
@@ -287,10 +283,10 @@ void loop() {
       wrist.write(0); // Then open the wrist gate
     }
     else if (command == 'A') {  // ARM UP: Shoulder UP + Elbow DOWN (horizontal to ground)
-      moveArmSmooth(currentShoulderL, 0, 90, 90, 20);  // Right shoulder up, Elbow down
+      moveArmSmooth(0, 90, 90, 20);  // Right shoulder up, Elbow down
     }
     else if (command == 'a') {  // ARM DOWN: Shoulder DOWN + Elbow UP (return to start)
-      moveArmSmooth(currentShoulderL, 130, 0, 180, 20);  // Use identical smooth tracking algorithm as 'g'
+      moveArmSmooth(130, 0, 180, 20);  // Use identical smooth tracking algorithm as 'g'
     }
     else if (command == 'J') {  // Custom Slow Staggered Down
       moveShoulderSmooth(60, 30);  // Step 1: Shoulder goes 0->60
@@ -299,7 +295,7 @@ void loop() {
       moveShoulderSmooth(130, 30); // Step 3: Shoulder continues 60->130
     }
     else if (command == 'H') {  // ARM VERTICAL: Shoulder UP + Elbow UP
-      moveArmSmooth(currentShoulderL, 0, 0, 180);  // Right shoulder up, Elbow up
+      moveArmSmooth(0, 0, 180);  // Right shoulder up, Elbow up
     }
     else if (command == 'O') {
       if (!wrist.attached()) wrist.attach(PIN_WRIST);
@@ -316,7 +312,7 @@ void loop() {
     else if (command == 'v') {
       int servoIdx = Serial.parseInt();
       int angle = Serial.parseInt();
-      if (servoIdx == 0) { if (!shoulderLeft.attached()) shoulderLeft.attach(PIN_SHOULDER_L); shoulderLeft.write(angle); currentShoulderL = angle; }
+      if (servoIdx == 0) { /* Left shoulder not installed; ignore index 0 */ }
       else if (servoIdx == 1) { if (!shoulderRight.attached()) shoulderRight.attach(PIN_SHOULDER_R); shoulderRight.write(angle); currentShoulderR = angle; }
       else if (servoIdx == 2) { if (!elbowLeft.attached()) elbowLeft.attach(PIN_ELBOW_L); elbowLeft.write(angle); currentElbowL = angle; }
       else if (servoIdx == 3) { if (!elbowRight.attached()) elbowRight.attach(PIN_ELBOW_R); elbowRight.write(angle); currentElbowR = angle; }
@@ -329,7 +325,6 @@ void loop() {
     // Interpret Stop command specifically for Servos (New Option)
     else if (command == 'x') {
        // Detach to explicitly disable PWM signal and force stop
-       shoulderLeft.detach();
        shoulderRight.detach();
        elbowLeft.detach();
        elbowRight.detach();
@@ -356,11 +351,16 @@ void loop() {
     int d1 = getDistance(leftTrig, leftEcho);
     int d2 = getDistance(centerTrig, centerEcho);
     int d3 = getDistance(rightTrig, rightEcho);
+    int lineState = digitalRead(PIN_LINE_SENSOR);
     
     // Format: "D,Left,Center,Right"
     Serial.print("D,");
     Serial.print(d1); Serial.print(",");
     Serial.print(d2); Serial.print(",");
     Serial.println(d3);
+
+    // Format: "LINE,0" or "LINE,1"
+    Serial.print("LINE,");
+    Serial.println(lineState);
   }
 }
