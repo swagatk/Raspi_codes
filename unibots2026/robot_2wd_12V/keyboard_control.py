@@ -69,13 +69,32 @@ def parse_line_sensor_state(line):
     return None
 
 
-def print_sensor_status(left, center, right, line_state):
-    if line_state is None:
-        line_text = "-"
-    else:
-        surface = "BLACK" if line_state == 0 else "WHITE"
-        line_text = f"{line_state}({surface})"
-    sys.stdout.write(f"\rSensors -> L:{left} C:{center} R:{right} Line:{line_text}   ")
+def parse_dual_line_sensor_states(line):
+    cleaned = line.strip().upper()
+    if not cleaned.startswith("LINE,"):
+        return None
+
+    parts = [p.strip() for p in cleaned.split(",")]
+    if len(parts) != 3:
+        return None
+
+    if parts[1] in ("0", "1") and parts[2] in ("0", "1"):
+        return int(parts[1]), int(parts[2])
+    return None
+
+
+def sensor_surface_text(state):
+    if state is None:
+        return "-"
+    return "BLACK" if state == 0 else "WHITE"
+
+
+def print_sensor_status(left, center, right, line_left_state, line_right_state):
+    left_text = sensor_surface_text(line_left_state)
+    right_text = sensor_surface_text(line_right_state)
+    sys.stdout.write(
+        f"\rSensors -> L:{left} C:{center} R:{right} | Line Left={left_text}, Right={right_text}   "
+    )
     sys.stdout.flush()
 
 
@@ -83,7 +102,8 @@ def listen_to_arduino():
     last_l = "-"
     last_c = "-"
     last_r = "-"
-    last_line_state = None
+    last_line_left_state = None
+    last_line_right_state = None
 
     while running:
         if ser.in_waiting > 0:
@@ -95,12 +115,20 @@ def listen_to_arduino():
                         last_l = parts[1]
                         last_c = parts[2]
                         last_r = parts[3]
-                        print_sensor_status(last_l, last_c, last_r, last_line_state)
+                        print_sensor_status(last_l, last_c, last_r, last_line_left_state, last_line_right_state)
                 else:
+                    dual_states = parse_dual_line_sensor_states(line)
+                    if dual_states is not None:
+                        last_line_left_state, last_line_right_state = dual_states
+                        print_sensor_status(last_l, last_c, last_r, last_line_left_state, last_line_right_state)
+                        continue
+
+                    # Legacy single-sensor fallback: mirror one state to both fields.
                     line_state = parse_line_sensor_state(line)
                     if line_state is not None:
-                        last_line_state = line_state
-                        print_sensor_status(last_l, last_c, last_r, last_line_state)
+                        last_line_left_state = line_state
+                        last_line_right_state = line_state
+                        print_sensor_status(last_l, last_c, last_r, last_line_left_state, last_line_right_state)
             except:
                 pass
         time.sleep(0.05) # Small rest to save CPU

@@ -7,9 +7,9 @@ where left/right are 0 or 1.
 
 Logic:
 1) Left=WHITE, Right=WHITE -> move forward.
-2) Left=BLACK, Right=WHITE -> slight right nudge.
-3) Left=WHITE, Right=BLACK -> slight left nudge.
-4) Left=BLACK, Right=BLACK -> alternate left/right turns to find line edge.
+2) Left=BLACK, Right=WHITE -> slight left nudge.
+3) Left=WHITE, Right=BLACK -> slight right nudge.
+4) Left=BLACK, Right=BLACK -> move forward slowly (anti-oscillation on curves).
 """
 
 import argparse
@@ -26,10 +26,17 @@ ARM_MOVE_DELAY_S = 2.0
 SERIAL_RESET_DELAY_S = 2.0
 SENSOR_TIMEOUT_S = 0.8
 
-DRIVE_SPEED_CMD = "1"
-NUDGE_SECONDS = 0.10
-NUDGE_PAUSE_SECONDS = 0.05
-BOTH_BLACK_SWITCH_SECONDS = 0.30
+FORWARD_SPEED_CMD = "1"
+TURN_SPEED_CMD = "1"
+FORWARD_MOVE_SECONDS = 0.06
+FORWARD_PAUSE_SECONDS = 0.12
+NUDGE_SECONDS = 0.08
+NUDGE_PAUSE_SECONDS = 0.08
+BOTH_BLACK_SPEED_CMD = "1"
+BOTH_BLACK_MOVE_SECONDS = 0.04
+BOTH_BLACK_PAUSE_SECONDS = 0.14
+OSCILLATION_THRESHOLD = 3
+OSCILLATION_FORWARD_SECONDS = 0.20
 
 
 def find_arduino_port() -> str | None:
@@ -81,14 +88,45 @@ def send_drive_cmd(ser: serial.Serial, cmd: str, current_cmd: str) -> str:
 	return current_cmd
 
 
+def send_speed_cmd(ser: serial.Serial, speed_cmd: str, current_speed_cmd: str) -> str:
+	if speed_cmd != current_speed_cmd:
+		ser.write((speed_cmd + "\n").encode("utf-8"))
+		return speed_cmd
+	return current_speed_cmd
+
+
 def main() -> int:
 	parser = argparse.ArgumentParser(description="Follow a black line on white surface")
 	parser.add_argument("--port", default=None, help="Serial port (e.g. /dev/ttyACM0)")
 	parser.add_argument("--baud", type=int, default=BAUD_RATE, help="Serial baud rate")
 	parser.add_argument(
+		"--forward-speed-cmd",
 		"--speed-cmd",
-		default=DRIVE_SPEED_CMD,
-		help="Speed command to send to Arduino (typically 1, 2, or 3)",
+		dest="forward_speed_cmd",
+		default=FORWARD_SPEED_CMD,
+		help="Forward speed command to send to Arduino (typically 1, 2, or 3)",
+	)
+	parser.add_argument(
+		"--turn-speed-cmd",
+		default=TURN_SPEED_CMD,
+		help="Turn speed command for left/right nudges and edge search (typically 1, 2, or 3)",
+	)
+	parser.add_argument(
+		"--both-black-speed-cmd",
+		default=BOTH_BLACK_SPEED_CMD,
+		help="Speed command when both sensors are BLACK (slow curve mode)",
+	)
+	parser.add_argument(
+		"--forward-move-seconds",
+		type=float,
+		default=FORWARD_MOVE_SECONDS,
+		help="Forward pulse duration when Left=WHITE and Right=WHITE",
+	)
+	parser.add_argument(
+		"--forward-pause-seconds",
+		type=float,
+		default=FORWARD_PAUSE_SECONDS,
+		help="Pause duration between forward pulses",
 	)
 	parser.add_argument(
 		"--nudge-seconds",
@@ -103,10 +141,28 @@ def main() -> int:
 		help="Pause duration after each nudge",
 	)
 	parser.add_argument(
-		"--both-black-switch-seconds",
+		"--both-black-move-seconds",
 		type=float,
-		default=BOTH_BLACK_SWITCH_SECONDS,
-		help="Switch interval while alternating L/R when both sensors are BLACK",
+		default=BOTH_BLACK_MOVE_SECONDS,
+		help="Forward pulse duration when both sensors are BLACK",
+	)
+	parser.add_argument(
+		"--both-black-pause-seconds",
+		type=float,
+		default=BOTH_BLACK_PAUSE_SECONDS,
+		help="Pause duration between forward pulses when both sensors are BLACK",
+	)
+	parser.add_argument(
+		"--oscillation-threshold",
+		type=int,
+		default=OSCILLATION_THRESHOLD,
+		help="Number of L/R correction flips before forward recovery is triggered",
+	)
+	parser.add_argument(
+		"--oscillation-forward-seconds",
+		type=float,
+		default=OSCILLATION_FORWARD_SECONDS,
+		help="Forward recovery duration after oscillation threshold is hit",
 	)
 
 	mapping = parser.add_mutually_exclusive_group()
@@ -140,15 +196,20 @@ def main() -> int:
 		return 1
 
 	current_cmd = "S"
+	current_speed_cmd = ""
 	last_valid_sensor_time = time.monotonic()
-	both_black_cmd = "L"
-	last_both_black_switch = time.monotonic()
 	nudge_cmd = None
 	nudge_until = 0.0
 	pause_until = 0.0
+	forward_phase = "MOVE"
+	last_forward_phase_change = time.monotonic()
+	both_black_phase = "MOVE"
+	last_both_black_phase_change = time.monotonic()
 	left_surface = "WHITE"
 	right_surface = "WHITE"
-	last_surface_time = time.monotonic()
+	last_turn_dir = None
+	oscillation_flips = 0
+	oscillation_recovery_until = 0.0
 
 	print(f"Connected to {port} @ {args.baud}")
 	print(f"Mapping: {'0=BLACK, 1=WHITE' if args.black_is_low else '1=BLACK, 0=WHITE'}")
@@ -157,7 +218,7 @@ def main() -> int:
 	time.sleep(ARM_MOVE_DELAY_S)
 
 	print("Setting speed and starting dual-sensor line follow...")
-	ser.write((args.speed_cmd + "\n").encode("utf-8"))
+	current_speed_cmd = send_speed_cmd(ser, args.forward_speed_cmd, current_speed_cmd)
 	current_cmd = send_drive_cmd(ser, "S", current_cmd)
 	print("Press Ctrl+C to stop.")
 
@@ -168,47 +229,128 @@ def main() -> int:
 			if surfaces is not None:
 				left_surface, right_surface = surfaces
 				last_valid_sensor_time = now
-				last_surface_time = now
-
-				if left_surface == "WHITE" and right_surface == "WHITE":
-					nudge_cmd = None
-					nudge_until = 0.0
-					pause_until = 0.0
-					current_cmd = send_drive_cmd(ser, "F", current_cmd)
-
-				elif left_surface == "BLACK" and right_surface == "WHITE":
-					nudge_cmd = "R"
-					nudge_until = now + args.nudge_seconds
-					pause_until = nudge_until + args.nudge_pause_seconds
-
-				elif left_surface == "WHITE" and right_surface == "BLACK":
-					nudge_cmd = "L"
-					nudge_until = now + args.nudge_seconds
-					pause_until = nudge_until + args.nudge_pause_seconds
-
-				else:
-					nudge_cmd = None
-					nudge_until = 0.0
-					pause_until = 0.0
-					if now - last_both_black_switch >= args.both_black_switch_seconds:
-						both_black_cmd = "R" if both_black_cmd == "L" else "L"
-						last_both_black_switch = now
-					current_cmd = send_drive_cmd(ser, both_black_cmd, current_cmd)
 
 			if now - last_valid_sensor_time > SENSOR_TIMEOUT_S:
 				current_cmd = send_drive_cmd(ser, "S", current_cmd)
 			else:
-				if nudge_cmd is not None:
+				if now < oscillation_recovery_until:
+					current_speed_cmd = send_speed_cmd(ser, args.forward_speed_cmd, current_speed_cmd)
+					current_cmd = send_drive_cmd(ser, "F", current_cmd)
+					sys.stdout.write(
+						f"\rLeft:{left_surface:<5} Right:{right_surface:<5} Speed:{current_speed_cmd:<1} Cmd:{current_cmd} OscFlips:{oscillation_flips} RECOVER   "
+					)
+					sys.stdout.flush()
+					time.sleep(POLL_DELAY_S)
+					continue
+
+				# 1) Left=WHITE, Right=WHITE -> move forward.
+				if left_surface == "WHITE" and right_surface == "WHITE":
+					last_turn_dir = None
+					oscillation_flips = 0
+					nudge_cmd = None
+					nudge_until = 0.0
+					pause_until = 0.0
+					current_speed_cmd = send_speed_cmd(ser, args.forward_speed_cmd, current_speed_cmd)
+					if forward_phase == "MOVE":
+						if now - last_forward_phase_change >= args.forward_move_seconds:
+							current_cmd = send_drive_cmd(ser, "S", current_cmd)
+							forward_phase = "PAUSE"
+							last_forward_phase_change = now
+						else:
+							current_cmd = send_drive_cmd(ser, "F", current_cmd)
+					else:
+						if now - last_forward_phase_change >= args.forward_pause_seconds:
+							forward_phase = "MOVE"
+							last_forward_phase_change = now
+							current_cmd = send_drive_cmd(ser, "F", current_cmd)
+
+				# 2) Left=BLACK, Right=WHITE -> slight left nudge.
+				elif left_surface == "BLACK" and right_surface == "WHITE":
+					if last_turn_dir == "R":
+						oscillation_flips += 1
+					elif last_turn_dir != "L":
+						oscillation_flips = 0
+					last_turn_dir = "L"
+
+					if oscillation_flips >= max(1, args.oscillation_threshold):
+						oscillation_recovery_until = now + max(0.01, args.oscillation_forward_seconds)
+						oscillation_flips = 0
+						last_turn_dir = None
+						current_speed_cmd = send_speed_cmd(ser, args.forward_speed_cmd, current_speed_cmd)
+						current_cmd = send_drive_cmd(ser, "F", current_cmd)
+						continue
+
+					forward_phase = "MOVE"
+					last_forward_phase_change = now
+					both_black_phase = "MOVE"
+					last_both_black_phase_change = now
+					if nudge_cmd != "L" or (now >= pause_until):
+						nudge_cmd = "L"
+						nudge_until = now + args.nudge_seconds
+						pause_until = nudge_until + args.nudge_pause_seconds
+
+					current_speed_cmd = send_speed_cmd(ser, args.turn_speed_cmd, current_speed_cmd)
 					if now < nudge_until:
-						current_cmd = send_drive_cmd(ser, nudge_cmd, current_cmd)
+						current_cmd = send_drive_cmd(ser, "L", current_cmd)
 					elif now < pause_until:
 						current_cmd = send_drive_cmd(ser, "S", current_cmd)
-					else:
-						nudge_cmd = None
+
+				# 3) Left=WHITE, Right=BLACK -> slight right nudge.
+				elif left_surface == "WHITE" and right_surface == "BLACK":
+					if last_turn_dir == "L":
+						oscillation_flips += 1
+					elif last_turn_dir != "R":
+						oscillation_flips = 0
+					last_turn_dir = "R"
+
+					if oscillation_flips >= max(1, args.oscillation_threshold):
+						oscillation_recovery_until = now + max(0.01, args.oscillation_forward_seconds)
+						oscillation_flips = 0
+						last_turn_dir = None
+						current_speed_cmd = send_speed_cmd(ser, args.forward_speed_cmd, current_speed_cmd)
 						current_cmd = send_drive_cmd(ser, "F", current_cmd)
+						continue
+
+					forward_phase = "MOVE"
+					last_forward_phase_change = now
+					both_black_phase = "MOVE"
+					last_both_black_phase_change = now
+					if nudge_cmd != "R" or (now >= pause_until):
+						nudge_cmd = "R"
+						nudge_until = now + args.nudge_seconds
+						pause_until = nudge_until + args.nudge_pause_seconds
+
+					current_speed_cmd = send_speed_cmd(ser, args.turn_speed_cmd, current_speed_cmd)
+					if now < nudge_until:
+						current_cmd = send_drive_cmd(ser, "R", current_cmd)
+					elif now < pause_until:
+						current_cmd = send_drive_cmd(ser, "S", current_cmd)
+
+				# 4) Left=BLACK, Right=BLACK -> move forward slowly to reduce oscillation.
+				else:
+					last_turn_dir = None
+					oscillation_flips = 0
+					forward_phase = "MOVE"
+					last_forward_phase_change = now
+					nudge_cmd = None
+					nudge_until = 0.0
+					pause_until = 0.0
+					current_speed_cmd = send_speed_cmd(ser, args.both_black_speed_cmd, current_speed_cmd)
+					if both_black_phase == "MOVE":
+						if now - last_both_black_phase_change >= args.both_black_move_seconds:
+							current_cmd = send_drive_cmd(ser, "S", current_cmd)
+							both_black_phase = "PAUSE"
+							last_both_black_phase_change = now
+						else:
+							current_cmd = send_drive_cmd(ser, "F", current_cmd)
+					else:
+						if now - last_both_black_phase_change >= args.both_black_pause_seconds:
+							both_black_phase = "MOVE"
+							last_both_black_phase_change = now
+							current_cmd = send_drive_cmd(ser, "F", current_cmd)
 
 			sys.stdout.write(
-				f"\rLeft:{left_surface:<5} Right:{right_surface:<5} Cmd:{current_cmd}     "
+				f"\rLeft:{left_surface:<5} Right:{right_surface:<5} Speed:{current_speed_cmd:<1} Cmd:{current_cmd} OscFlips:{oscillation_flips}     "
 			)
 			sys.stdout.flush()
 
