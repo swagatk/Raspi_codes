@@ -3,12 +3,9 @@
 Simple line sensor test over Arduino serial output.
 
 Expected Arduino output examples (one per line):
-  0
-  1
-  LINE,0
-  LINE,1
-  LOW / HIGH
-  BLACK / WHITE
+	LINE,0,1
+	LINE,1,0
+	(legacy single-sensor packets LINE,0 or LINE,1 are also accepted)
 
 If your sensor logic is inverted, use --black-high.
 """
@@ -31,25 +28,18 @@ def find_arduino_port() -> str | None:
 	return None
 
 
-def parse_sensor_state(line: str) -> int | None:
-	"""Return digital state as 0/1 when possible, else None."""
+def parse_single_line_state(line: str) -> int | None:
+	"""Parse legacy LINE,<state> packets and return 0/1."""
 	cleaned = line.strip().upper()
-	if not cleaned:
+	if not cleaned.startswith("LINE,"):
 		return None
 
-	if "BLACK" in cleaned:
-		return 0
-	if "WHITE" in cleaned:
-		return 1
-	if "LOW" in cleaned:
-		return 0
-	if "HIGH" in cleaned:
-		return 1
+	parts = [p.strip() for p in cleaned.split(",")]
+	if len(parts) != 2:
+		return None
 
-	# Accept lines like "0", "1", "LINE,0", "S:1"
-	match = re.search(r"(^|[^0-9])([01])($|[^0-9])", cleaned)
-	if match:
-		return int(match.group(2))
+	if parts[1] in ("0", "1"):
+		return int(parts[1])
 
 	return None
 
@@ -57,6 +47,22 @@ def parse_sensor_state(line: str) -> int | None:
 def state_to_surface(state: int, black_is_low: bool) -> str:
 	is_black = (state == 0) if black_is_low else (state == 1)
 	return "BLACK" if is_black else "WHITE"
+
+
+def parse_dual_line_states(line: str) -> tuple[int, int] | None:
+	"""Parse LINE,left,right packets. Returns (left_state, right_state)."""
+	cleaned = line.strip().upper()
+	if not cleaned.startswith("LINE,"):
+		return None
+
+	parts = [p.strip() for p in cleaned.split(",")]
+	if len(parts) != 3:
+		return None
+
+	if parts[1] in ("0", "1") and parts[2] in ("0", "1"):
+		return int(parts[1]), int(parts[2])
+
+	return None
 
 
 def main() -> int:
@@ -89,17 +95,32 @@ def main() -> int:
 		return 1
 
 	try:
+		last_left_state = 1
+		last_right_state = 1
 		while True:
 			raw = ser.readline().decode("utf-8", errors="ignore").strip()
 			if not raw:
 				continue
 
-			state = parse_sensor_state(raw)
-			if state is None:
+			dual_states = parse_dual_line_states(raw)
+			if dual_states is not None:
+				left_state, right_state = dual_states
+				last_left_state, last_right_state = left_state, right_state
+				left_surface = state_to_surface(left_state, args.black_is_low)
+				right_surface = state_to_surface(right_state, args.black_is_low)
+				print(f"LEFT={left_surface} RIGHT={right_surface}")
 				continue
 
-			surface = state_to_surface(state, args.black_is_low)
-			print(surface)
+			single_state = parse_single_line_state(raw)
+			if single_state is None:
+				continue
+
+			# Backward compatibility: mirror single state to both sensors.
+			last_left_state = single_state
+			last_right_state = single_state
+			left_surface = state_to_surface(last_left_state, args.black_is_low)
+			right_surface = state_to_surface(last_right_state, args.black_is_low)
+			print(f"LEFT={left_surface} RIGHT={right_surface}")
 	except KeyboardInterrupt:
 		print("\nStopped.")
 	finally:

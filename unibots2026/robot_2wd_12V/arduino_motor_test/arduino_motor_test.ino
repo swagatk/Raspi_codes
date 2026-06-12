@@ -16,8 +16,9 @@ const int ENB = 11; // PWM Speed Rights
 const int IN3 = 12;
 const int IN4 = 13;
 
-// 3. Line Sensor (Digital)
-const int PIN_LINE_SENSOR = 2;
+// 3. Line Sensors (Digital)
+const int PIN_LINE_SENSOR_LEFT = 2;
+const int PIN_LINE_SENSOR_RIGHT = 10;
 
 // 4. Servo Motors
 const int PIN_SHOULDER_R = 4;
@@ -51,7 +52,8 @@ void setup() {
   pinMode(leftTrig, OUTPUT); pinMode(leftEcho, INPUT);
   pinMode(centerTrig, OUTPUT); pinMode(centerEcho, INPUT);
   pinMode(rightTrig, OUTPUT); pinMode(rightEcho, INPUT);
-  pinMode(PIN_LINE_SENSOR, INPUT);
+  pinMode(PIN_LINE_SENSOR_LEFT, INPUT);
+  pinMode(PIN_LINE_SENSOR_RIGHT, INPUT);
   
   // Motor Setup
   pinMode(ENA, OUTPUT); pinMode(ENB, OUTPUT);
@@ -351,7 +353,8 @@ void loop() {
     int d1 = getDistance(leftTrig, leftEcho);
     int d2 = getDistance(centerTrig, centerEcho);
     int d3 = getDistance(rightTrig, rightEcho);
-    int lineState = digitalRead(PIN_LINE_SENSOR);
+    int lineLeft = digitalRead(PIN_LINE_SENSOR_LEFT);
+    int lineRight = digitalRead(PIN_LINE_SENSOR_RIGHT);
     
     // Format: "D,Left,Center,Right"
     Serial.print("D,");
@@ -359,8 +362,10 @@ void loop() {
     Serial.print(d2); Serial.print(",");
     Serial.println(d3);
 
-    // Format: "LINE,0" or "LINE,1"
+    // Format: "LINE,left,right"
     Serial.print("LINE,");
-    Serial.println(lineState);
+    Serial.print(lineLeft);
+    Serial.print(",");
+    Serial.println(lineRight);
   }
 }
