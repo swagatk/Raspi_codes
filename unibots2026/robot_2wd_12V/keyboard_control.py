@@ -92,6 +92,10 @@ def sensor_surface_text(state):
 def print_sensor_status(left, center, right, line_left_state, line_right_state):
     left_text = sensor_surface_text(line_left_state)
     right_text = sensor_surface_text(line_right_state)
+
+    if line_left_state == 0 and line_right_state == 0:
+        sys.stdout.write("\n Black Line Detected\n")
+
     sys.stdout.write(
         f"\rSensors -> L:{left} C:{center} R:{right} | Line Left={left_text}, Right={right_text}   "
     )

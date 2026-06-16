@@ -61,8 +61,8 @@ class VisionModule:
         self.cap = None
         self.picam2 = None
         self.model = YOLO(MODEL_PATH, task='detect')
-        self.at_detector_usb = Detector(families='tagStandard41h12', quad_decimate=2.0)
-        self.at_detector_picam = Detector(families='tagStandard41h12', quad_decimate=2.0)
+        self.at_detector_usb = Detector(families=APRILTAG_FAMILY, quad_decimate=2.0)
+        self.at_detector_picam = Detector(families=APRILTAG_FAMILY, quad_decimate=2.0)
         
         self.frame = None
         self.picam_frame = None

@@ -4,7 +4,10 @@ import serial
 import sys
 import numpy as np
 import threading
+import os
+from pathlib import Path
 from picamera2 import Picamera2
+from libcamera import Transform
 
 try:
     from pupil_apriltags import Detector as PoseDetector
@@ -13,7 +16,7 @@ except ImportError:
     sys.exit()
 
 # --- CONFIGURATION ---
-TARGET_TAG_ID = 21          # The ID of the AprilTag to search for
+TARGET_TAG_ID = 14          # The ID of the AprilTag to search for
 TARGET_Z_DIST = 0.10       # Target distance to stop at (in meters)
 X_OFFSET_TOL = 0.08        # Acceptable horizontal offset from center (meters)
 Z_DIST_TOL = 0.05          # Acceptable distance tolerance (meters)
@@ -29,7 +32,66 @@ SENSOR_SMOOTHING_COUNT = 3 # Number of sensor readings to average to prevent fal
 SERIAL_PORT = '/dev/ttyACM0'  
 WIDTH = 640 
 HEIGHT = 480
-CAMERA_PARAMS = (954.4949188171072, 955.5979729485147, 332.0798756650343, 245.67451277016548)
+
+# User-defined camera selector: "picamera" or "usb"
+Camera_type = "picamera"
+CAMERA_TYPE = Camera_type.strip().lower()
+
+
+def _video_device_sort_key(path_obj: Path):
+    name = path_obj.name
+    suffix = name.replace("video", "", 1)
+    return int(suffix) if suffix.isdigit() else 10_000
+
+
+def _is_usb_video_node(path_obj: Path):
+    sysfs_node = Path("/sys/class/video4linux") / path_obj.name / "device"
+    try:
+        resolved = Path(os.path.realpath(sysfs_node))
+    except OSError:
+        return False
+    return "usb" in str(resolved)
+
+
+def _can_grab_frame(video_cap):
+    for _ in range(10):
+        ok, _ = video_cap.read()
+        if ok:
+            return True
+    return False
+
+
+def open_usb_camera(width, height):
+    devices = sorted(Path("/dev").glob("video*"), key=_video_device_sort_key)
+    usb_devices = [d for d in devices if _is_usb_video_node(d)]
+    candidates = usb_devices if usb_devices else devices
+
+    if not candidates:
+        raise RuntimeError("No /dev/video* devices found")
+
+    for device in candidates:
+        node_path = str(device)
+        cap = cv2.VideoCapture(node_path, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            cap.release()
+            continue
+
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+        if _can_grab_frame(cap):
+            return cap, node_path
+        cap.release()
+
+    raise RuntimeError(f"Found devices {[str(d) for d in candidates]}, but none returned frames")
+
+# Configure calibration parameters dynamically based on selected camera
+if CAMERA_TYPE == "picamera":
+    CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+else:
+    CAMERA_PARAMS = (742.843247995633, 743.2228374107693, 322.3205884283167, 234.06623771807327)
+
 TAG_SIZE = 0.10  # 10 cm tag
 SCALE = 3.0      # Scale factor from previous calibration
 
@@ -75,27 +137,51 @@ def send_cmd(cmd, force=False):
 
 # --- CAMERA SETUP & THREADING ---
 print("Starting Camera...")
-picam2 = Picamera2()
-config = picam2.create_video_configuration(
-    main={"size": (WIDTH, HEIGHT), "format": "RGB888"},
-    controls={"FrameRate": 30},
-    buffer_count=2
-)
-picam2.configure(config)
-picam2.start()
+picam2 = None
+cap = None
 
-apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=2.0)
+if CAMERA_TYPE == "picamera":
+    picam2 = Picamera2()
+    config = picam2.create_video_configuration(
+        main={"size": (WIDTH, HEIGHT), "format": "RGB888"},
+        controls={"FrameRate": 30},
+        transform=Transform(hflip=1, vflip=1),
+        buffer_count=2
+    )
+    picam2.configure(config)
+    picam2.start()
+    print("Using PiCamera2")
+elif CAMERA_TYPE == "usb":
+    cap, usb_node = open_usb_camera(WIDTH, HEIGHT)
+    print(f"Using USB camera: {usb_node}")
+else:
+    raise ValueError("Camera_type must be 'picamera' or 'usb'")
+
+apriltag_detector = PoseDetector(families='tag36h11', quad_decimate=2.0)
 
 running = True
 raw_frame = None
+
+# Lift arm before starting autonomous behavior.
+if ser:
+    print("Sending ARM UP command...")
+    send_cmd(b'A\n', force=True)
+    time.sleep(1.0)
 
 def camera_capture_thread():
     """ Dedicated thread purely to empty the camera buffer as fast as possible. """
     global running, raw_frame
     while running:
         try:
-            frame = picam2.capture_array()
-            raw_frame = frame
+            if CAMERA_TYPE == "picamera":
+                raw_frame = picam2.capture_array()
+            else:
+                ok, frame = cap.read()
+                if ok:
+                    # Keep downstream pipeline consistent with Picamera RGB frames.
+                    raw_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                else:
+                    time.sleep(0.01)
         except Exception as e:
             time.sleep(0.01)
 
@@ -406,5 +492,14 @@ finally:
     running = False
     send_cmd('S')
     time.sleep(0.1) # Wait for stop command to go through
-    picam2.stop()
+
+    if ser:
+        print("Sending ARM DOWN command...")
+        send_cmd(b'a\n', force=True)
+        time.sleep(1.0)
+
+    if picam2 is not None:
+        picam2.stop()
+    if cap is not None:
+        cap.release()
     print("Clean exit.")

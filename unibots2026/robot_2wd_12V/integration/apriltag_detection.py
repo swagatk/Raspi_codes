@@ -2,6 +2,7 @@ import cv2
 import sys
 import math
 import numpy as np
+from config import APRILTAG_FAMILY
 
 try:
     from pupil_apriltags import Detector as PoseDetector
@@ -12,7 +13,7 @@ except ImportError:
 TAG_SIZE = 0.10  # 10 cm tag
 
 # Initialize the AprilTag detector globally so it doesn't rebuild on every frame
-apriltag_detector = PoseDetector(families='tagStandard41h12', quad_decimate=2.0)
+apriltag_detector = PoseDetector(families=APRILTAG_FAMILY, quad_decimate=2.0)
 
 def capture_home_tag_function(frame, camera_params):
     """

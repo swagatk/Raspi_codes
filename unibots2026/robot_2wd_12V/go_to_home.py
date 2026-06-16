@@ -11,8 +11,10 @@ import serial.tools.list_ports
 import time
 import math
 import sys
+import atexit
 import select
 import threading
+from pathlib import Path
 from picamera2 import Picamera2
 from libcamera import Transform
 import matplotlib
@@ -25,27 +27,50 @@ from matplotlib.figure import Figure
 CAMERA_TYPE = "usb"  # Options: "picamera" or "usb"
 
 def find_usb_camera():
-    import glob
-    video_devices = sorted(glob.glob('/dev/video*'))
-    for dev in video_devices:
-        try:
-            num = int(dev.replace('/dev/video', ''))
-            if num >= 10:
-                continue
-        except ValueError:
-            continue
-            
-        print(f"Testing {dev}...")
-        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
-        if cap.isOpened():
-            ret, _ = cap.read()
-            cap.release()
-            if ret:
-                print(f"Found working camera at {dev}")
-                return dev
-    return "/dev/video0" # Fallback
+    def _video_device_sort_key(path_obj: Path):
+        name = path_obj.name
+        suffix = name.replace("video", "", 1)
+        return int(suffix) if suffix.isdigit() else 10_000
 
-USB_CAMERA_PATH = find_usb_camera()
+    def _is_usb_video_node(path_obj: Path):
+        sysfs_node = Path("/sys/class/video4linux") / path_obj.name / "device"
+        try:
+            resolved = Path(os.path.realpath(sysfs_node))
+        except OSError:
+            return False
+        return "usb" in str(resolved)
+
+    def _can_grab_frame(video_cap):
+        for _ in range(10):
+            ok, _ = video_cap.read()
+            if ok:
+                return True
+        return False
+
+    devices = sorted(Path("/dev").glob("video*"), key=_video_device_sort_key)
+    usb_devices = [d for d in devices if _is_usb_video_node(d)]
+    candidates = usb_devices if usb_devices else devices
+
+    for device in candidates:
+        device_path = str(device)
+        print(f"Testing {device_path}...")
+        cap = cv2.VideoCapture(device_path, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            cap.release()
+            continue
+
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+        if _can_grab_frame(cap):
+            print(f"Found working camera at {device_path}")
+            return cap, device_path
+        cap.release()
+
+    return None, None
+
+USB_CAMERA_PATH = None
 
 # Configure calibration parameters dynamically based on selected camera
 if CAMERA_TYPE == "picamera":
@@ -55,7 +80,7 @@ else:
 
 # --- MAP CONFIGURATION ---
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
-SCALE = 2.0     # Scale factor for Picamera distance calibration
+SCALE = 1.0     # Scale factor for Picamera distance calibration
 
 STOP_DIST = 40             # Front ultrasonic sensor stop distance (cm)
 SIDE_DIST = 40             # Side ultrasonic sensor push away distance (cm)
@@ -266,6 +291,7 @@ except Exception as e:
 
 current_cmd = b'S'
 last_cmd_time = 0
+arm_down_sent = False
 
 def send_cmd(cmd, force=False):
     global current_cmd, last_cmd_time
@@ -280,6 +306,20 @@ def send_cmd(cmd, force=False):
         ser.flush()
         current_cmd = cmd
         last_cmd_time = now
+
+
+def send_arm_down_once(reason="shutdown"):
+    global arm_down_sent
+    if arm_down_sent:
+        return
+    if ser:
+        print(f"Sending ARM DOWN command ({reason})...")
+        send_cmd(b'a\n', force=True)
+        time.sleep(1)  # Give the arm a moment to start moving
+    arm_down_sent = True
+
+
+atexit.register(send_arm_down_once, "process exit")
 
 # Tell the robot to raise the arm at the start of the script
 print("Sending ARM UP command...")
@@ -306,15 +346,13 @@ if CAMERA_TYPE == "picamera":
     picam2.start()
     print("PiCamera Started.")
 elif CAMERA_TYPE == "usb":
-    cap = cv2.VideoCapture(USB_CAMERA_PATH, cv2.CAP_V4L2)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    if not cap.isOpened():
+    cap, USB_CAMERA_PATH = find_usb_camera()
+    if cap is None:
         print(f"Error: Cannot open USB camera at {USB_CAMERA_PATH}")
         sys.exit(1)
     print(f"USB Camera Started ({USB_CAMERA_PATH}).")
 
-detector = Detector(families='tagStandard41h12', quad_decimate=2.0)
+detector = Detector(families='tag36h11', quad_decimate=2.0)
 
 raw_frame = None
 
@@ -986,10 +1024,8 @@ finally:
     except Exception as e:
         print(f"Thread shutdown warning: {e}")
     
-    # Tell the robot to lower the arm when shutting down
-    print("Sending ARM DOWN command...")
-    send_cmd(b'a\n', force=True)
-    time.sleep(1) # Give the arm a moment to start moving
+    # Tell the robot to lower the arm when shutting down.
+    send_arm_down_once("normal cleanup")
     
     stop_robot()
     time.sleep(0.1)

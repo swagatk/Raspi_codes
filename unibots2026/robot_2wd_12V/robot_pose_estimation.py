@@ -1,21 +1,32 @@
 import cv2
+import os
 import numpy as np
 from pupil_apriltags import Detector
 import time
 import math
 import sys
 import threading
+from pathlib import Path
 from picamera2 import Picamera2
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
+from libcamera import Transform
 
 # --- CONFIGURATION ---
-CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+CAMERA_TYPE = "picamera"  # Options: "picamera" or "usb"
+
+if CAMERA_TYPE == "picamera":
+    CAMERA_PARAMS = (907.462397724348, 908.550833315007, 358.40056240558073, 246.47297678800183)
+elif CAMERA_TYPE == "usb":
+    CAMERA_PARAMS = (742.843247995633, 743.2228374107693, 322.3205884283167, 234.06623771807327)
+else:
+    raise ValueError("CAMERA_TYPE must be 'picamera' or 'usb'")
+
 TAG_SIZE = 0.10 # 10 centimeters = 0.10 meters
-SCALE = 2.0     # Scale factor for Picamera distance calibration
+SCALE = 1.0     # Scale factor for Picamera distance calibration
 FRAME_SKIP = 3  # Only run detection every Nth frame
 
 # --- HOME TAGS (Goal Location) ---
@@ -91,18 +102,73 @@ def heading_from_vector(vec_x, vec_y):
 
 running = True
 
+
+def open_usb_camera(width, height):
+    def video_device_sort_key(path_obj: Path):
+        name = path_obj.name
+        suffix = name.replace("video", "", 1)
+        return int(suffix) if suffix.isdigit() else 10_000
+
+    def is_usb_video_node(path_obj: Path):
+        sysfs_node = Path("/sys/class/video4linux") / path_obj.name / "device"
+        try:
+            resolved = Path(os.path.realpath(sysfs_node))
+        except OSError:
+            return False
+        return "usb" in str(resolved)
+
+    def can_grab_frame(video_cap):
+        for _ in range(10):
+            ok, _ = video_cap.read()
+            if ok:
+                return True
+        return False
+
+    devices = sorted(Path("/dev").glob("video*"), key=video_device_sort_key)
+    usb_devices = [d for d in devices if is_usb_video_node(d)]
+    candidates = usb_devices if usb_devices else devices
+
+    if not candidates:
+        raise RuntimeError("No /dev/video* devices found")
+
+    for device in candidates:
+        device_path = str(device)
+        cap = cv2.VideoCapture(device_path, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            cap.release()
+            continue
+
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+        if can_grab_frame(cap):
+            return cap, device_path
+        cap.release()
+
+    raise RuntimeError(f"Found devices {[str(d) for d in candidates]}, but none could stream frames")
+
 # --- CAMERA SETUP & THREADING ---
 print("Starting Camera...")
-picam2 = Picamera2()
-config = picam2.create_video_configuration(
-    main={"size": (640, 480), "format": "RGB888"},
-    controls={"FrameRate": 30},
-    buffer_count=2
-)
-picam2.configure(config)
-picam2.start()
+picam2 = None
+cap = None
 
-detector = Detector(families='tagStandard41h12', quad_decimate=2.0)
+if CAMERA_TYPE == "picamera":
+    picam2 = Picamera2()
+    config = picam2.create_video_configuration(
+        main={"size": (640, 480), "format": "BGR888"},
+        transform= Transform(hflip=1, vflip=1),
+        controls={"FrameRate": 30},
+        buffer_count=2
+    )
+    picam2.configure(config)
+    picam2.start()
+    print("Using PiCamera2")
+else:
+    cap, node = open_usb_camera(640, 480)
+    print(f"Using USB camera: {node}")
+
+detector = Detector(families='tag36h11', quad_decimate=2.0)
 
 raw_frame = None
 
@@ -110,7 +176,15 @@ def camera_capture_thread():
     global running, raw_frame
     while running:
         try:
-            raw_frame = picam2.capture_array()
+            if CAMERA_TYPE == "picamera":
+                raw_frame = picam2.capture_array()
+            else:
+                ok, frame = cap.read()
+                if ok:
+                    # Keep downstream path RGB-consistent across both camera types.
+                    raw_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                else:
+                    time.sleep(0.01)
         except:
             time.sleep(0.01)
 
@@ -357,5 +431,8 @@ except KeyboardInterrupt:
 finally:
     running = False
     time.sleep(0.1)
-    picam2.stop()
+    if picam2 is not None:
+        picam2.stop()
+    if cap is not None:
+        cap.release()
     print("Clean exit.")

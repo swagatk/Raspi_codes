@@ -37,6 +37,7 @@ logging.basicConfig(
 button_pressed = False
 mission_running = False
 button = None
+desired_exit_arm_pose = 'down'
 
 def is_valid_distance_cm(dist):
     return SAFETY_MIN_VALID_CM <= dist <= SAFETY_MAX_VALID_CM
@@ -196,7 +197,13 @@ def check_button_thread():
 
     last_pressed = False
     while True:
-        current_pressed = bool(button.is_pressed)
+        try:
+            if button is None:
+                break
+            current_pressed = bool(button.is_pressed)
+        except Exception:
+            # GPIO objects can become unavailable during shutdown; end thread quietly.
+            break
         if current_pressed and not last_pressed:
             if not mission_running:
                 button_pressed = True
@@ -333,11 +340,9 @@ def get_pose_with_camera_fallback(vision, arena_map, estimate_robot_pose_func):
 
     return None, None
 
-def estimate_robot_pose_from_tags(tags, arena_map):
+def estimate_robot_pose_from_tags(tags, arena_map, pose_scale=1.0):
     if not tags:
         return None
-
-    pose_scale = 2.0
 
     xmax = max((max(info["x"] for info in arena_map.values()), 2.0)) if arena_map else 2.0
     ymax = max((max(info["y"] for info in arena_map.values()), 2.0)) if arena_map else 2.0
@@ -409,19 +414,21 @@ def get_pose_with_tag_data_fallback(vision, arena_map, preferred_camera=None):
         if camera_name == 'usb':
             frame = getattr(vision, 'frame', None)
             camera_params = getattr(vision, 'usb_camera_params', None)
+            pose_scale = USB_TAG_POSE_SCALE
         else:
             frame = getattr(vision, 'picam_frame', None)
             camera_params = getattr(vision, 'picam_camera_params', None)
+            pose_scale = PICAM_TAG_POSE_SCALE
 
         if frame is None or camera_params is None:
             continue
 
         tags = capture_home_tag_function(frame, camera_params)
-        pose = estimate_robot_pose_from_tags(tags, arena_map)
+        pose = estimate_robot_pose_from_tags(tags, arena_map, pose_scale=pose_scale)
         if pose:
-            return pose, tags, camera_name
+            return pose, tags, camera_name, pose_scale
 
-    return None, [], None
+    return None, [], None, None
 
 def get_nearest_wall_distance_cm():
     valid_distances = [dist for dist in (robot.latest_L, robot.latest_C, robot.latest_R) if 0 < dist < 300]
@@ -443,15 +450,43 @@ def back_up_for_tag_reacquire():
     )
     execute_burst('B', STEP5_RELOCALIZE_BACKUP_SPEED, STEP5_TAG_REACQUIRE_BACKUP_DURATION_S, 0.1)
 
-def get_average_home_tag_measurement(tags):
+def get_average_home_tag_measurement(tags, pose_scale=1.0):
     visible_home_tags = [tag for tag in tags if tag.tag_id in HOME_TAG_IDS]
     if not visible_home_tags:
         return None
 
-    pose_scale = 2.0
     avg_x = sum(tag.pose_t[0][0] / max(pose_scale, 1e-6) for tag in visible_home_tags) / len(visible_home_tags)
     avg_z = sum(tag.pose_t[2][0] / max(pose_scale, 1e-6) for tag in visible_home_tags) / len(visible_home_tags)
     return avg_x, avg_z, [tag.tag_id for tag in visible_home_tags]
+
+def save_tag_detection_frame_from_source(frame, tags, filename):
+    if frame is None:
+        return
+
+    annotated = frame.copy()
+    for tag in tags:
+        try:
+            corners = tag.corners.astype(int)
+            for i in range(4):
+                cv2.line(annotated, tuple(corners[i]), tuple(corners[(i + 1) % 4]), (0, 255, 255), 2)
+            center = tuple(tag.center.astype(int))
+            cv2.circle(annotated, center, 4, (0, 0, 255), -1)
+            cv2.putText(
+                annotated,
+                f"ID:{tag.tag_id}",
+                (max(5, corners[0][0]), max(20, corners[0][1] - 6)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.55,
+                (0, 255, 255),
+                2,
+            )
+        except Exception:
+            continue
+
+    try:
+        cv2.imwrite(os.path.join(LOG_DIR, filename), annotated)
+    except Exception as e:
+        logging.warning(f"Failed to save Step 5 tag detection image {filename}: {e}")
 
 def get_confirmed_pose_with_camera_fallback(vision, arena_map, estimate_robot_pose_func):
     # Confirm pose across consecutive frames to reject one-off jitter.
@@ -533,8 +568,29 @@ def global_progress_thread():
             time.sleep(1)
             pbar.update(1)
 
+def wait_for_exit_button_press(lower_arm_before_exit=False):
+    # check_button_thread toggles mission_running=False on a press while mission is active.
+    if button is None:
+        logging.warning("Exit wait requested, but button is unavailable. Exiting immediately.")
+        return
+
+    logging.info("Waiting for physical button press to exit program...")
+    while mission_running:
+        time.sleep(0.1)
+    logging.info("Exit button press received.")
+
+    if lower_arm_before_exit and robot is not None:
+        logging.info("Lowering ARM to DOWN pose before exiting.")
+        try:
+            robot.arm_down()
+            if 'vision' in globals() and vision:
+                vision.update_active_camera(False)
+            time.sleep(1.0)
+        except Exception:
+            pass
+
 def main():
-    global robot, vision
+    global robot, vision, desired_exit_arm_pose
     logging.info("--- Step 1: Initialization phase ---")
     robot = RobotController()
     vision = VisionModule()
@@ -584,11 +640,11 @@ def main():
 
     logging.info("Button status: Listener running (press the physical button on GPIO %d to start/stop).", BUTTON_PIN)
 
-    logging.info("Moving ARM to UP pose.")
+    logging.info("Assuming ARM starts in DOWN pose. Moving ARM to UP pose.")
     robot.arm_up()
     if 'vision' in globals() and vision:
         vision.update_active_camera(True)
-    time.sleep(1)
+    time.sleep(1.0)
     
     threading.Thread(target=check_button_thread, daemon=True).start()
     logging.info("System Online. Waiting for the physical button press on GPIO %d to start the mission sequence...", BUTTON_PIN)
@@ -801,8 +857,27 @@ def main():
                 
         # 3. Grab the ball
         if reached:
-            if robot.latest_L < STOP_DIST or robot.latest_C < STOP_DIST or robot.latest_R < STOP_DIST:
-                logging.warning("Safety limits breached during catch! Aborting!")
+            blocked_channels = []
+            for ch_name, ch_dist in (
+                ("L", robot.latest_L),
+                ("C", robot.latest_C),
+                ("R", robot.latest_R),
+            ):
+                if is_valid_distance_cm(ch_dist) and ch_dist < STEP4_ARM_LOWER_MIN_CLEARANCE_CM:
+                    blocked_channels.append(f"{ch_name}:{ch_dist:.1f}cm")
+
+            if blocked_channels:
+                logging.warning(
+                    f"Too close to obstacle for arm-lower safety (< {STEP4_ARM_LOWER_MIN_CLEARANCE_CM:.1f}cm) "
+                    f"[{', '.join(blocked_channels)}]. Skipping arm down and backing up."
+                )
+                robot.halt()
+                execute_burst(
+                    'B',
+                    OBSTACLE_BACKUP_SPEED,
+                    OBSTACLE_BACKUP_DURATION_S,
+                    OBSTACLE_SETTLE_S,
+                )
                 reached = False
                 continue
 
@@ -943,327 +1018,223 @@ def main():
     
     logging.info("Moving to Home tag")
 
-    state = "SEARCHING"
-    last_seen_time = time.time()
-    last_known_side = 1.0
-    last_tag_reacquire_backup_time = 0.0
-    last_nav_motion = None
-    one_shot_distance_threshold_m = STEP5_ONE_SHOT_DISTANCE_THRESHOLD_M
-    final_turn_attempts = 0
     active_nav_camera = None
-    pending_camera_switch = None
-    pending_camera_switch_count = 0
-    last_stable_pose = None
-    last_localized_time = time.time()
+    pose_lock_acquired = False
+    last_align_turn_dir = 'L'
 
     arrived_at_home = False
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
-        pose_result, detected_tags, pose_cam = get_pose_with_tag_data_fallback(
+        pose_result, detected_tags, pose_cam, pose_scale = get_pose_with_tag_data_fallback(
             vision,
             ARENA_MAP,
             preferred_camera=active_nav_camera,
         )
-        is_localized = pose_result is not None
-
-        if state == "NAVIGATING" and is_localized and active_nav_camera and pose_cam != active_nav_camera:
-            if pending_camera_switch != pose_cam:
-                pending_camera_switch = pose_cam
-                pending_camera_switch_count = 1
-            else:
-                pending_camera_switch_count += 1
-
-            if pending_camera_switch_count < STEP5_CAMERA_SWITCH_CONFIRM_FRAMES:
-                # Ignore one-off camera-source flips to prevent heading jumps.
-                is_localized = False
+        if pose_result is None:
+            failed_localize_cycles += 1
+            if not pose_lock_acquired:
+                logging.info(
+                    f"Step 5: pose not found (attempt {failed_localize_cycles}). "
+                    f"Backing up for {STEP5_RELOCALIZE_BACKUP_DURATION_S:.2f}s and retrying."
+                )
+                execute_burst(
+                    'B',
+                    STEP5_RELOCALIZE_BACKUP_SPEED,
+                    STEP5_RELOCALIZE_BACKUP_DURATION_S,
+                    STEP5_RELOCALIZE_BACKUP_SETTLE_S,
+                )
             else:
                 logging.info(
-                    f"Step 5 camera switch confirmed: {active_nav_camera} -> {pose_cam} "
-                    f"({pending_camera_switch_count}/{STEP5_CAMERA_SWITCH_CONFIRM_FRAMES})"
+                    f"Step 5: pose lost after lock (attempt {failed_localize_cycles}). "
+                    f"Turning {last_align_turn_dir} briefly to reacquire (no backward move)."
                 )
-                active_nav_camera = pose_cam
-                pending_camera_switch = None
-                pending_camera_switch_count = 0
-                last_stable_pose = None
-        else:
-            pending_camera_switch = None
-            pending_camera_switch_count = 0
-
-        if state == "NAVIGATING" and is_localized and last_stable_pose is not None:
-            pos_jump_m = math.hypot(
-                pose_result[0] - last_stable_pose[0],
-                pose_result[1] - last_stable_pose[1],
-            )
-            heading_jump_deg = abs(normalize_rotation(pose_result[2] - last_stable_pose[2]))
-            if (
-                pos_jump_m > STEP5_POSE_CONFIRM_MAX_POS_JUMP_M
-                or heading_jump_deg > STEP5_POSE_CONFIRM_MAX_HEADING_JUMP_DEG
-            ):
-                logging.warning(
-                    f"Step 5 pose jump rejected: dpos={pos_jump_m:.2f}m "
-                    f"dhead={heading_jump_deg:.1f}deg (camera={pose_cam})"
+                execute_burst(
+                    last_align_turn_dir,
+                    STEP5_SEARCH_TURN_SPEED,
+                    STEP5_SEARCH_TURN_BURST_S,
+                    0.05,
                 )
-                is_localized = False
+            continue
 
-        if is_localized:
-            failed_localize_cycles = 0
-            rx, ry, heading, pose_estimates = pose_result
-            last_stable_pose = (rx, ry, heading)
-            last_localized_time = time.time()
-            last_seen_time = time.time()
-            desired_heading, route_turn, linear_distance_m = compute_heading_and_distance_to_home(
-                rx, ry, heading, home_target_xy
-            )
-            dist_to_home_cm = linear_distance_m * 100.0
-            home_measurement = get_average_home_tag_measurement(detected_tags)
-
-            for tag in detected_tags:
-                x_dist = tag.pose_t[0][0] / 2.0
-                if x_dist > 0:
-                    last_known_side = 1.0
-                elif x_dist < 0:
-                    last_known_side = -1.0
-
-            now = time.time()
-            if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
-                save_path = os.path.join(LOG_DIR, f"localize_{time.strftime('%Y%m%d_%H%M%S')}.jpg")
-                generate_localization_image(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path)
-                last_localize_save_ts = now
-
-            logging.info(
-                f"Robot Pose: x={rx:.2f}, y={ry:.2f}, heading={heading:.1f} (camera={pose_cam}), dist_to_home={dist_to_home_cm:.1f}cm"
-            )
-            logging.info(
-                f"Route: desired={desired_heading:.1f}deg, turn={route_turn:+.1f}deg, dist={linear_distance_m:.2f}m"
-            )
-        else:
-            failed_localize_cycles += 1
-            rx = ry = heading = None
-            desired_heading = None
-            route_turn = None
-            linear_distance_m = None
-            dist_to_home_cm = None
-            home_measurement = None
+        failed_localize_cycles = 0
+        pose_lock_acquired = True
+        active_nav_camera = pose_cam
+        rx, ry, heading, _ = pose_result
+        desired_heading, route_turn, linear_distance_m = compute_heading_and_distance_to_home(
+            rx, ry, heading, home_target_xy
+        )
+        dist_to_home_cm = linear_distance_m * 100.0
+        home_measurement = get_average_home_tag_measurement(detected_tags, pose_scale=pose_scale)
 
         now = time.time()
+        if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
+            ts = time.strftime('%Y%m%d_%H%M%S')
+            save_path = os.path.join(LOG_DIR, f"localize_{ts}.jpg")
+            generate_localization_image(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path)
+            source_frame = getattr(vision, 'frame', None) if pose_cam == 'usb' else getattr(vision, 'picam_frame', None)
+            save_tag_detection_frame_from_source(source_frame, detected_tags, f"tag_detection_{ts}.png")
+            last_localize_save_ts = now
 
-        if state == "SEARCHING":
-            last_nav_motion = None
-            if is_localized:
+        logging.info(
+            f"Robot Pose: x={rx:.2f}, y={ry:.2f}, heading={heading:.1f} (camera={pose_cam}), dist_to_home={dist_to_home_cm:.1f}cm"
+        )
+        logging.info(
+            f"Route: desired={desired_heading:.1f}deg, turn={route_turn:+.1f}deg"
+        )
+
+        valid_wall_dists = [
+            d for d in (robot.latest_L, robot.latest_C, robot.latest_R)
+            if is_valid_distance_cm(d)
+        ]
+        if valid_wall_dists and min(valid_wall_dists) <= STEP5_WALL_APPROACH_STOP_CM:
+            near_home_confirm += 1
+            logging.info(
+                f"Wall stop check {near_home_confirm}/{HOME_WALL_STOP_CONFIRM_COUNT}: "
+                f"L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}, "
+                f"threshold={STEP5_WALL_APPROACH_STOP_CM:.1f}cm"
+            )
+            if near_home_confirm >= HOME_WALL_STOP_CONFIRM_COUNT:
                 robot.halt()
-                active_nav_camera = pose_cam
-                pending_camera_switch = None
-                pending_camera_switch_count = 0
-                last_stable_pose = None
-                state = "NAVIGATING"
-                logging.info("Step 5 state -> NAVIGATING (pose locked)")
-                continue
-
-            if (
-                should_back_up_for_tag_reacquire()
-                and (now - last_tag_reacquire_backup_time) > STEP5_TAG_REACQUIRE_BACKUP_COOLDOWN_S
-            ):
-                back_up_for_tag_reacquire()
-                last_tag_reacquire_backup_time = time.time()
-                continue
-
-            if (now - last_seen_time) > STEP5_SEARCH_TIMEOUT_S:
-                search_dir = 'R' if last_known_side > 0 else 'L'
-                logging.info(f"Step 5 SEARCHING: turning {search_dir} ({get_ultrasonic_status()})")
-                execute_burst(search_dir, STEP5_SEARCH_TURN_SPEED, STEP5_SEARCH_TURN_BURST_S, 0.08)
-            continue
-
-        if state == "BLIND_FORWARD":
-            if (
-                (is_valid_distance_cm(robot.latest_C) and robot.latest_C < STOP_DIST)
-                or (is_valid_distance_cm(robot.latest_L) and robot.latest_L < SIDE_DIST)
-                or (is_valid_distance_cm(robot.latest_R) and robot.latest_R < SIDE_DIST)
-            ):
-                robot.halt()
-                logging.info(
-                    f"HOME REACHED (BLIND_FORWARD): L:{robot.latest_L} C:{robot.latest_C} R:{robot.latest_R}"
-                )
                 arrived_at_home = True
                 break
+        else:
+            near_home_confirm = 0
 
-            robot.move('F', STEP5_STEADY_FORWARD_SPEED)
-            time.sleep(0.05)
+        if obstacle_detected(robot):
+            logging.warning(
+                f"Obstacle ahead during Step 5 (L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid"
+            )
+            run_obstacle_avoidance(robot)
+            robot.halt()
             continue
 
-        if state == "NAVIGATING":
-            camera_z_cm = (home_measurement[1] * 100.0) if home_measurement else 999.0
+        if abs(route_turn) > STEP5_HEADING_TOL_DEG:
+            turn_direction = 'L' if route_turn > 0 else 'R'
+            last_align_turn_dir = turn_direction
+            turn_speed = STEP5_COARSE_TURN_SPEED if abs(route_turn) > STEP5_COARSE_TURN_THRESHOLD_DEG else STEP5_FINE_TURN_SPEED
+            logging.info(
+                f"Step 5 align: turning {turn_direction} (error={route_turn:+.1f}deg, speed={turn_speed})"
+            )
+            execute_burst(
+                turn_direction,
+                turn_speed,
+                STEP5_ALIGN_TURN_BURST_S,
+                CENTERING_SETTLE_S,
+            )
+            continue
 
-            close_by_camera = camera_z_cm < HOME_WALL_STOP_DISTANCE
-            close_by_sensor_near_home = (
-                linear_distance_m is not None
-                and linear_distance_m <= one_shot_distance_threshold_m
-                and (
-                    (is_valid_distance_cm(robot.latest_C) and robot.latest_C < HOME_WALL_STOP_DISTANCE)
-                    or (is_valid_distance_cm(robot.latest_L) and robot.latest_L < HOME_WALL_STOP_DISTANCE)
-                    or (is_valid_distance_cm(robot.latest_R) and robot.latest_R < HOME_WALL_STOP_DISTANCE)
-                )
+        if dist_to_home_cm > FINE_TUNING_HOME_DIST_CM:
+            logging.info(
+                f"Step 5 far approach (> {FINE_TUNING_HOME_DIST_CM:.0f}cm): large forward step"
+            )
+            moved = execute_forward_with_sensor_guard(
+                COURSE_FORWARD_SPEED,
+                STEP5_FAR_FORWARD_BURST_S,
+                STEP5_STEADY_FORWARD_SETTLE_S,
+                "Step 5 far forward",
+            )
+        else:
+            if home_measurement is not None:
+                lateral_offset_m = home_measurement[0]
+                if abs(lateral_offset_m) > STEP5_FINE_TUNE_TAG_CENTER_TOL_M:
+                    fine_turn_dir = 'R' if lateral_offset_m > 0 else 'L'
+                    logging.info(
+                        f"Step 5 fine tune: centering tag offset={lateral_offset_m:+.3f}m by turning {fine_turn_dir}"
+                    )
+                    execute_burst(
+                        fine_turn_dir,
+                        STEP5_FINE_TUNE_TURN_SPEED,
+                        STEP5_FINE_TUNE_TURN_BURST_S,
+                        CENTERING_SETTLE_S,
+                    )
+                    continue
+
+            logging.info(
+                f"Step 5 near approach (<= {FINE_TUNING_HOME_DIST_CM:.0f}cm): fine forward step"
+            )
+            moved = execute_forward_with_sensor_guard(
+                STEP5_STEADY_FORWARD_SPEED,
+                STEP5_FINE_TUNE_FORWARD_BURST_S,
+                STEP5_STEADY_FORWARD_SETTLE_S,
+                "Step 5 fine forward",
             )
 
-            if close_by_camera or close_by_sensor_near_home:
-                near_home_confirm += 1
-                logging.info(
-                    f"Home wall proximity check {near_home_confirm}/{HOME_WALL_STOP_CONFIRM_COUNT}: "
-                    f"L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f} Z={camera_z_cm:.1f}cm"
-                )
-                if near_home_confirm >= HOME_WALL_STOP_CONFIRM_COUNT:
-                    robot.halt()
-                    arrived_at_home = True
-                    break
-            else:
-                near_home_confirm = 0
-
+        if not moved:
             if obstacle_detected(robot):
                 logging.warning(
-                    f"Obstacle ahead during NAVIGATING (L:{robot.latest_L:.1f} "
-                    f"C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid + relocalize"
+                    f"Obstacle during Step 5 forward step (L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid"
                 )
                 run_obstacle_avoidance(robot)
                 robot.halt()
-                last_nav_motion = None
-                last_stable_pose = None
-                active_nav_camera = None
-                state = "SEARCHING"
-                continue
-
-            if not is_localized:
-                if (
-                    last_nav_motion
-                    and last_nav_motion[0] == "FORWARD"
-                    and linear_distance_m is not None
-                    and linear_distance_m < one_shot_distance_threshold_m
-                    and (now - last_localized_time) <= STEP5_LOST_TAG_FORWARD_GRACE_S
-                ):
-                    logging.info("Step 5: brief tag loss near home; continuing forward to avoid unnecessary turns.")
-                    robot.move('F', STEP5_STEADY_FORWARD_SPEED)
-                    time.sleep(0.05)
-                    continue
-
-                robot.halt()
-                last_nav_motion = None
-                last_stable_pose = None
-                active_nav_camera = None
-                state = "SEARCHING"
-                logging.warning("Localization lost in NAVIGATING -> SEARCHING")
-                continue
-
-            if abs(route_turn) > STEP5_COARSE_TURN_THRESHOLD_DEG:
-                turn_direction = 'L' if route_turn > 0 else 'R'
-                motion_signature = ("TURN", turn_direction, STEP5_COARSE_TURN_SPEED)
-                if last_nav_motion != motion_signature:
-                    if linear_distance_m is not None and linear_distance_m <= one_shot_distance_threshold_m:
-                        final_turn_attempts += 1
-                        if final_turn_attempts > STEP5_FINAL_TURN_MAX_ATTEMPTS:
-                            logging.warning("Final-leg turn attempts exceeded. Switching to BLIND_FORWARD.")
-                            state = "BLIND_FORWARD"
-                            continue
-                    logging.info(
-                        f"Coarse turn {turn_direction}: desired={desired_heading:.1f}deg, "
-                        f"error={route_turn:+.1f}deg (attempt {final_turn_attempts}/{STEP5_FINAL_TURN_MAX_ATTEMPTS})"
-                    )
-                    last_nav_motion = motion_signature
-
-                execute_burst(
-                    turn_direction,
-                    STEP5_COARSE_TURN_SPEED,
-                    STEP5_COARSE_TURN_BURST_S,
-                    0.03,
-                )
-                continue
-
-            if abs(route_turn) > STEP5_HEADING_TOL_DEG:
-                turn_direction = 'L' if route_turn > 0 else 'R'
-                motion_signature = ("PULSE_TURN", turn_direction, STEP5_FINE_TURN_SPEED)
-                if last_nav_motion != motion_signature:
-                    if linear_distance_m is not None and linear_distance_m <= one_shot_distance_threshold_m:
-                        final_turn_attempts += 1
-                        if final_turn_attempts > STEP5_FINAL_TURN_MAX_ATTEMPTS:
-                            logging.warning("Final-leg trim attempts exceeded. Switching to BLIND_FORWARD.")
-                            state = "BLIND_FORWARD"
-                            continue
-                    logging.info(
-                        f"Fine turn {turn_direction}: desired={desired_heading:.1f}deg, "
-                        f"error={route_turn:+.1f}deg (attempt {final_turn_attempts}/{STEP5_FINAL_TURN_MAX_ATTEMPTS})"
-                    )
-                    last_nav_motion = motion_signature
-
-                execute_burst(
-                    turn_direction,
-                    STEP5_FINE_TURN_SPEED,
-                    STEP5_FINE_TURN_BURST_S,
-                    CENTERING_SETTLE_S,
-                )
-                continue
-
-            forward_speed = (
-                COURSE_FORWARD_SPEED
-                if linear_distance_m > one_shot_distance_threshold_m
-                else STEP5_STEADY_FORWARD_SPEED
-            )
-            motion_signature = ("FORWARD", forward_speed)
-            if last_nav_motion != motion_signature:
-                logging.info(
-                    f"Heading aligned (tol={STEP5_HEADING_TOL_DEG:.1f}deg). Driving forward speed={forward_speed}."
-                )
-                last_nav_motion = motion_signature
-
-            logging.info(
-                f"Step 5 forward step: speed={forward_speed}, "
-                f"L={robot.latest_L:.1f}cm C={robot.latest_C:.1f}cm R={robot.latest_R:.1f}cm"
-            )
-            moved = execute_forward_with_sensor_guard(
-                forward_speed,
-                STEP5_STEADY_FORWARD_BURST_S,
-                STEP5_STEADY_FORWARD_SETTLE_S,
-                "Step 5 forward step",
-            )
-
-            if not moved:
-                if obstacle_detected(robot):
-                    logging.warning(
-                        f"Obstacle encountered during Step 5 forward step "
-                        f"(L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid + relocalize"
-                    )
-                    run_obstacle_avoidance(robot)
-                    robot.halt()
-                    last_nav_motion = None
-                    last_stable_pose = None
-                    active_nav_camera = None
-                    state = "SEARCHING"
-                    continue
-                if not mission_running:
-                    break
-                # Non-obstacle interruption: force a fresh localization cycle.
-                last_nav_motion = None
-                last_stable_pose = None
-                active_nav_camera = None
-                state = "SEARCHING"
-                continue
+            if not mission_running:
+                break
             continue
-
-        time.sleep(0.01)
 
     if not mission_running:
         logging.info("Mission stopped before drop sequence.")
         return
 
+    drop_executed = False
+    final_home_tag_distance_cm = None
     if arrived_at_home:
+        _, final_tags, final_cam, final_pose_scale = get_pose_with_tag_data_fallback(
+            vision,
+            ARENA_MAP,
+            preferred_camera=active_nav_camera,
+        )
+        final_home_measurement = get_average_home_tag_measurement(final_tags, pose_scale=final_pose_scale if final_pose_scale is not None else 1.0)
+        if final_home_measurement is not None:
+            final_home_tag_distance_cm = final_home_measurement[1] * 100.0
+            logging.info(
+                f"Final home-tag distance from {final_cam} camera: {final_home_tag_distance_cm:.1f}cm"
+            )
+        else:
+            logging.warning("Could not get final home-tag distance for drop check.")
+
+    if arrived_at_home and final_home_tag_distance_cm is not None and final_home_tag_distance_cm <= HOME_WALL_STOP_DISTANCE:
         logging.info("Executing Ball drop...")
         robot.arm_drop()
         wait_with_abort(2)
         robot.gripper_open()
         wait_with_abort(1)
+        drop_executed = True
+    elif arrived_at_home:
+        logging.warning(
+            f"At home proximity, but home-tag distance is beyond drop threshold "
+            f"({final_home_tag_distance_cm if final_home_tag_distance_cm is not None else float('nan'):.1f}cm > {HOME_WALL_STOP_DISTANCE:.1f}cm). "
+            "Skipping drop; keeping arm UP and gripper closed."
+        )
     else:
-        logging.error("Failed to reach home within time limit. Skipping drop sequence.")
+        logging.error("Failed to reach home within time limit. Skipping drop sequence and keeping arm UP.")
 
-    robot.arm_down()
-    if 'vision' in globals() and vision:
-        vision.update_active_camera(False)
+    if drop_executed:
+        logging.info("Post-drop: turning around by 180 degrees, then moving arm to DOWN pose.")
+        execute_burst(
+            STEP5_POST_DROP_TURN_DIR,
+            STEP5_POST_DROP_TURN_SPEED,
+            STEP5_POST_DROP_TURN_DURATION_S,
+            STEP5_POST_DROP_TURN_SETTLE_S,
+        )
+        robot.arm_down()
+        desired_exit_arm_pose = 'down'
+        if 'vision' in globals() and vision:
+            vision.update_active_camera(False)
+        robot.halt()
+        wait_for_exit_button_press(lower_arm_before_exit=True)
+        desired_exit_arm_pose = 'down'
+    elif not arrived_at_home:
+        # Step-5 timeout before drop: wait in current pose until button press, then lower arm and exit.
+        robot.halt()
+        wait_for_exit_button_press(lower_arm_before_exit=True)
+        desired_exit_arm_pose = 'down'
+    else:
+        robot.gripper_close()
+        robot.arm_up()
+        desired_exit_arm_pose = 'up'
+        if 'vision' in globals() and vision:
+            vision.update_active_camera(True)
+
     robot.halt()
-    logging.info("Mission sequence finalized. Entering rest pose and shutting down.")
+    logging.info("Mission sequence finalized. Shutting down with configured final arm pose.")
 
 global robot, vision
 robot = None
@@ -1278,11 +1249,20 @@ if __name__ == "__main__":
         logging.error(f"Mission crashed due to exception: {e}")
     finally:
         if robot is not None:
-            logging.info("Moving ARM to DOWN pose before exit.")
+            final_pose = desired_exit_arm_pose if desired_exit_arm_pose in ('up', 'down', 'keep') else 'down'
+            if final_pose == 'keep':
+                logging.info("Keeping current ARM pose before exit.")
+            else:
+                logging.info("Moving ARM to %s pose before exit.", final_pose.upper())
             try:
-                robot.arm_down()
-                if 'vision' in globals() and vision:
-                    vision.update_active_camera(False)
+                if final_pose == 'up':
+                    robot.arm_up()
+                    if 'vision' in globals() and vision:
+                        vision.update_active_camera(True)
+                elif final_pose == 'down':
+                    robot.arm_down()
+                    if 'vision' in globals() and vision:
+                        vision.update_active_camera(False)
                 time.sleep(1)
             except Exception:
                 pass
