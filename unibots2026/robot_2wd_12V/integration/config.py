@@ -64,14 +64,14 @@ APRILTAG_FAMILY = 'tag36h11'
 
 # AprilTag pose scaling by camera for Step 5 localization/distance.
 # Keep USB at 1.0 unless calibration indicates otherwise.
-USB_TAG_POSE_SCALE = 1.0
-PICAM_TAG_POSE_SCALE = 1.0
+USB_TAG_POSE_SCALE = 2.0
+PICAM_TAG_POSE_SCALE = 2.0
 
 # Mission Timing (seconds)
 STEP2_CONFIRM_HOME_TIMEOUT_S = 10.0
 STEP3_READY_TO_EXPLORE_S = 10.0
 STEP4_SEARCH_AND_APPROACH_TIMEOUT_S = 60.0
-STEP5_RETURN_HOME_TIMEOUT_S = 100.0
+STEP5_RETURN_HOME_TIMEOUT_S = 110.0
 
 # Step 5 behavior (localize -> rotate -> coarse forward step)
 COURSE_FWD_MOTION_DIST_CM = 30.0
