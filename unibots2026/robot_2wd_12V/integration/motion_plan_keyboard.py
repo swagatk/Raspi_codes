@@ -343,6 +343,35 @@ def save_home_tag_frame_from_source(frame, tags, tag_id, filename):
     except Exception as e:
         logging.error(f"Failed to save image {filename}: {e}")
 
+def save_tag_detection_frame_from_source(frame, tags, filename):
+    if frame is None:
+        return
+
+    annotated = frame.copy()
+    for tag in tags:
+        try:
+            corners = tag.corners.astype(int)
+            for i in range(4):
+                cv2.line(annotated, tuple(corners[i]), tuple(corners[(i + 1) % 4]), (0, 255, 255), 2)
+            center = tuple(tag.center.astype(int))
+            cv2.circle(annotated, center, 4, (0, 0, 255), -1)
+            cv2.putText(
+                annotated,
+                f"ID:{tag.tag_id}",
+                (max(5, corners[0][0]), max(20, corners[0][1] - 6)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.55,
+                (0, 255, 255),
+                2,
+            )
+        except Exception:
+            continue
+
+    try:
+        cv2.imwrite(os.path.join(LOG_DIR, filename), annotated)
+    except Exception as e:
+        logging.warning(f"Failed to save Step 5 tag detection image {filename}: {e}")
+
 def get_pose_with_camera_fallback(vision, arena_map, estimate_robot_pose_func):
     # Try USB first, then PiCamera. Returns (pose, camera_name) where camera_name in {'usb','picam'}.
     usb_frame = getattr(vision, 'frame', None)
@@ -442,12 +471,14 @@ def get_pose_with_tag_data_fallback(vision, arena_map, preferred_camera=None):
         if frame is None or camera_params is None:
             continue
 
-        tags = capture_home_tag_function(frame, camera_params)
+        frame_to_use = frame.copy()
+
+        tags = capture_home_tag_function(frame_to_use, camera_params)
         pose = estimate_robot_pose_from_tags(tags, arena_map)
         if pose:
-            return pose, tags, camera_name
+            return pose, tags, camera_name, frame_to_use
 
-    return None, [], None
+    return None, [], None, None
 
 def get_nearest_wall_distance_cm():
     valid_distances = [dist for dist in (robot.latest_L, robot.latest_C, robot.latest_R) if 0 < dist < 300]
@@ -975,7 +1006,7 @@ def main():
 
     arrived_at_home = False
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
-        pose_result, detected_tags, pose_cam = get_pose_with_tag_data_fallback(
+        pose_result, detected_tags, pose_cam, source_frame = get_pose_with_tag_data_fallback(
             vision,
             ARENA_MAP,
             preferred_camera=active_nav_camera,
@@ -1042,8 +1073,18 @@ def main():
 
             now = time.time()
             if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
-                save_path = os.path.join(LOG_DIR, f"localize_{time.strftime('%Y%m%d_%H%M%S')}.jpg")
-                generate_localization_image(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path)
+                ts = time.strftime('%Y%m%d_%H%M%S')
+                save_path = os.path.join(LOG_DIR, f"localize_{ts}.jpg")
+                threading.Thread(
+                    target=generate_localization_image,
+                    args=(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path),
+                    daemon=True
+                ).start()
+                threading.Thread(
+                    target=save_tag_detection_frame_from_source,
+                    args=(source_frame, detected_tags, f"tag_detection_{ts}.png"),
+                    daemon=True
+                ).start()
                 last_localize_save_ts = now
 
             logging.info(

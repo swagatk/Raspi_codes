@@ -423,12 +423,14 @@ def get_pose_with_tag_data_fallback(vision, arena_map, preferred_camera=None):
         if frame is None or camera_params is None:
             continue
 
-        tags = capture_home_tag_function(frame, camera_params)
+        frame_to_use = frame.copy()
+
+        tags = capture_home_tag_function(frame_to_use, camera_params)
         pose = estimate_robot_pose_from_tags(tags, arena_map, pose_scale=pose_scale)
         if pose:
-            return pose, tags, camera_name, pose_scale
+            return pose, tags, camera_name, pose_scale, frame_to_use
 
-    return None, [], None, None
+    return None, [], None, None, None
 
 def get_nearest_wall_distance_cm():
     valid_distances = [dist for dist in (robot.latest_L, robot.latest_C, robot.latest_R) if 0 < dist < 300]
@@ -1024,7 +1026,7 @@ def main():
 
     arrived_at_home = False
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
-        pose_result, detected_tags, pose_cam, pose_scale = get_pose_with_tag_data_fallback(
+        pose_result, detected_tags, pose_cam, pose_scale, source_frame = get_pose_with_tag_data_fallback(
             vision,
             ARENA_MAP,
             preferred_camera=active_nav_camera,
@@ -1069,9 +1071,16 @@ def main():
         if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
             ts = time.strftime('%Y%m%d_%H%M%S')
             save_path = os.path.join(LOG_DIR, f"localize_{ts}.jpg")
-            generate_localization_image(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path)
-            source_frame = getattr(vision, 'frame', None) if pose_cam == 'usb' else getattr(vision, 'picam_frame', None)
-            save_tag_detection_frame_from_source(source_frame, detected_tags, f"tag_detection_{ts}.png")
+            threading.Thread(
+                target=generate_localization_image,
+                args=(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path),
+                daemon=True
+            ).start()
+            threading.Thread(
+                target=save_tag_detection_frame_from_source,
+                args=(source_frame, detected_tags, f"tag_detection_{ts}.png"),
+                daemon=True
+            ).start()
             last_localize_save_ts = now
 
         logging.info(
@@ -1176,7 +1185,7 @@ def main():
     drop_executed = False
     final_home_tag_distance_cm = None
     if arrived_at_home:
-        _, final_tags, final_cam, final_pose_scale = get_pose_with_tag_data_fallback(
+        _, final_tags, final_cam, final_pose_scale, _ = get_pose_with_tag_data_fallback(
             vision,
             ARENA_MAP,
             preferred_camera=active_nav_camera,

@@ -422,10 +422,66 @@ fig = None
 canvas = None
 ax = None
 last_map_update = 0.0
+map_bgr_frame = None
+map_render_thread_running = False
+
+def render_map_background(rx, ry, rhead, localized):
+    global map_bgr_frame, map_render_thread_running
+    try:
+        fig = Figure(figsize=(8, 6), dpi=100)
+        canvas = FigureCanvasAgg(fig)
+        ax = fig.add_axes([0.1, 0.1, 0.6, 0.8])
+        ax.set_xlim(-0.2, 2.2)
+        ax.set_ylim(-0.2, 2.2)
+        ax.set_aspect('equal')
+        ax.set_title("Robot Arena")
+        ax.grid(True)
+
+        for tid, tinfo in ARENA_MAP.items():
+            tx = tinfo["x"]
+            ty = tinfo["y"]
+            is_home = (tid in HOME_TAGS)
+            c = 'blue' if is_home else 'black'
+            label = 'Home Tag' if (is_home and tid == HOME_TAGS[0]) else ('Arena Tag' if (not is_home and tid == 0) else "")
+            if label:
+                ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None', label=label)
+            else:
+                ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None')
+            ax.text(tx, ty, f' {tid}', color=c, fontsize=9, verticalalignment='bottom')
+
+        ax.plot(HOME_X, HOME_Y, marker='x', color='dodgerblue', markersize=10, linestyle='None', label='Home Target')
+
+        if localized:
+            ax.plot(rx, ry, marker='o', color='red', markersize=12, linestyle='None', label='Robot')
+            rad = math.radians(rhead)
+            dx_head = 0.2 * math.cos(rad)
+            dy_head = 0.2 * math.sin(rad)
+            ax.arrow(rx, ry, dx_head, dy_head, head_width=0.04, head_length=0.06, fc='red', ec='red')
+
+            dx_t = HOME_X - rx
+            dy_t = HOME_Y - ry
+            t_angle = heading_from_vector(dx_t, dy_t)
+            turn_angle = normalize_rotation(t_angle - rhead)
+            ax.arrow(rx, ry, dx_t, dy_t, head_width=0.03, head_length=0.05, fc='green', ec='green',
+                     linestyle='--', length_includes_head=True, alpha=0.7, label='Target Path')
+
+            dist = math.hypot(dx_t, dy_t)
+            info_text = (f"=== TELEMETRY ===\n\nPos X: {rx:.2f} m\nPos Y: {ry:.2f} m\nHeading: {rhead:.1f}*\n\n--- ROUTE ---\nDist: {dist:.2f} m\nAngle: {t_angle:.1f}*\nTurn: {turn_angle:+.1f}*")
+            fig.text(0.75, 0.5, info_text, transform=fig.transFigure, fontsize=12, ha='left', va='center', family='monospace', bbox=dict(facecolor='white', alpha=0.9, edgecolor='black', boxstyle='round,pad=1'))
+
+        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+        canvas.draw()
+        buf = canvas.buffer_rgba()
+        map_img = np.asarray(buf)
+        map_bgr_frame = cv2.cvtColor(map_img, cv2.COLOR_RGBA2BGR)
+    except Exception as e:
+        print(f"Map render error: {e}")
+    finally:
+        map_render_thread_running = False
 
 
 def init_gui_once():
-    global gui_initialized, gui_paused_frame, fig, canvas, ax
+    global gui_initialized, gui_paused_frame
     if gui_initialized or not ENABLE_GUI:
         return
 
@@ -435,10 +491,6 @@ def init_gui_once():
     cv2.namedWindow("Arena Map", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Arena Map", 800, 600)
 
-    fig = Figure(figsize=(8, 6), dpi=100)
-    canvas = FigureCanvasAgg(fig)
-    ax = fig.add_axes([0.1, 0.1, 0.6, 0.8])
-
     gui_paused_frame = np.zeros((240, 320, 3), dtype=np.uint8)
     cv2.putText(gui_paused_frame, "Vision Paused", (60, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     cv2.putText(gui_paused_frame, "Press 'C' to toggle", (60, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
@@ -447,7 +499,7 @@ def init_gui_once():
 
 
 def update_gui():
-    global running, show_vision, start_motion, last_map_update
+    global running, show_vision, start_motion, last_map_update, map_render_thread_running, map_bgr_frame
     if not ENABLE_GUI:
         return
 
@@ -469,71 +521,13 @@ def update_gui():
         cv2.imshow("Robot Vision", gui_paused_frame)
 
     now = time.time()
-    if now - last_map_update > 0.2:
+    if now - last_map_update > 0.5 and not map_render_thread_running:
         last_map_update = now
-        ax.clear()
-        ax.set_xlim(-0.2, 2.2)
-        ax.set_ylim(-0.2, 2.2)
-        ax.set_aspect('equal')
-        ax.set_title("Robot Arena")
-        ax.grid(True)
-
-        for tid, tinfo in ARENA_MAP.items():
-            tx = tinfo["x"]
-            ty = tinfo["y"]
-            is_home = (tid in HOME_TAGS)
-            c = 'blue' if is_home else 'black'
-
-            label = 'Home Tag' if (is_home and tid == HOME_TAGS[0]) else ('Arena Tag' if (not is_home and tid == 0) else "")
-
-            if label:
-                ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None', label=label)
-            else:
-                ax.plot(tx, ty, marker='s', color=c, markersize=8, linestyle='None')
-
-            ax.text(tx, ty, f' {tid}', color=c, fontsize=9, verticalalignment='bottom')
-
-        ax.plot(HOME_X, HOME_Y, marker='x', color='dodgerblue', markersize=10, linestyle='None', label='Home Target')
-
-        if is_localized:
-            ax.plot(robot_x, robot_y, marker='o', color='red', markersize=12, linestyle='None', label='Robot')
-
-            rad = math.radians(robot_heading)
-            dx_head = 0.2 * math.cos(rad)
-            dy_head = 0.2 * math.sin(rad)
-            ax.arrow(robot_x, robot_y, dx_head, dy_head,
-                     head_width=0.04, head_length=0.06, fc='red', ec='red')
-
-            dx_t = HOME_X - robot_x
-            dy_t = HOME_Y - robot_y
-            t_angle = heading_from_vector(dx_t, dy_t)
-            turn_angle = normalize_rotation(t_angle - robot_heading)
-
-            ax.arrow(robot_x, robot_y, dx_t, dy_t,
-                     head_width=0.03, head_length=0.05, fc='green', ec='green',
-                     linestyle='--', length_includes_head=True, alpha=0.7, label='Target Path')
-
-            dist = math.hypot(dx_t, dy_t)
-            info_text = (f"=== TELEMETRY ===\n\n"
-                         f"Pos X: {robot_x:.2f} m\n"
-                         f"Pos Y: {robot_y:.2f} m\n"
-                         f"Heading: {robot_heading:.1f}*\n\n"
-                         f"--- ROUTE ---\n"
-                         f"Dist: {dist:.2f} m\n"
-                         f"Angle: {t_angle:.1f}*\n"
-                         f"Turn: {turn_angle:+.1f}*")
-
-            fig.text(0.75, 0.5, info_text, transform=fig.transFigure,
-                     fontsize=12, ha='left', va='center', family='monospace',
-                     bbox=dict(facecolor='white', alpha=0.9, edgecolor='black', boxstyle='round,pad=1'))
-
-        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
-
-        canvas.draw()
-        buf = canvas.buffer_rgba()
-        map_img = np.asarray(buf)
-        map_bgr = cv2.cvtColor(map_img, cv2.COLOR_RGBA2BGR)
-        cv2.imshow("Arena Map", map_bgr)
+        map_render_thread_running = True
+        threading.Thread(target=render_map_background, args=(robot_x, robot_y, robot_heading, is_localized), daemon=True).start()
+        
+    if map_bgr_frame is not None:
+        cv2.imshow("Arena Map", map_bgr_frame)
 
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q') or key == ord('Q'):
