@@ -1058,7 +1058,7 @@ def main():
             last_stable_pose = (rx, ry, heading)
             last_localized_time = time.time()
             last_seen_time = time.time()
-            desired_heading, route_turn, linear_distance_m = compute_heading_and_distance_to_home(
+            desired_heading, route_turn, linear_distance_m, cross_track_error = compute_heading_and_distance_to_home(
                 rx, ry, heading, home_target_xy
             )
             dist_to_home_cm = linear_distance_m * 100.0
@@ -1150,14 +1150,14 @@ def main():
         if state == "NAVIGATING":
             camera_z_cm = (home_measurement[1] * 100.0) if home_measurement else 999.0
 
-            close_by_camera = camera_z_cm < HOME_WALL_STOP_DISTANCE
+            close_by_camera = camera_z_cm <= STOP_DIST
             close_by_sensor_near_home = (
                 linear_distance_m is not None
                 and linear_distance_m <= one_shot_distance_threshold_m
                 and (
-                    (is_valid_distance_cm(robot.latest_C) and robot.latest_C < HOME_WALL_STOP_DISTANCE)
-                    or (is_valid_distance_cm(robot.latest_L) and robot.latest_L < HOME_WALL_STOP_DISTANCE)
-                    or (is_valid_distance_cm(robot.latest_R) and robot.latest_R < HOME_WALL_STOP_DISTANCE)
+                    (is_valid_distance_cm(robot.latest_C) and robot.latest_C <= STOP_DIST)
+                    or (is_valid_distance_cm(robot.latest_L) and robot.latest_L <= STOP_DIST)
+                    or (is_valid_distance_cm(robot.latest_R) and robot.latest_R <= STOP_DIST)
                 )
             )
 
@@ -1256,9 +1256,20 @@ def main():
                 )
                 continue
 
+            is_normal_aligned = cross_track_error < 0.20
+            if (is_normal_aligned or linear_distance_m <= 0.50) and home_measurement is not None:
+                lateral_offset_m = home_measurement[0]
+                if abs(lateral_offset_m) > STEP5_FINE_TUNE_TAG_CENTER_TOL_M:
+                    fine_turn_dir = 'R' if lateral_offset_m > 0 else 'L'
+                    motion_signature = ("TRIM_CENTER", fine_turn_dir)
+                    if last_nav_motion != motion_signature:
+                        last_nav_motion = motion_signature
+                    execute_burst(fine_turn_dir, STEP5_FINE_TUNE_TURN_SPEED, STEP5_FINE_TUNE_TURN_BURST_S, CENTERING_SETTLE_S)
+                    continue
+
             forward_speed = (
                 COURSE_FORWARD_SPEED
-                if linear_distance_m > one_shot_distance_threshold_m
+                if linear_distance_m > 0.50
                 else STEP5_STEADY_FORWARD_SPEED
             )
             motion_signature = ("FORWARD", forward_speed)

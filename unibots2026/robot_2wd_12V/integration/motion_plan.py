@@ -81,7 +81,9 @@ def compute_home_target_xy(arena_map):
         return None
     mid_x = sum(point["x"] for point in home_points) / len(home_points)
     mid_y = sum(point["y"] for point in home_points) / len(home_points)
-    return mid_x, mid_y
+    _, inward_normal = get_wall_axes(HOME_TAG_IDS[0])
+    approach_heading = heading_from_vector(-inward_normal[0], -inward_normal[1])
+    return mid_x, mid_y, approach_heading, inward_normal
 
 def heading_from_vector(vec_x, vec_y):
     return math.degrees(math.atan2(vec_y, vec_x)) % 360.0
@@ -551,13 +553,32 @@ def get_home_tag_center_error_px(vision):
 
     return None
 
-def compute_heading_and_distance_to_home(rx, ry, heading, home_target_xy):
-    dx = home_target_xy[0] - rx
-    dy = home_target_xy[1] - ry
+def compute_heading_and_distance_to_home(rx, ry, heading, home_target_data):
+    hx, hy, approach_heading, inward_normal = home_target_data
+    dx = hx - rx
+    dy = hy - ry
     linear_distance_m = math.hypot(dx, dy)
-    desired_heading = math.degrees(math.atan2(dy, dx)) % 360.0
+
+    dist_along_normal = -(dx * inward_normal[0] + dy * inward_normal[1])
+    cross_track_x = rx - (hx + inward_normal[0] * dist_along_normal)
+    cross_track_y = ry - (hy + inward_normal[1] * dist_along_normal)
+    cross_track_error = math.hypot(cross_track_x, cross_track_y)
+
+    lookahead = 0.5
+    target_dist_along_normal = max(0.0, dist_along_normal - lookahead)
+    waypoint_x = hx + inward_normal[0] * target_dist_along_normal
+    waypoint_y = hy + inward_normal[1] * target_dist_along_normal
+
+    w_dx = waypoint_x - rx
+    w_dy = waypoint_y - ry
+
+    if cross_track_error < 0.15 and dist_along_normal < 1.5:
+        desired_heading = approach_heading
+    else:
+        desired_heading = heading_from_vector(w_dx, w_dy)
+
     rotation_deg = normalize_rotation(desired_heading - heading)
-    return desired_heading, rotation_deg, linear_distance_m
+    return desired_heading, rotation_deg, linear_distance_m, cross_track_error
 
 def global_progress_thread():
     total_dur = int(
@@ -1013,8 +1034,8 @@ def main():
     
     from map import ARENA_MAP
     from map_visualizer import generate_localization_image
-    home_target_xy = compute_home_target_xy(ARENA_MAP)
-    if home_target_xy is None:
+    home_target_data = compute_home_target_xy(ARENA_MAP)
+    if home_target_data is None:
         logging.error("Home target cannot be computed from map/home tags. Exiting mission.")
         return
     
@@ -1061,8 +1082,8 @@ def main():
         pose_lock_acquired = True
         active_nav_camera = pose_cam
         rx, ry, heading, _ = pose_result
-        desired_heading, route_turn, linear_distance_m = compute_heading_and_distance_to_home(
-            rx, ry, heading, home_target_xy
+        desired_heading, route_turn, linear_distance_m, cross_track_error = compute_heading_and_distance_to_home(
+            rx, ry, heading, home_target_data
         )
         dist_to_home_cm = linear_distance_m * 100.0
         home_measurement = get_average_home_tag_measurement(detected_tags, pose_scale=pose_scale)
@@ -1094,12 +1115,12 @@ def main():
             d for d in (robot.latest_L, robot.latest_C, robot.latest_R)
             if is_valid_distance_cm(d)
         ]
-        if valid_wall_dists and min(valid_wall_dists) <= STEP5_WALL_APPROACH_STOP_CM:
+        if valid_wall_dists and min(valid_wall_dists) <= STOP_DIST:
             near_home_confirm += 1
             logging.info(
                 f"Wall stop check {near_home_confirm}/{HOME_WALL_STOP_CONFIRM_COUNT}: "
                 f"L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}, "
-                f"threshold={STEP5_WALL_APPROACH_STOP_CM:.1f}cm"
+                f"threshold={STOP_DIST:.1f}cm"
             )
             if near_home_confirm >= HOME_WALL_STOP_CONFIRM_COUNT:
                 robot.halt()
@@ -1131,6 +1152,23 @@ def main():
             )
             continue
 
+        is_normal_aligned = cross_track_error < 0.20
+        
+        if (is_normal_aligned or dist_to_home_cm <= FINE_TUNING_HOME_DIST_CM) and home_measurement is not None:
+            lateral_offset_m = home_measurement[0]
+            if abs(lateral_offset_m) > STEP5_FINE_TUNE_TAG_CENTER_TOL_M:
+                fine_turn_dir = 'R' if lateral_offset_m > 0 else 'L'
+                logging.info(
+                    f"Step 5 align: centering tag offset={lateral_offset_m:+.3f}m by turning {fine_turn_dir}"
+                )
+                execute_burst(
+                    fine_turn_dir,
+                    STEP5_FINE_TUNE_TURN_SPEED,
+                    STEP5_FINE_TUNE_TURN_BURST_S,
+                    CENTERING_SETTLE_S,
+                )
+                continue
+
         if dist_to_home_cm > FINE_TUNING_HOME_DIST_CM:
             logging.info(
                 f"Step 5 far approach (> {FINE_TUNING_HOME_DIST_CM:.0f}cm): large forward step"
@@ -1142,21 +1180,6 @@ def main():
                 "Step 5 far forward",
             )
         else:
-            if home_measurement is not None:
-                lateral_offset_m = home_measurement[0]
-                if abs(lateral_offset_m) > STEP5_FINE_TUNE_TAG_CENTER_TOL_M:
-                    fine_turn_dir = 'R' if lateral_offset_m > 0 else 'L'
-                    logging.info(
-                        f"Step 5 fine tune: centering tag offset={lateral_offset_m:+.3f}m by turning {fine_turn_dir}"
-                    )
-                    execute_burst(
-                        fine_turn_dir,
-                        STEP5_FINE_TUNE_TURN_SPEED,
-                        STEP5_FINE_TUNE_TURN_BURST_S,
-                        CENTERING_SETTLE_S,
-                    )
-                    continue
-
             logging.info(
                 f"Step 5 near approach (<= {FINE_TUNING_HOME_DIST_CM:.0f}cm): fine forward step"
             )
