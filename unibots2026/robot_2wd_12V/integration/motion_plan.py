@@ -564,7 +564,7 @@ def compute_heading_and_distance_to_home(rx, ry, heading, home_target_data):
     cross_track_y = ry - (hy + inward_normal[1] * dist_along_normal)
     cross_track_error = math.hypot(cross_track_x, cross_track_y)
 
-    if linear_distance_m <= (FINE_TUNING_HOME_DIST_CM / 100.0):
+    if linear_distance_m <= (ALIGN_DIST_TO_HOME / 100.0):
         # We are close to the wall, so orient to be normal to it
         desired_heading = approach_heading
     else:
@@ -1146,9 +1146,9 @@ def main():
             )
             continue
 
-        if dist_to_home_cm > FINE_TUNING_HOME_DIST_CM:
+        if dist_to_home_cm > ALIGN_DIST_TO_HOME:
             logging.info(
-                f"Step 5 far approach (> {FINE_TUNING_HOME_DIST_CM:.0f}cm): large forward step"
+                f"Step 5 far approach (> {ALIGN_DIST_TO_HOME:.0f}cm): large forward step"
             )
             moved = execute_forward_with_sensor_guard(
                 COURSE_FORWARD_SPEED,
@@ -1158,7 +1158,7 @@ def main():
             )
         else:
             logging.info(
-                f"Step 5 near approach (<= {FINE_TUNING_HOME_DIST_CM:.0f}cm): fine forward step"
+                f"Step 5 near approach (<= {ALIGN_DIST_TO_HOME:.0f}cm): fine forward step"
             )
             moved = execute_forward_with_sensor_guard(
                 STEP5_STEADY_FORWARD_SPEED,

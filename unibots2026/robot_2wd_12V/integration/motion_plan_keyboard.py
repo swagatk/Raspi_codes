@@ -579,7 +579,7 @@ def compute_heading_and_distance_to_home(rx, ry, heading, home_target_data):
     dy = hy - ry
     linear_distance_m = math.hypot(dx, dy)
 
-    if linear_distance_m <= (FINE_TUNING_HOME_DIST_CM / 100.0):
+    if linear_distance_m <= (ALIGN_DIST_TO_HOME / 100.0):
         desired_heading = approach_heading
     else:
         desired_heading = heading_from_vector(dx, dy)
@@ -1266,7 +1266,7 @@ def main():
 
             forward_speed = (
                 COURSE_FORWARD_SPEED
-                if linear_distance_m > 0.50
+                if linear_distance_m > (ALIGN_DIST_TO_HOME / 100.0)
                 else STEP5_STEADY_FORWARD_SPEED
             )
             motion_signature = ("FORWARD", forward_speed)
