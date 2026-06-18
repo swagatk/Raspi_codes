@@ -564,18 +564,12 @@ def compute_heading_and_distance_to_home(rx, ry, heading, home_target_data):
     cross_track_y = ry - (hy + inward_normal[1] * dist_along_normal)
     cross_track_error = math.hypot(cross_track_x, cross_track_y)
 
-    lookahead = 0.5
-    target_dist_along_normal = max(0.0, dist_along_normal - lookahead)
-    waypoint_x = hx + inward_normal[0] * target_dist_along_normal
-    waypoint_y = hy + inward_normal[1] * target_dist_along_normal
-
-    w_dx = waypoint_x - rx
-    w_dy = waypoint_y - ry
-
-    if cross_track_error < 0.15 and dist_along_normal < 1.5:
+    if linear_distance_m <= (FINE_TUNING_HOME_DIST_CM / 100.0):
+        # We are close to the wall, so orient to be normal to it
         desired_heading = approach_heading
     else:
-        desired_heading = heading_from_vector(w_dx, w_dy)
+        # We are far, just head in a straight line towards the target
+        desired_heading = heading_from_vector(dx, dy)
 
     rotation_deg = normalize_rotation(desired_heading - heading)
     return desired_heading, rotation_deg, linear_distance_m, cross_track_error
@@ -1151,23 +1145,6 @@ def main():
                 CENTERING_SETTLE_S,
             )
             continue
-
-        is_normal_aligned = cross_track_error < 0.20
-        
-        if (is_normal_aligned or dist_to_home_cm <= FINE_TUNING_HOME_DIST_CM) and home_measurement is not None:
-            lateral_offset_m = home_measurement[0]
-            if abs(lateral_offset_m) > STEP5_FINE_TUNE_TAG_CENTER_TOL_M:
-                fine_turn_dir = 'R' if lateral_offset_m > 0 else 'L'
-                logging.info(
-                    f"Step 5 align: centering tag offset={lateral_offset_m:+.3f}m by turning {fine_turn_dir}"
-                )
-                execute_burst(
-                    fine_turn_dir,
-                    STEP5_FINE_TUNE_TURN_SPEED,
-                    STEP5_FINE_TUNE_TURN_BURST_S,
-                    CENTERING_SETTLE_S,
-                )
-                continue
 
         if dist_to_home_cm > FINE_TUNING_HOME_DIST_CM:
             logging.info(

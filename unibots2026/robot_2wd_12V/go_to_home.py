@@ -851,23 +851,13 @@ try:
 
             distance_to_home = math.hypot(HOME_X - robot_x, HOME_Y - robot_y)
             
-            dist_along_normal = -(dx * HOME_INWARD_NORMAL[0] + dy * HOME_INWARD_NORMAL[1])
-            cross_track_x = robot_x - (HOME_X + HOME_INWARD_NORMAL[0] * dist_along_normal)
-            cross_track_y = robot_y - (HOME_Y + HOME_INWARD_NORMAL[1] * dist_along_normal)
-            cross_track_error = math.hypot(cross_track_x, cross_track_y)
+            dx = HOME_X - robot_x
+            dy = HOME_Y - robot_y
             
-            lookahead = 0.5
-            target_dist_along_normal = max(0.0, dist_along_normal - lookahead)
-            waypoint_x = HOME_X + HOME_INWARD_NORMAL[0] * target_dist_along_normal
-            waypoint_y = HOME_Y + HOME_INWARD_NORMAL[1] * target_dist_along_normal
-            
-            w_dx = waypoint_x - robot_x
-            w_dy = waypoint_y - robot_y
-            
-            if cross_track_error < 0.15 and dist_along_normal < 1.5:
+            if distance_to_home <= 0.50:
                 desired_heading = HOME_APPROACH_HEADING
             else:
-                desired_heading = heading_from_vector(w_dx, w_dy)
+                desired_heading = heading_from_vector(dx, dy)
             
             route_turn = normalize_rotation(desired_heading - robot_heading)
             final_turn = normalize_rotation(HOME_APPROACH_HEADING - robot_heading)
@@ -999,16 +989,6 @@ try:
                     last_nav_motion = motion_signature
                 pulse_turn(turn_direction, duration=ROUTE_FINE_TURN_DURATION_S, speed=ROUTE_FINE_TURN_SPEED)
                 continue
-
-            is_normal_aligned = cross_track_error < 0.20
-            
-            if (is_normal_aligned or distance_to_home <= 0.50) and home_measurement is not None:
-                lateral_offset_m = home_measurement[0]
-                if abs(lateral_offset_m) > 0.03:  # 3cm tolerance
-                    turn_direction = 'R' if lateral_offset_m > 0 else 'L'
-                    print(f"Centering tag: turning {turn_direction} (offset={lateral_offset_m:+.3f}m)")
-                    pulse_turn(turn_direction, duration=0.05, speed='1')
-                    continue
 
             # If already fairly aligned OR within the threshold, just drive forward
             forward_speed = '3' if distance_to_home > 0.50 else '2'
