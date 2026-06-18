@@ -123,20 +123,25 @@ def execute_course_step_forward():
         step_duration,
         STEP5_STEADY_FORWARD_SETTLE_S,
         "course approach",
+        check_line=False
     )
 
 
-def execute_forward_with_sensor_guard(speed, run_s, settle_s=0.0, context_label="forward move"):
+def execute_forward_with_sensor_guard(speed, run_s, settle_s=0.0, context_label="forward move", check_line=False):
     if not can_continue():
         return False
 
     robot.move('F', speed)
     blocked = False
+    line_detected = False
     end_t = time.time() + max(0.0, run_s)
     while can_continue() and time.time() < end_t:
         # Continuously poll all ultrasonic sensors while moving forward.
         if obstacle_detected(robot):
             blocked = True
+            break
+        if check_line and (robot.line_L == 0 or robot.line_R == 0):
+            line_detected = True
             break
         time.sleep(min(0.02, end_t - time.time()))
 
@@ -150,6 +155,10 @@ def execute_forward_with_sensor_guard(speed, run_s, settle_s=0.0, context_label=
             f"(L:{robot.latest_L} C:{robot.latest_C} R:{robot.latest_R})."
         )
         return False
+
+    if line_detected:
+        logging.info(f"{context_label}: line sensor triggered (L:{robot.line_L} R:{robot.line_R}). Stopping forward motion.")
+        return True
 
     if settle_s > 0 and not wait_with_abort(settle_s):
         return False
@@ -1123,6 +1132,18 @@ def main():
         else:
             near_home_confirm = 0
 
+        if dist_to_home_cm <= ALIGN_DIST_TO_HOME:
+            if robot.line_L == 0 and robot.line_R == 0:
+                logging.info("Both line sensors detect the home line. Perfectly aligned at home.")
+                robot.halt()
+                arrived_at_home = True
+                break
+            elif robot.line_L == 0 or robot.line_R == 0:
+                turn_dir = 'L' if robot.line_L == 0 else 'R'
+                logging.info(f"Step 5 align: Line aligning, turning {turn_dir} (L:{robot.line_L} R:{robot.line_R})")
+                execute_burst(turn_dir, STEP5_FINE_TURN_SPEED, 0.04, CENTERING_SETTLE_S)
+                continue
+
         if obstacle_detected(robot):
             logging.warning(
                 f"Obstacle ahead during Step 5 (L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid"
@@ -1155,6 +1176,7 @@ def main():
                 STEP5_FAR_FORWARD_BURST_S,
                 STEP5_STEADY_FORWARD_SETTLE_S,
                 "Step 5 far forward",
+                check_line=False
             )
         else:
             logging.info(
@@ -1165,6 +1187,7 @@ def main():
                 STEP5_FINE_TUNE_FORWARD_BURST_S,
                 STEP5_STEADY_FORWARD_SETTLE_S,
                 "Step 5 fine forward",
+                check_line=True
             )
 
         if not moved:

@@ -262,6 +262,8 @@ HOME_X, HOME_Y, HOME_APPROACH_HEADING, HOME_INWARD_NORMAL = get_home_target()
 latest_L = 999
 latest_C = 999
 latest_R = 999
+latest_line_L = 1
+latest_line_R = 1
 history_L = []
 history_C = []
 history_R = []
@@ -374,6 +376,7 @@ def camera_capture_thread():
 
 def update_sensors():
     global latest_L, latest_C, latest_R, history_L, history_C, history_R, running
+    global latest_line_L, latest_line_R
     while running:
         if ser and ser.in_waiting > 0:
             try:
@@ -384,6 +387,10 @@ def update_sensors():
                     new_C = int(parts[2])
                     new_R = int(parts[3])
                     
+                    if len(parts) >= 6:
+                        latest_line_L = int(parts[4])
+                        latest_line_R = int(parts[5])
+
                     history_L.append(new_L)
                     history_C.append(new_C)
                     history_R.append(new_R)
@@ -397,6 +404,11 @@ def update_sensors():
                         latest_L = sum(history_L) / len(history_L)
                         latest_C = sum(history_C) / len(history_C)
                         latest_R = sum(history_R) / len(history_R)
+                elif line.startswith("L,"):
+                    parts = line.split(",")
+                    if len(parts) >= 3:
+                        latest_line_L = int(parts[1])
+                        latest_line_R = int(parts[2])
             except:
                 pass
         time.sleep(0.01)
@@ -930,6 +942,19 @@ try:
                 state = "DONE"
                 continue
             
+            if distance_to_home is not None and distance_to_home <= 0.70:
+                if latest_line_L == 0 and latest_line_R == 0:
+                    stop_robot()
+                    print("HOME REACHED: Both line sensors detected the home line.")
+                    state = "DONE"
+                    continue
+                elif latest_line_L == 0 or latest_line_R == 0:
+                    turn_direction = 'L' if latest_line_L == 0 else 'R'
+                    print(f"Line aligning: turning {turn_direction} (L:{latest_line_L} R:{latest_line_R})")
+                    pulse_turn(turn_direction, duration=0.04, speed='1')
+                    last_nav_motion = None
+                    continue
+
             # Obstacle avoidance if not near home:
             elif latest_C < STOP_DIST:
                 print(f"Obstacle in the way: {latest_C:.1f}cm. Rerouting...")

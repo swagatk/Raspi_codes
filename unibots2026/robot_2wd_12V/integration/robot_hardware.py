@@ -10,6 +10,8 @@ class RobotController:
         self.latest_L = 999
         self.latest_C = 999
         self.latest_R = 999
+        self.line_L = 1
+        self.line_R = 1
         self.running = False
         
         self.connect()
@@ -39,6 +41,14 @@ class RobotController:
                             self.latest_L = int(parts[1])
                             self.latest_C = int(parts[2])
                             self.latest_R = int(parts[3])
+                        if len(parts) >= 6:
+                            self.line_L = int(parts[4])
+                            self.line_R = int(parts[5])
+                    elif line.startswith("L,"):
+                        parts = line.split(",")
+                        if len(parts) >= 3:
+                            self.line_L = int(parts[1])
+                            self.line_R = int(parts[2])
                 except:
                     pass
             time.sleep(0.01)
