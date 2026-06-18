@@ -1192,8 +1192,9 @@ def main():
                 near_home_confirm = 0
 
             if linear_distance_m is not None and linear_distance_m <= (ALIGN_DIST_TO_HOME / 100.0):
+                logging.info(f"Line sensors: L={robot.line_L} R={robot.line_R}")
                 if robot.line_L == 0 and robot.line_R == 0:
-                    logging.info("Both line sensors detect the home line. Perfectly aligned at home.")
+                    logging.info("Home boundary detected")
                     robot.halt()
                     arrived_at_home = True
                     break
