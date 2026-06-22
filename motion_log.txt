@@ -4396,3 +4396,140 @@
 2026-06-02 13:19:03 | Action: Turn LEFT (Track) | L:95 C:86 R:91
 2026-06-02 13:19:03 | Action: Ball Reached (39.8cm) | L:100 C:86 R:88
 2026-06-02 13:19:12 | Action: Ball Reached (39.8cm) | L:99 C:86 R:86
+2026-06-18 12:35:06 | Action: OBSTACLE (L:126 C:139 R:9) | L:126 C:139 R:9
+2026-06-18 12:35:06 | Action: Turn RIGHT (Avoid) | L:128 C:139 R:324
+2026-06-18 12:35:07 | Action: Turn RIGHT (Track) | L:125 C:140 R:280
+2026-06-18 12:35:08 | Action: Turn RIGHT (Track) | L:126 C:141 R:135
+2026-06-18 12:35:08 | Action: Turn RIGHT (Track) | L:126 C:140 R:999
+2026-06-18 12:35:09 | Action: Turn RIGHT (Track) | L:127 C:139 R:999
+2026-06-18 12:35:09 | Action: Turn RIGHT (Track) | L:126 C:140 R:999
+2026-06-18 12:35:09 | Action: Turn RIGHT (Track) | L:126 C:143 R:999
+2026-06-18 12:35:10 | Action: Turn RIGHT (Track) | L:126 C:141 R:205
+2026-06-18 12:35:10 | Action: Turn RIGHT (Track) | L:126 C:140 R:999
+2026-06-18 12:35:11 | Action: Turn RIGHT (Track) | L:126 C:139 R:999
+2026-06-18 12:35:11 | Action: Turn RIGHT (Track) | L:126 C:141 R:999
+2026-06-18 12:35:11 | Action: Turn RIGHT (Track) | L:125 C:141 R:999
+2026-06-18 12:35:12 | Action: Turn RIGHT (Track) | L:126 C:141 R:999
+2026-06-18 12:35:12 | Action: Turn RIGHT (Track) | L:126 C:140 R:999
+2026-06-18 12:35:13 | Action: Turn RIGHT (Track) | L:127 C:140 R:999
+2026-06-18 12:35:13 | Action: Turn RIGHT (Track) | L:127 C:144 R:173
+2026-06-18 12:35:14 | Action: Turn RIGHT (Track) | L:124 C:141 R:110
+2026-06-18 12:35:14 | Action: Turn RIGHT (Track) | L:126 C:141 R:81
+2026-06-18 12:35:14 | Action: Turn RIGHT (Track) | L:126 C:87 R:71
+2026-06-18 12:35:15 | Action: Turn RIGHT (Track) | L:126 C:99 R:57
+2026-06-18 12:35:15 | Action: Turn RIGHT (Track) | L:127 C:87 R:111
+2026-06-18 12:35:15 | Action: Turn RIGHT (Track) | L:125 C:141 R:112
+2026-06-18 12:35:16 | Action: Turn RIGHT (Track) | L:125 C:140 R:112
+2026-06-18 12:35:16 | Action: Turn RIGHT (Track) | L:127 C:147 R:81
+2026-06-18 12:35:16 | Action: Forward (Track) | L:127 C:142 R:115
+2026-06-18 12:35:17 | Action: Turn LEFT (Track) | L:123 C:128 R:51
+2026-06-18 12:35:18 | Action: Turn RIGHT (Track) | L:123 C:79 R:46
+2026-06-18 12:35:18 | Action: Turn LEFT (Track) | L:121 C:131 R:46
+2026-06-18 12:35:19 | Action: Turn LEFT (Track) | L:123 C:78 R:47
+2026-06-18 12:35:20 | Action: Turn LEFT (Track) | L:114 C:132 R:48
+2026-06-18 12:35:20 | Action: Turn LEFT (Track) | L:115 C:132 R:47
+2026-06-18 12:35:20 | Action: Turn LEFT (Track) | L:122 C:77 R:46
+2026-06-18 12:35:21 | Action: Turn LEFT (Track) | L:118 C:131 R:159
+2026-06-18 12:35:21 | Action: Turn LEFT (Track) | L:115 C:131 R:51
+2026-06-18 12:35:21 | Action: Forward (Track) | L:122 C:131 R:154
+2026-06-18 12:35:22 | Action: Turn RIGHT (Track) | L:119 C:128 R:139
+2026-06-18 12:35:23 | Action: Turn RIGHT (Track) | L:115 C:124 R:999
+2026-06-18 12:35:23 | Action: Turn RIGHT (Track) | L:114 C:124 R:999
+2026-06-18 12:35:23 | Action: Turn RIGHT (Track) | L:115 C:125 R:999
+2026-06-18 12:35:24 | Action: Turn RIGHT (Track) | L:113 C:76 R:147
+2026-06-18 12:35:24 | Action: Ball Reached (36.1cm) | L:115 C:124 R:151
+2026-06-18 12:35:45 | Action: Ball Reached (33.9cm) | L:58 C:74 R:999
+2026-06-18 12:36:22 | Action: Ball Reached (28.4cm) | L:88 C:81 R:88
+2026-06-18 12:36:50 | Action: Turn LEFT (Track) | L:113 C:117 R:94
+2026-06-18 12:36:50 | Action: Turn LEFT (Track) | L:48 C:66 R:69
+2026-06-18 12:36:51 | Action: Turn LEFT (Track) | L:48 C:115 R:135
+2026-06-18 12:36:51 | Action: Turn LEFT (Track) | L:49 C:65 R:68
+2026-06-18 12:36:51 | Action: Turn LEFT (Track) | L:50 C:64 R:69
+2026-06-18 12:36:52 | Action: Turn LEFT (Track) | L:50 C:115 R:120
+2026-06-18 12:36:52 | Action: Forward (Track) | L:50 C:116 R:136
+2026-06-18 12:36:53 | Action: Forward (Track) | L:47 C:65 R:66
+2026-06-18 12:36:54 | Action: Ball Reached (36.4cm) | L:52 C:101 R:100
+2026-06-18 12:37:37 | Action: Forward (Track) | L:123 C:67 R:68
+2026-06-18 12:37:38 | Action: Forward (Track) | L:117 C:98 R:63
+2026-06-18 12:37:38 | Action: Forward (Track) | L:85 C:115 R:56
+2026-06-18 12:37:39 | Action: Forward (Track) | L:91 C:53 R:48
+2026-06-18 12:37:40 | Action: Turn RIGHT (Track) | L:86 C:106 R:45
+2026-06-18 12:37:40 | Action: OBSTACLE (L:83 C:95 R:38) | L:83 C:95 R:38
+2026-06-18 12:37:41 | Action: Turn LEFT (Avoid) | L:83 C:95 R:36
+2026-06-18 12:37:41 | Action: Turn RIGHT (Track) | L:81 C:64 R:107
+2026-06-18 12:38:28 | Action: Turn LEFT (Track) | L:155 C:126 R:51
+2026-06-18 12:38:28 | Action: Turn LEFT (Track) | L:154 C:155 R:51
+2026-06-18 12:38:29 | Action: Turn LEFT (Track) | L:156 C:154 R:57
+2026-06-18 12:38:29 | Action: Turn LEFT (Track) | L:188 C:155 R:51
+2026-06-18 12:38:29 | Action: Turn LEFT (Track) | L:188 C:155 R:57
+2026-06-18 12:38:30 | Action: Turn LEFT (Track) | L:187 C:156 R:60
+2026-06-18 12:38:30 | Action: Forward (Track) | L:187 C:155 R:52
+2026-06-18 12:38:31 | Action: Turn RIGHT (Track) | L:186 C:152 R:83
+2026-06-18 12:38:31 | Action: Turn RIGHT (Track) | L:185 C:151 R:92
+2026-06-18 12:38:32 | Action: Turn RIGHT (Track) | L:154 C:151 R:89
+2026-06-18 12:38:32 | Action: Turn RIGHT (Track) | L:154 C:152 R:92
+2026-06-18 12:38:32 | Action: Turn RIGHT (Track) | L:152 C:153 R:84
+2026-06-18 12:38:33 | Action: Ball Reached (37.9cm) | L:153 C:150 R:59
+2026-06-18 12:38:55 | Action: Turn LEFT (Track) | L:152 C:151 R:89
+2026-06-18 12:38:55 | Action: Turn LEFT (Track) | L:152 C:151 R:95
+2026-06-18 12:38:55 | Action: Turn LEFT (Track) | L:153 C:152 R:90
+2026-06-18 12:38:56 | Action: Turn LEFT (Track) | L:151 C:152 R:90
+2026-06-18 12:38:56 | Action: Turn LEFT (Track) | L:151 C:152 R:90
+2026-06-18 12:38:56 | Action: Turn LEFT (Track) | L:154 C:151 R:89
+2026-06-18 12:38:57 | Action: Turn LEFT (Track) | L:154 C:151 R:999
+2026-06-18 12:38:57 | Action: Turn LEFT (Track) | L:154 C:152 R:999
+2026-06-18 12:38:57 | Action: Turn LEFT (Track) | L:152 C:152 R:999
+2026-06-18 12:38:58 | Action: Turn LEFT (Track) | L:153 C:152 R:999
+2026-06-18 12:38:58 | Action: Turn LEFT (Track) | L:154 C:152 R:999
+2026-06-18 12:38:58 | Action: Turn LEFT (Track) | L:155 C:151 R:999
+2026-06-18 12:38:59 | Action: Turn LEFT (Track) | L:155 C:151 R:150
+2026-06-18 12:38:59 | Action: Turn LEFT (Track) | L:156 C:151 R:999
+2026-06-18 12:38:59 | Action: Turn LEFT (Track) | L:156 C:152 R:999
+2026-06-18 12:39:00 | Action: Ball Reached (38.1cm) | L:155 C:153 R:999
+2026-06-18 12:39:18 | Action: Forward (Track) | L:158 C:124 R:124
+2026-06-18 12:39:19 | Action: Forward (Track) | L:157 C:122 R:122
+2026-06-18 12:39:21 | Action: Forward (Track) | L:154 C:119 R:89
+2026-06-18 12:39:22 | Action: Turn RIGHT (Track) | L:148 C:113 R:95
+2026-06-18 12:39:22 | Action: Turn RIGHT (Track) | L:91 C:108 R:104
+2026-06-18 12:39:22 | Action: Turn RIGHT (Track) | L:134 C:100 R:99
+2026-06-18 12:39:23 | Action: Turn RIGHT (Track) | L:136 C:100 R:99
+2026-06-18 12:39:23 | Action: Turn RIGHT (Track) | L:137 C:99 R:100
+2026-06-18 12:39:23 | Action: Turn RIGHT (Track) | L:134 C:100 R:100
+2026-06-18 12:39:24 | Action: Forward (Track) | L:103 C:100 R:103
+2026-06-18 12:39:25 | Action: Forward (Track) | L:102 C:97 R:99
+2026-06-18 12:39:26 | Action: Forward (Track) | L:96 C:91 R:135
+2026-06-18 12:39:26 | Action: Turn LEFT (Track) | L:87 C:84 R:85
+2026-06-18 12:39:27 | Action: Turn LEFT (Track) | L:121 C:79 R:79
+2026-06-18 12:39:27 | Action: Turn LEFT (Track) | L:86 C:80 R:81
+2026-06-18 12:39:28 | Action: Ball Reached (33.5cm) | L:82 C:82 R:80
+2026-06-18 12:39:54 | Action: Turn RIGHT (Track) | L:82 C:82 R:78
+2026-06-18 12:39:54 | Action: Turn RIGHT (Track) | L:81 C:82 R:79
+2026-06-18 12:39:54 | Action: Turn RIGHT (Track) | L:86 C:79 R:79
+2026-06-18 12:39:55 | Action: Turn RIGHT (Track) | L:72 C:79 R:79
+2026-06-18 12:39:55 | Action: Turn RIGHT (Track) | L:81 C:81 R:80
+2026-06-18 12:39:56 | Action: Turn RIGHT (Track) | L:82 C:80 R:81
+2026-06-18 12:39:56 | Action: Turn RIGHT (Track) | L:85 C:79 R:79
+2026-06-18 12:39:56 | Action: Ball Reached (33.7cm) | L:86 C:79 R:82
+2026-06-18 12:40:02 | Action: Turn LEFT (Track) | L:81 C:78 R:82
+2026-06-18 12:40:02 | Action: Turn LEFT (Track) | L:85 C:71 R:80
+2026-06-18 12:40:02 | Action: Turn LEFT (Track) | L:85 C:74 R:81
+2026-06-18 12:40:03 | Action: Turn LEFT (Track) | L:85 C:81 R:80
+2026-06-18 12:40:03 | Action: Turn LEFT (Track) | L:119 C:68 R:80
+2026-06-18 12:40:03 | Action: Turn LEFT (Track) | L:84 C:79 R:81
+2026-06-18 12:40:04 | Action: Turn LEFT (Track) | L:119 C:77 R:79
+2026-06-18 12:40:04 | Action: Ball Reached (33.9cm) | L:86 C:80 R:79
+2026-06-18 12:40:37 | Action: Forward (Track) | L:50 C:122 R:104
+2026-06-18 12:40:38 | Action: Forward (Track) | L:47 C:119 R:102
+2026-06-18 12:40:38 | Action: Forward (Track) | L:44 C:113 R:100
+2026-06-18 12:40:39 | Action: OBSTACLE (L:38 C:105 R:97) | L:38 C:105 R:97
+2026-06-18 12:40:39 | Action: Turn RIGHT (Avoid) | L:36 C:104 R:104
+2026-06-18 12:40:40 | Action: Turn RIGHT (Track) | L:60 C:95 R:93
+2026-06-18 12:40:40 | Action: Turn RIGHT (Track) | L:56 C:94 R:91
+2026-06-18 12:40:41 | Action: Turn RIGHT (Track) | L:58 C:93 R:91
+2026-06-18 12:40:41 | Action: Turn RIGHT (Track) | L:101 C:95 R:92
+2026-06-18 12:40:41 | Action: Turn RIGHT (Track) | L:100 C:95 R:93
+2026-06-18 12:41:08 | Action: Forward (Track) | L:79 C:90 R:148
+2026-06-18 12:41:09 | Action: Forward (Track) | L:80 C:146 R:140
+2026-06-18 12:41:10 | Action: Forward (Track) | L:106 C:89 R:135
+2026-06-18 12:41:10 | Action: Forward (Track) | L:65 C:128 R:127
+2026-06-18 12:41:11 | Action: Ball Reached (35.5cm) | L:71 C:114 R:119
