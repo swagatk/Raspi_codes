@@ -6,6 +6,7 @@ import termios
 import tty
 import select
 import os
+import shutil
 import cv2
 import logging
 import numpy as np
@@ -16,6 +17,8 @@ import config
 from config import *
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log")
+if os.path.exists(LOG_DIR):
+    shutil.rmtree(LOG_DIR, ignore_errors=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 
 class TqdmLoggingHandler(logging.Handler):
@@ -608,7 +611,7 @@ def global_progress_thread():
             pbar.update(1)
 
 def main():
-    global robot, vision
+    global robot, vision, button_pressed
     logging.info("--- Step 1: Initialization phase ---")
     robot = RobotController()
     vision = VisionModule()
@@ -1020,15 +1023,21 @@ def main():
     pending_camera_switch_count = 0
     last_stable_pose = None
     last_localized_time = time.time()
+    last_valid_dist = None
+    unrealistic_jump_count = 0
 
     arrived_at_home = False
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
-        pose_result, detected_tags, pose_cam, source_frame = get_pose_with_tag_data_fallback(
-            vision,
-            ARENA_MAP,
-            preferred_camera=active_nav_camera,
-        )
-        is_localized = pose_result is not None
+        if state != "BLIND_FORWARD":
+            pose_result, detected_tags, pose_cam, source_frame = get_pose_with_tag_data_fallback(
+                vision,
+                ARENA_MAP,
+                preferred_camera=active_nav_camera,
+            )
+            is_localized = pose_result is not None
+        else:
+            pose_result, detected_tags, pose_cam, source_frame = None, [], None, None
+            is_localized = False
 
         if state == "NAVIGATING" and is_localized and active_nav_camera and pose_cam != active_nav_camera:
             if pending_camera_switch != pose_cam:
@@ -1079,6 +1088,37 @@ def main():
                 rx, ry, heading, home_target_data
             )
             dist_to_home_cm = linear_distance_m * 100.0
+
+            if last_valid_dist is not None and abs(dist_to_home_cm - last_valid_dist) > 30.0:
+                unrealistic_jump_count += 1
+                logging.warning(f"Unrealistic pose jump detected ({unrealistic_jump_count}/3): {last_valid_dist:.1f}cm -> {dist_to_home_cm:.1f}cm. Discarding pose.")
+                if unrealistic_jump_count >= 3:
+                    if last_valid_dist <= 80.0 and state != "BLIND_FORWARD":
+                        logging.warning("Persistent jump while close to home. Forcing BLIND_FORWARD to break deadlock.")
+                        state = "BLIND_FORWARD"
+                        dist_to_home_cm = last_valid_dist
+                    else:
+                        logging.warning("Persistent jump. Accepting new pose to break deadlock.")
+                        last_valid_dist = dist_to_home_cm
+                        unrealistic_jump_count = 0
+                else:
+                    is_localized = False
+                    failed_localize_cycles += 1
+                    rx = ry = heading = None
+                    desired_heading = None
+                    route_turn = None
+                    linear_distance_m = None
+                    dist_to_home_cm = None
+                    home_measurement = None
+                    continue
+            else:
+                unrealistic_jump_count = 0
+                last_valid_dist = dist_to_home_cm
+
+            if dist_to_home_cm is not None and dist_to_home_cm <= 45.0 and state != "BLIND_FORWARD":
+                logging.info("Entering blind approach mode (dist <= 45cm). Switching to BLIND_FORWARD.")
+                state = "BLIND_FORWARD"
+
             home_measurement = get_average_home_tag_measurement(detected_tags)
 
             for tag in detected_tags:
@@ -1340,15 +1380,50 @@ def main():
         logging.info("Mission stopped before drop sequence.")
         return
 
+    drop_executed = False
+    final_home_tag_distance_cm = None
     if arrived_at_home:
-        logging.info("Executing Ball drop...")
-        robot.arm_drop()
-        wait_with_abort(2)
-        robot.gripper_open()
-        wait_with_abort(1)
+        _, final_tags, final_cam, source_frame = get_pose_with_tag_data_fallback(
+            vision,
+            ARENA_MAP,
+            preferred_camera=active_nav_camera,
+        )
+        final_home_measurement = get_average_home_tag_measurement(final_tags)
+        if final_home_measurement is not None:
+            final_home_tag_distance_cm = final_home_measurement[1] * 100.0
+            logging.info(
+                f"Final home-tag distance from {final_cam} camera: {final_home_tag_distance_cm:.1f}cm"
+            )
+        else:
+            logging.warning("Could not get final home-tag distance for drop check.")
+
+    if arrived_at_home:
+        if final_home_tag_distance_cm is None or final_home_tag_distance_cm <= (HOME_WALL_STOP_DISTANCE + 5.0):
+            logging.info("Executing Ball drop...")
+            robot.arm_drop()
+            wait_with_abort(2)
+            robot.gripper_open()
+            wait_with_abort(1)
+            drop_executed = True
+        else:
+            logging.warning(
+                f"At home proximity, but home-tag distance ({final_home_tag_distance_cm:.1f}cm > {HOME_WALL_STOP_DISTANCE + 5.0:.1f}cm). "
+                "Skipping drop; keeping arm UP and gripper closed."
+            )
     else:
         logging.error("Failed to reach home within time limit. Skipping drop sequence.")
 
+    if not drop_executed and arrived_at_home:
+        robot.gripper_close()
+        robot.arm_up()
+        if 'vision' in globals() and vision:
+            vision.update_active_camera(True)
+        robot.halt()
+        logging.info(f"Waiting for key press '{START_STOP_KEY}' before exit after skipped drop.")
+        button_pressed = False
+        while not button_pressed:
+            time.sleep(0.1)
+        
     robot.arm_down()
     if 'vision' in globals() and vision:
         vision.update_active_camera(False)
