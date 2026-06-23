@@ -1,1 +1,50 @@
 2026-06-22 13:24:38,623 [INFO] --- Step 1: Initialization phase ---
+2026-06-22 13:24:52,026 [INFO] Motor status: OK
+2026-06-22 13:24:52,587 [INFO] Initialization successful.
+2026-06-22 13:24:52,590 [INFO] Camera now open.
+2026-06-22 13:24:52,610 [INFO] Camera configuration has been adjusted!
+2026-06-22 13:24:52,616 [INFO] Configuration successful!
+2026-06-22 13:24:52,676 [INFO] Camera started
+2026-06-22 13:24:54,992 [INFO] PiCamera started.
+2026-06-22 13:24:56,993 [INFO] USB Camera status: OK
+2026-06-22 13:24:56,994 [INFO] PiCamera status: OK
+2026-06-22 13:24:56,996 [INFO] Ultrasonic sensor status: OK (L:9 C:96 R:53)
+2026-06-22 13:24:57,051 [INFO] Physical start/stop button ready on GPIO 25.
+2026-06-22 13:24:57,056 [INFO] Button status: Listener running (press the physical button on GPIO 25 to start/stop).
+2026-06-22 13:24:57,904 [INFO] Assuming ARM starts in DOWN pose. Moving ARM to UP pose.
+2026-06-22 13:24:59,685 [INFO] System Online. Waiting for the physical button press on GPIO 25 to start the mission sequence...
+2026-06-22 13:25:10,620 [INFO] Start command received via physical button on GPIO 25.
+2026-06-22 13:25:10,621 [INFO] Button pressed. Mission Started!
+2026-06-22 13:25:10,630 [INFO] --- Step 2: Confirm Home Location ---
+2026-06-22 13:25:10,923 [INFO] Home tag(s) [14] confirmed via USB camera.
+2026-06-22 13:25:10,950 [INFO] Step 2 completed successfully.
+2026-06-22 13:25:10,953 [INFO] --- Step 3: Ready to Explore ---
+2026-06-22 13:25:13,924 [INFO] Completion of Step 3
+2026-06-22 13:25:13,930 [INFO] --- Step 4: Search and Approach balls ---
+2026-06-22 13:25:13,938 [INFO] Searching for ball...
+2026-06-22 13:25:14,514 [INFO] Target detected (dist=70.0cm, x=188.8). Switching immediately to approach.
+2026-06-22 13:25:14,534 [INFO] Approaching the ball...
+2026-06-22 13:25:28,803 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-22 13:25:28,813 [INFO] Grabbing the ball...
+2026-06-22 13:25:31,302 [INFO] PiCamera wall distance during arm-down capture: 87.2cm
+2026-06-22 13:25:32,525 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-22 13:25:39,239 [INFO] Ball grab complete.
+2026-06-22 13:25:39,242 [INFO] Searching for ball...
+2026-06-22 13:25:39,246 [INFO] Target detected (dist=50.2cm, x=157.3). Switching immediately to approach.
+2026-06-22 13:25:39,264 [INFO] Approaching the ball...
+2026-06-22 13:25:40,141 [WARNING] Obstacle detected (L:9 C:126 R:139) -> evasive maneuver
+2026-06-22 13:25:41,046 [WARNING] Obstacle detected (L:9 C:124 R:137) -> evasive maneuver
+2026-06-22 13:25:42,031 [WARNING] Obstacle detected (L:9 C:106 R:119) -> evasive maneuver
+2026-06-22 13:25:42,949 [WARNING] Obstacle detected (L:9 C:98 R:101) -> evasive maneuver
+2026-06-22 13:25:43,846 [WARNING] Obstacle detected (L:9 C:79 R:79) -> evasive maneuver
+2026-06-22 13:25:45,586 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-22 13:25:45,595 [INFO] Grabbing the ball...
+2026-06-22 13:25:47,873 [INFO] PiCamera wall distance during arm-down capture: 54.1cm
+2026-06-22 13:25:48,925 [INFO] Moving forward for 2.0s while opening/closing gripper 3 times...
+2026-06-22 13:25:50,940 [WARNING] Wall too close during capture move (38.2cm < 40.0cm). Backing up.
+2026-06-22 13:25:55,584 [INFO] Ball grab complete.
+2026-06-22 13:25:55,587 [INFO] Searching for ball...
+2026-06-22 13:25:55,590 [INFO] Target detected (dist=54.2cm, x=289.7). Switching immediately to approach.
+2026-06-22 13:25:55,604 [INFO] Approaching the ball...
+2026-06-22 13:26:10,380 [INFO] Target reached BALL_PICK_DISTANCE (40.0cm).
+2026-06-22 13:26:10,389 [INFO] Grabbing the ball...
