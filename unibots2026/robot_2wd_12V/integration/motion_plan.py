@@ -174,7 +174,17 @@ def run_obstacle_avoidance(robot):
     robot.halt()
     if not execute_burst('B', OBSTACLE_BACKUP_SPEED, OBSTACLE_BACKUP_DURATION_S):
         return False
-    if not execute_burst(OBSTACLE_TURN_DIR, OBSTACLE_TURN_SPEED, OBSTACLE_TURN_DURATION_S, OBSTACLE_SETTLE_S):
+        
+    turn_dir = OBSTACLE_TURN_DIR
+    L = robot.latest_L if is_valid_distance_cm(robot.latest_L) else 999
+    R = robot.latest_R if is_valid_distance_cm(robot.latest_R) else 999
+    
+    if L < R and L < 40:
+        turn_dir = 'R'
+    elif R < L and R < 40:
+        turn_dir = 'L'
+        
+    if not execute_burst(turn_dir, OBSTACLE_TURN_SPEED, OBSTACLE_TURN_DURATION_S, OBSTACLE_SETTLE_S):
         return False
     return True
 
@@ -807,6 +817,10 @@ def main():
                 continue
                 
             if vision.ball_detected:
+                # Wait briefly here to let vision thread process fresh frames if we just moved
+                if time.time() - last_seen_ts > 0.05:
+                    time.sleep(0.1)
+                
                 error = vision.ball_x - CENTER_X
                 last_seen_error = error
                 last_seen_ts = time.time()
@@ -818,6 +832,9 @@ def main():
                     logging.debug(f"Centering ball: error={error:+.1f}px -> turn {turn_dir}")
                     if not execute_burst(turn_dir, CENTERING_TURN_SPEED, CENTERING_TURN_BURST_S, CENTERING_SETTLE_S):
                         break
+                    
+                    # Force a slightly longer loop delay here so exponential smoothing in vision thread catches up
+                    time.sleep(0.3)
                     continue
                 else:
                     if vision.ball_distance <= BALL_PICK_DISTANCE:
@@ -838,6 +855,9 @@ def main():
                                 break
                         if not execute_burst('F', APPROACH_FORWARD_SPEED, APPROACH_FORWARD_BURST_S, APPROACH_FORWARD_SETTLE_S):
                             break
+                        
+                        # Wait after moving forward to purge stale buffered frames and let vision inference catch up
+                        time.sleep(0.3)
             else:
                 # Keep target lock for short dropouts instead of immediately rescanning.
                 if (time.time() - last_seen_ts) <= TARGET_LOSS_GRACE_S:
@@ -898,17 +918,13 @@ def main():
             if blocked_channels:
                 logging.warning(
                     f"Too close to obstacle for arm-lower safety (< {STEP4_ARM_LOWER_MIN_CLEARANCE_CM:.1f}cm) "
-                    f"[{', '.join(blocked_channels)}]. Skipping arm down and backing up."
+                    f"[{', '.join(blocked_channels)}]. Skipping arm down, running obstacle avoidance."
                 )
-                robot.halt()
-                execute_burst(
-                    'B',
-                    OBSTACLE_BACKUP_SPEED,
-                    OBSTACLE_BACKUP_DURATION_S,
-                    OBSTACLE_SETTLE_S,
-                )
+                run_obstacle_avoidance(robot)
                 reached = False
-                continue
+                
+                # Discard current target so we search for a new ball.
+                break 
 
             logging.info("Grabbing the ball...")
             robot.arm_down()
@@ -929,7 +945,8 @@ def main():
                     if 'vision' in globals() and vision:
                         vision.update_active_camera(True)
                     time.sleep(1.0)
-                    continue
+                    run_obstacle_avoidance(robot)
+                    break
                 logging.warning(
                     f"No AprilTag wall-distance available from PiCamera during arm-down capture. "
                     f"Falling back to C sensor: C={c_reading:.1f}cm."
@@ -944,7 +961,8 @@ def main():
                     if 'vision' in globals() and vision:
                         vision.update_active_camera(True)
                     time.sleep(1.0)
-                    continue
+                    run_obstacle_avoidance(robot)
+                    break
 
             robot.gripper_open()
             wait_with_abort(1.0)
@@ -1034,12 +1052,8 @@ def main():
     # ---------------------------------------------------------
     logging.info("--- Step 5: Returning home ---")
     home_start = time.time()
-    last_localize_save_ts = 0.0
-    near_home_confirm = 0
-    failed_localize_cycles = 0
     
     from map import ARENA_MAP
-    from map_visualizer import generate_localization_image
     home_target_data = compute_home_target_xy(ARENA_MAP)
     if home_target_data is None:
         logging.error("Home target cannot be computed from map/home tags. Exiting mission.")
@@ -1047,239 +1061,125 @@ def main():
     
     logging.info("Moving to Home tag")
 
-    active_nav_camera = None
-    pose_lock_acquired = False
-    last_align_turn_dir = 'L'
-
     arrived_at_home = False
-    blind_approach_active = False
-    last_valid_dist = None
-    unrealistic_jump_count = 0
+    search_turn_dir = 'L'
+    last_known_dist_to_home_cm = 999.0
 
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
-        if not blind_approach_active:
-            pose_result, detected_tags, pose_cam, pose_scale, source_frame = get_pose_with_tag_data_fallback(
-                vision,
-                ARENA_MAP,
-                preferred_camera=active_nav_camera,
-            )
-            if pose_result is None:
-                failed_localize_cycles += 1
-                if not pose_lock_acquired:
-                    logging.info(
-                        f"Step 5: pose not found (attempt {failed_localize_cycles}). "
-                        f"Backing up for {STEP5_RELOCALIZE_BACKUP_DURATION_S:.2f}s and retrying."
-                    )
-                    execute_burst(
-                        'B',
-                        STEP5_RELOCALIZE_BACKUP_SPEED,
-                        STEP5_RELOCALIZE_BACKUP_DURATION_S,
-                        STEP5_RELOCALIZE_BACKUP_SETTLE_S,
-                    )
-                else:
-                    logging.info(
-                        f"Step 5: pose lost after lock (attempt {failed_localize_cycles}). "
-                        f"Turning {last_align_turn_dir} briefly to reacquire (no backward move)."
-                    )
-                    execute_burst(
-                        last_align_turn_dir,
-                        STEP5_SEARCH_TURN_SPEED,
-                        STEP5_SEARCH_TURN_BURST_S,
-                        0.05,
-                    )
-                continue
-
-            failed_localize_cycles = 0
-            pose_lock_acquired = True
-            active_nav_camera = pose_cam
+        # 1) Get pose from camera
+        pose_result, detected_tags, pose_cam, pose_scale, source_frame = get_pose_with_tag_data_fallback(
+            vision, ARENA_MAP
+        )
+        
+        if pose_result is not None:
             rx, ry, heading, _ = pose_result
-            desired_heading, route_turn, linear_distance_m, cross_track_error = compute_heading_and_distance_to_home(
+            desired_heading, route_turn, linear_distance_m, _ = compute_heading_and_distance_to_home(
                 rx, ry, heading, home_target_data
             )
             dist_to_home_cm = linear_distance_m * 100.0
-
-            if last_valid_dist is not None and abs(dist_to_home_cm - last_valid_dist) > 30.0:
-                unrealistic_jump_count += 1
-                logging.warning(f"Unrealistic pose jump detected ({unrealistic_jump_count}/3): {last_valid_dist:.1f}cm -> {dist_to_home_cm:.1f}cm. Discarding pose.")
-                if unrealistic_jump_count >= 3:
-                    if last_valid_dist <= 80.0:
-                        logging.warning("Persistent jump while close to home. Forcing blind approach to break deadlock.")
-                        blind_approach_active = True
-                        dist_to_home_cm = last_valid_dist
-                    else:
-                        logging.warning("Persistent jump. Accepting new pose to break deadlock.")
-                        last_valid_dist = dist_to_home_cm
-                        unrealistic_jump_count = 0
-                else:
-                    continue
-            else:
-                unrealistic_jump_count = 0
-                last_valid_dist = dist_to_home_cm
-
-            home_measurement = get_average_home_tag_measurement(detected_tags, pose_scale=pose_scale)
-
-            if dist_to_home_cm <= 45.0:
-                logging.info("Entering blind approach mode (dist <= 45cm). Ignoring camera, using ultrasonic sensors.")
-                blind_approach_active = True
-
-            now = time.time()
-            if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
-                ts = time.strftime('%Y%m%d_%H%M%S')
-                save_path = os.path.join(LOG_DIR, f"localize_{ts}.jpg")
-                threading.Thread(
-                    target=generate_localization_image,
-                    args=(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path),
-                    daemon=True
-                ).start()
-                threading.Thread(
-                    target=save_tag_detection_frame_from_source,
-                    args=(source_frame, detected_tags, f"tag_detection_{ts}.png"),
-                    daemon=True
-                ).start()
-                last_localize_save_ts = now
-
-            logging.info(
-                f"Robot Pose: x={rx:.2f}, y={ry:.2f}, heading={heading:.1f} (camera={pose_cam}), dist_to_home={dist_to_home_cm:.1f}cm"
-            )
-            logging.info(
-                f"Route: desired={desired_heading:.1f}deg, turn={route_turn:+.1f}deg"
-            )
-
-        valid_wall_dists = [
-            d for d in (robot.latest_L, robot.latest_C, robot.latest_R)
-            if is_valid_distance_cm(d)
-        ]
-        if valid_wall_dists and min(valid_wall_dists) <= STOP_DIST:
-            near_home_confirm += 1
-            logging.info(
-                f"Wall stop check {near_home_confirm}/{HOME_WALL_STOP_CONFIRM_COUNT}: "
-                f"L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}, "
-                f"threshold={STOP_DIST:.1f}cm"
-            )
-            if near_home_confirm >= HOME_WALL_STOP_CONFIRM_COUNT:
+            last_known_dist_to_home_cm = dist_to_home_cm
+        else:
+            dist_to_home_cm = last_known_dist_to_home_cm
+        
+        # 2) Stop conditions based on sensors (ONLY if we know we are near home)
+        if dist_to_home_cm <= MOV_ST_DIST_TH:
+            valid_wall_dists = [d for d in (robot.latest_L, robot.latest_C, robot.latest_R) if is_valid_distance_cm(d)]
+            if valid_wall_dists and min(valid_wall_dists) <= STOP_DIST:
+                logging.info(f"Wall stop threshold reached! L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
                 robot.halt()
                 arrived_at_home = True
                 break
-        else:
-            near_home_confirm = 0
-
-        if blind_approach_active or dist_to_home_cm <= ALIGN_DIST_TO_HOME:
-            logging.info(f"Line sensors: L={robot.line_L} R={robot.line_R}")
+            
+        if dist_to_home_cm <= ALIGN_DIST_TO_HOME:
             if robot.line_L == 0 and robot.line_R == 0:
-                logging.info("Home boundary detected")
+                logging.info("Home boundary detected by line sensors")
                 robot.halt()
                 arrived_at_home = True
                 break
-            elif robot.line_L == 0 or robot.line_R == 0:
-                turn_dir = 'L' if robot.line_L == 0 else 'R'
-                logging.info(f"Step 5 align: Line aligning, turning {turn_dir} (L:{robot.line_L} R:{robot.line_R})")
-                execute_burst(turn_dir, STEP5_FINE_TURN_SPEED, 0.04, CENTERING_SETTLE_S)
+            
+        # 3) Handle lost tag / obstacle avoidance
+        if pose_result is None:
+            # If we are reasonably sure we are already within the threshold, switch to blind forward mode instead of rotating
+            if arrived_at_home or dist_to_home_cm <= MOV_ST_DIST_TH:
+                logging.info("Step 5 blind approach (tag lost, but very close or within threshold): blind forward step")
+                execute_forward_with_sensor_guard(
+                    STEP5_STEADY_FORWARD_SPEED,
+                    0.2,
+                    0.1,
+                    "Step 5 blind forward",
+                    check_line=True
+                )
                 continue
-
-        if not blind_approach_active and obstacle_detected(robot):
-            logging.warning(
-                f"Obstacle ahead during Step 5 (L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid"
-            )
-            run_obstacle_avoidance(robot)
-            robot.halt()
-            continue
-
-        if not blind_approach_active and abs(route_turn) > STEP5_HEADING_TOL_DEG:
-            turn_direction = 'L' if route_turn > 0 else 'R'
-            last_align_turn_dir = turn_direction
-            turn_speed = STEP5_COARSE_TURN_SPEED if abs(route_turn) > STEP5_COARSE_TURN_THRESHOLD_DEG else STEP5_FINE_TURN_SPEED
-            logging.info(
-                f"Step 5 align: turning {turn_direction} (error={route_turn:+.1f}deg, speed={turn_speed})"
-            )
-            execute_burst(
-                turn_direction,
-                turn_speed,
-                STEP5_ALIGN_TURN_BURST_S,
-                CENTERING_SETTLE_S,
-            )
-            continue
-
-        if not blind_approach_active and dist_to_home_cm > ALIGN_DIST_TO_HOME:
-            logging.info(
-                f"Step 5 far approach (> {ALIGN_DIST_TO_HOME:.0f}cm): large forward step"
-            )
-            moved = execute_forward_with_sensor_guard(
-                COURSE_FORWARD_SPEED,
-                STEP5_FAR_FORWARD_BURST_S,
-                STEP5_STEADY_FORWARD_SETTLE_S,
-                "Step 5 far forward",
-                check_line=False
-            )
-        else:
-            if blind_approach_active:
-                logging.info("Step 5 blind approach (<= 45cm): blind forward step")
             else:
-                logging.info(f"Step 5 near approach (<= {ALIGN_DIST_TO_HOME:.0f}cm): fine forward step")
-            moved = execute_forward_with_sensor_guard(
+                logging.info(f"Step 5: pose not found. Rotating {search_turn_dir} to search for home.")
+                execute_burst(search_turn_dir, STEP5_SEARCH_TURN_SPEED, 0.1, 0.1)
+                continue
+        
+        logging.info(f"Pose: x={rx:.2f}, y={ry:.2f}, head={heading:.1f}, dist={dist_to_home_cm:.1f}cm, turn={route_turn:+.1f}deg")
+
+        # If we are within MOV_ST_DIST_TH threshold, ignore heading and just drive straight in blind mode
+        if dist_to_home_cm <= MOV_ST_DIST_TH:
+            logging.info(f"Step 5 blind approach (dist <= {MOV_ST_DIST_TH}cm): blind forward step")
+            execute_forward_with_sensor_guard(
                 STEP5_STEADY_FORWARD_SPEED,
-                STEP5_FINE_TUNE_FORWARD_BURST_S,
-                STEP5_STEADY_FORWARD_SETTLE_S,
-                "Step 5 fine/blind forward",
+                0.2,
+                0.1,
+                "Step 5 blind forward",
                 check_line=True
             )
-
-        if not moved:
-            if not blind_approach_active and obstacle_detected(robot):
-                logging.warning(
-                    f"Obstacle during Step 5 forward step (L:{robot.latest_L:.1f} C:{robot.latest_C:.1f} R:{robot.latest_R:.1f}) -> avoid"
-                )
-                run_obstacle_avoidance(robot)
-                robot.halt()
-            if not mission_running:
-                break
             continue
+
+        # Prioritize obstacle avoidance if we are still far away from home
+        if obstacle_detected(robot):
+            logging.warning("Obstacle detected! Avoiding...")
+            run_obstacle_avoidance(robot)
+            continue
+            
+        # 4) Navigate: First turn, then move forward
+        if abs(route_turn) > STEP5_HEADING_TOL_DEG:
+            turn_direction = 'L' if route_turn > 0 else 'R'
+            search_turn_dir = turn_direction # Next blind search should be same direction
+            logging.info(f"Step 5 align: turning {turn_direction} (error={route_turn:+.1f}deg)")
+            execute_burst(turn_direction, STEP5_FINE_TURN_SPEED, 0.1, 0.2)
+        else:
+            logging.info(f"Step 5 approach: moving forward toward home")
+            # If we are close, check lines. If far, don't check lines.
+            execute_forward_with_sensor_guard(
+                STEP5_STEADY_FORWARD_SPEED,
+                0.2,
+                0.1,
+                "Step 5 forward",
+                check_line=(dist_to_home_cm <= ALIGN_DIST_TO_HOME)
+            )
 
     if not mission_running:
         logging.info("Mission stopped before drop sequence.")
         return
 
     drop_executed = False
-    final_home_tag_distance_cm = None
-    if arrived_at_home:
-        _, final_tags, final_cam, final_pose_scale, _ = get_pose_with_tag_data_fallback(
-            vision,
-            ARENA_MAP,
-            preferred_camera=active_nav_camera,
-        )
-        final_home_measurement = get_average_home_tag_measurement(final_tags, pose_scale=final_pose_scale if final_pose_scale is not None else 1.0)
-        if final_home_measurement is not None:
-            final_home_tag_distance_cm = final_home_measurement[1] * 100.0
-            logging.info(
-                f"Final home-tag distance from {final_cam} camera: {final_home_tag_distance_cm:.1f}cm"
-            )
-        else:
-            logging.warning("Could not get final home-tag distance for drop check.")
 
     if arrived_at_home:
-        if final_home_tag_distance_cm is None or final_home_tag_distance_cm <= (HOME_WALL_STOP_DISTANCE + 5.0):
-            logging.info("Executing Ball drop...")
-            robot.arm_drop()
-            wait_with_abort(2)
-            robot.gripper_open()
-            wait_with_abort(1)
-            drop_executed = True
-        else:
-            logging.warning(
-                f"At home proximity, but home-tag distance ({final_home_tag_distance_cm:.1f}cm > {HOME_WALL_STOP_DISTANCE + 5.0:.1f}cm). "
-                "Skipping drop; keeping arm UP and gripper closed."
-            )
+        logging.info("Executing Ball drop...")
+        robot.arm_drop()
+        wait_with_abort(2)
+        robot.gripper_open()
+        wait_with_abort(1)
+        drop_executed = True
     else:
         logging.error("Failed to reach home within time limit. Skipping drop sequence and keeping arm UP.")
 
     if drop_executed:
-        logging.info("Post-drop: turning around by 180 degrees, then moving arm to DOWN pose.")
+        logging.info(f"Post-drop: turning around by {config.STEP5_POST_DROP_TURN_ANGLE_DEG} degrees, then waiting for button press to lower arm.")
+        
+        # Scale the turning duration based on the configured angle (assuming 2.0s = 180deg)
+        turn_duration = (config.STEP5_POST_DROP_TURN_ANGLE_DEG / 180.0) * STEP5_POST_DROP_TURN_DURATION_S
+        
         execute_burst(
             STEP5_POST_DROP_TURN_DIR,
             STEP5_POST_DROP_TURN_SPEED,
-            STEP5_POST_DROP_TURN_DURATION_S,
+            turn_duration,
             STEP5_POST_DROP_TURN_SETTLE_S,
         )
-        robot.arm_down()
         desired_exit_arm_pose = 'down'
         if 'vision' in globals() and vision:
             vision.update_active_camera(False)

@@ -218,7 +218,7 @@ class VisionModule:
                     if current_target_box is None:
                         current_target_box = (best_match[0], best_match[1], best_match[2], best_match[3])
                     else:
-                        alpha = 0.5
+                        alpha = 0.8  # Increased from 0.5 to reduce lag during movement tracking
                         current_target_box = (
                             alpha * best_match[0] + (1 - alpha) * current_target_box[0],
                             alpha * best_match[1] + (1 - alpha) * current_target_box[1],
