@@ -206,11 +206,22 @@ def request_mission_stop(reason):
         return
     mission_running = False
     logging.warning(reason)
-    if robot is not None:
+    if 'robot' in globals() and robot is not None:
         try:
             robot.halt()
+            logging.info("Second press received: Lowering ARM to DOWN pose before exiting.")
+            robot.arm_down()
+            time.sleep(1.0)
+            robot.stop()
         except Exception:
             pass
+    if 'vision' in globals() and vision is not None:
+        try:
+            vision.stop()
+        except Exception:
+            pass
+    logging.info("Exiting immediately via STOP button.")
+    os._exit(0)
 
 def check_button_thread():
     global button_pressed, mission_running, button
@@ -593,6 +604,11 @@ def compute_heading_and_distance_to_home(rx, ry, heading, home_target_data):
         # We are far, just head in a straight line towards the target
         desired_heading = heading_from_vector(dx, dy)
 
+    # Use a small deadband for the final wall alignment to avoid tiny jitter turns and losing the tag.
+    # If the distance is small (e.g. <= MOV_ST_DIST_TH/100.0 or ALIGN_DIST_TO_HOME) and we are roughly aligned, don't keep correcting heading.
+    if linear_distance_m <= 0.60 and abs(normalize_rotation(desired_heading - heading)) < 15.0:
+        desired_heading = heading
+
     rotation_deg = normalize_rotation(desired_heading - heading)
     return desired_heading, rotation_deg, linear_distance_m, cross_track_error
 
@@ -631,6 +647,7 @@ def wait_for_exit_button_press(lower_arm_before_exit=False):
 def main():
     global robot, vision, desired_exit_arm_pose
     logging.info("--- Step 1: Initialization phase ---")
+    logging.info(f"Expected Home Tags: {HOME_TAG_IDS}")
     robot = RobotController()
     vision = VisionModule()
     
@@ -755,7 +772,7 @@ def main():
         
     step2_elapsed_s = time.time() - start_time
     step2_saved_s = max(0.0, STEP2_CONFIRM_HOME_TIMEOUT_S - step2_elapsed_s)
-    logging.info("Step 2 completed successfully.")
+    logging.info(f"Completion of Step 2. Elapsed time: {step2_elapsed_s:.1f}s")
     if not mission_running: return
 
     # ---------------------------------------------------------
@@ -767,7 +784,7 @@ def main():
     step3_budget_s = STEP3_READY_TO_EXPLORE_S + step2_saved_s
     step3_elapsed_s = time.time() - step3_start_s
     step3_saved_s = max(0.0, step3_budget_s - step3_elapsed_s)
-    logging.info("Completion of Step 3")
+    logging.info(f"Completion of Step 3. Elapsed time: {step3_elapsed_s:.1f}s")
 
     # ---------------------------------------------------------
     # STEP 4: Search and Approach balls (~ 2 minutes)
@@ -902,6 +919,7 @@ def main():
 
                 logging.warning("Target lost beyond local reacquire window. Returning to search.")
                 robot.halt()
+                reached = False
                 break # break approach loop, re-enter search
                 
         # 3. Grab the ball
@@ -912,19 +930,19 @@ def main():
                 ("C", robot.latest_C),
                 ("R", robot.latest_R),
             ):
-                if is_valid_distance_cm(ch_dist) and ch_dist < STEP4_ARM_LOWER_MIN_CLEARANCE_CM:
+                if is_valid_distance_cm(ch_dist) and ch_dist < SAFE_WALL_DISTANCE:
                     blocked_channels.append(f"{ch_name}:{ch_dist:.1f}cm")
 
             if blocked_channels:
                 logging.warning(
-                    f"Too close to obstacle for arm-lower safety (< {STEP4_ARM_LOWER_MIN_CLEARANCE_CM:.1f}cm) "
+                    f"Too close to obstacle for arm-lower safety (< {SAFE_WALL_DISTANCE:.1f}cm) "
                     f"[{', '.join(blocked_channels)}]. Skipping arm down, running obstacle avoidance."
                 )
                 run_obstacle_avoidance(robot)
                 reached = False
                 
                 # Discard current target so we search for a new ball.
-                break 
+                continue 
 
             logging.info("Grabbing the ball...")
             robot.arm_down()
@@ -946,7 +964,7 @@ def main():
                         vision.update_active_camera(True)
                     time.sleep(1.0)
                     run_obstacle_avoidance(robot)
-                    break
+                    continue
                 logging.warning(
                     f"No AprilTag wall-distance available from PiCamera during arm-down capture. "
                     f"Falling back to C sensor: C={c_reading:.1f}cm."
@@ -962,7 +980,7 @@ def main():
                         vision.update_active_camera(True)
                     time.sleep(1.0)
                     run_obstacle_avoidance(robot)
-                    break
+                    continue
 
             robot.gripper_open()
             wait_with_abort(1.0)
@@ -1044,7 +1062,7 @@ def main():
             wait_with_abort(2)
             logging.info("Ball grab complete.")
             
-    logging.info("Completion of Step 4")
+    logging.info(f"Completion of Step 4. Elapsed time: {time.time() - exploration_start:.1f}s")
     if not mission_running: return
 
     # ---------------------------------------------------------
@@ -1061,9 +1079,12 @@ def main():
     
     logging.info("Moving to Home tag")
 
+    from map_visualizer import generate_localization_image
+
     arrived_at_home = False
     search_turn_dir = 'L'
     last_known_dist_to_home_cm = 999.0
+    last_localize_save_ts = 0.0
 
     while mission_running and (time.time() - home_start < STEP5_RETURN_HOME_TIMEOUT_S):
         # 1) Get pose from camera
@@ -1078,13 +1099,31 @@ def main():
             )
             dist_to_home_cm = linear_distance_m * 100.0
             last_known_dist_to_home_cm = dist_to_home_cm
+            
+            now = time.time()
+            if (now - last_localize_save_ts) >= STEP5_LOCALIZE_IMAGE_INTERVAL_S:
+                ts = time.strftime('%Y%m%d_%H%M%S')
+                save_path = os.path.join(LOG_DIR, f"localize_{ts}.jpg")
+                threading.Thread(
+                    target=generate_localization_image,
+                    args=(rx, ry, heading, ARENA_MAP, config.HOME_TAG_IDS, save_path),
+                    daemon=True
+                ).start()
+                threading.Thread(
+                    target=save_tag_detection_frame_from_source,
+                    args=(source_frame, detected_tags, f"tag_detection_{ts}.png"),
+                    daemon=True
+                ).start()
+                last_localize_save_ts = now
         else:
             dist_to_home_cm = last_known_dist_to_home_cm
         
-        # 2) Stop conditions based on sensors (ONLY if we know we are near home)
-        if dist_to_home_cm <= MOV_ST_DIST_TH:
+        # 2) Stop conditions based on sensors
+        # Use a larger distance grouping (e.g. 65.0) since camera pose can significantly underestimate 
+        # actual distance when the tag occupies most of the frame.
+        if dist_to_home_cm <= 65.0:
             valid_wall_dists = [d for d in (robot.latest_L, robot.latest_C, robot.latest_R) if is_valid_distance_cm(d)]
-            if valid_wall_dists and min(valid_wall_dists) <= STOP_DIST:
+            if valid_wall_dists and min(valid_wall_dists) <= STEP5_WALL_APPROACH_STOP_CM:
                 logging.info(f"Wall stop threshold reached! L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
                 robot.halt()
                 arrived_at_home = True
@@ -1101,7 +1140,7 @@ def main():
         if pose_result is None:
             # If we are reasonably sure we are already within the threshold, switch to blind forward mode instead of rotating
             if arrived_at_home or dist_to_home_cm <= MOV_ST_DIST_TH:
-                logging.info("Step 5 blind approach (tag lost, but very close or within threshold): blind forward step")
+                logging.info(f"Step 5 blind approach (tag lost, but very close or within threshold): blind forward step. Ultrasonic: L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
                 execute_forward_with_sensor_guard(
                     STEP5_STEADY_FORWARD_SPEED,
                     0.2,
@@ -1110,6 +1149,17 @@ def main():
                     check_line=True
                 )
                 continue
+            elif dist_to_home_cm <= 60.0:
+                 # It lost the tag very close to home, just creep forward blindly hoping to hit threshold.
+                 logging.info(f"Step 5 blind approach (tag lost near {dist_to_home_cm:.1f}cm): creeping forward. Ultrasonic: L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
+                 execute_forward_with_sensor_guard(
+                    STEP5_STEADY_FORWARD_SPEED,
+                    0.2,
+                    0.1,
+                    "Step 5 blind creep",
+                    check_line=True
+                 )
+                 continue
             else:
                 logging.info(f"Step 5: pose not found. Rotating {search_turn_dir} to search for home.")
                 execute_burst(search_turn_dir, STEP5_SEARCH_TURN_SPEED, 0.1, 0.1)
@@ -1119,7 +1169,7 @@ def main():
 
         # If we are within MOV_ST_DIST_TH threshold, ignore heading and just drive straight in blind mode
         if dist_to_home_cm <= MOV_ST_DIST_TH:
-            logging.info(f"Step 5 blind approach (dist <= {MOV_ST_DIST_TH}cm): blind forward step")
+            logging.info(f"Step 5 blind approach (dist <= {MOV_ST_DIST_TH}cm): blind forward step. Ultrasonic: L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
             execute_forward_with_sensor_guard(
                 STEP5_STEADY_FORWARD_SPEED,
                 0.2,
@@ -1167,6 +1217,8 @@ def main():
         drop_executed = True
     else:
         logging.error("Failed to reach home within time limit. Skipping drop sequence and keeping arm UP.")
+    
+    logging.info(f"Completion of Step 5. Elapsed time: {time.time() - home_start:.1f}s")
 
     if drop_executed:
         logging.info(f"Post-drop: turning around by {config.STEP5_POST_DROP_TURN_ANGLE_DEG} degrees, then waiting for button press to lower arm.")

@@ -1,0 +1,3 @@
+- Code only, no explanation.
+- Bullets over paragraphs.
+- Keep answers terse.
