@@ -1,254 +1,222 @@
-2026-06-24 12:53:01,531 [INFO] --- Step 1: Initialization phase ---
-2026-06-24 12:53:01,540 [INFO] Expected Home Tags: [2, 3]
-2026-06-24 12:53:14,910 [INFO] Motor status: OK
-2026-06-24 12:53:15,470 [INFO] Initialization successful.
-2026-06-24 12:53:15,472 [INFO] Camera now open.
-2026-06-24 12:53:15,491 [INFO] Camera configuration has been adjusted!
-2026-06-24 12:53:15,497 [INFO] Configuration successful!
-2026-06-24 12:53:15,543 [INFO] Camera started
-2026-06-24 12:53:17,218 [INFO] PiCamera started.
-2026-06-24 12:53:19,221 [INFO] USB Camera status: OK
-2026-06-24 12:53:19,223 [INFO] PiCamera status: OK
-2026-06-24 12:53:19,224 [INFO] Ultrasonic sensor status: OK (L:9 C:103 R:102)
-2026-06-24 12:53:19,492 [INFO] Physical start/stop button ready on GPIO 25.
-2026-06-24 12:53:19,495 [INFO] Button status: Listener running (press the physical button on GPIO 25 to start/stop).
-2026-06-24 12:53:19,498 [INFO] Assuming ARM starts in DOWN pose. Moving ARM to UP pose.
-2026-06-24 12:53:20,501 [INFO] System Online. Waiting for the physical button press on GPIO 25 to start the mission sequence...
-2026-06-24 12:53:40,355 [INFO] Start command received via physical button on GPIO 25.
-2026-06-24 12:53:40,355 [INFO] Button pressed. Mission Started!
-2026-06-24 12:53:40,363 [INFO] --- Step 2: Confirm Home Location ---
-2026-06-24 12:53:40,659 [INFO] Home tag(s) [3] confirmed via USB camera.
-2026-06-24 12:53:40,678 [INFO] Completion of Step 2. Elapsed time: 0.3s
-2026-06-24 12:53:40,681 [INFO] --- Step 3: Ready to Explore ---
-2026-06-24 12:53:43,687 [INFO] Completion of Step 3. Elapsed time: 3.0s
-2026-06-24 12:53:43,692 [INFO] --- Step 4: Search and Approach balls ---
-2026-06-24 12:53:43,697 [INFO] Searching for ball...
-2026-06-24 12:53:44,276 [INFO] Target detected (dist=64.9cm, x=258.5). Switching immediately to approach.
-2026-06-24 12:53:44,294 [INFO] Approaching the ball...
-2026-06-24 12:54:08,478 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-24 12:54:08,484 [INFO] Grabbing the ball...
-2026-06-24 12:54:11,016 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=127.0cm.
-2026-06-24 12:54:12,020 [INFO] Moving forward for 1.5s while opening/closing gripper 0 times...
-2026-06-24 12:54:12,337 [WARNING] Wall too close during capture move (36.7cm < 40.0cm). Backing up.
-2026-06-24 12:54:13,205 [WARNING] Wall too close during capture move (36.7cm < 40.0cm). Backing up.
-2026-06-24 12:54:16,879 [INFO] Ball grab complete.
-2026-06-24 12:54:16,887 [INFO] Searching for ball...
-2026-06-24 12:54:16,893 [INFO] Target detected (dist=29.5cm, x=165.7). Switching immediately to approach.
-2026-06-24 12:54:16,916 [INFO] Approaching the ball...
-2026-06-24 12:54:17,175 [WARNING] Obstacle detected (L:9 C:114 R:262) -> evasive maneuver
-2026-06-24 12:54:18,422 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-24 12:54:18,427 [WARNING] Too close to obstacle for arm-lower safety (< 40.0cm) [R:36.0cm]. Skipping arm down, running obstacle avoidance.
-2026-06-24 12:54:18,435 [WARNING] Obstacle detected (L:119 C:999 R:36) -> evasive maneuver
-2026-06-24 12:54:19,305 [INFO] Searching for ball...
-2026-06-24 12:54:19,310 [INFO] Target detected (dist=27.9cm, x=78.7). Switching immediately to approach.
-2026-06-24 12:54:19,334 [INFO] Approaching the ball...
-2026-06-24 12:54:23,688 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-24 12:54:23,693 [WARNING] Too close to obstacle for arm-lower safety (< 40.0cm) [R:38.0cm]. Skipping arm down, running obstacle avoidance.
-2026-06-24 12:54:23,697 [WARNING] Obstacle detected (L:119 C:126 R:38) -> evasive maneuver
-2026-06-24 12:54:24,559 [INFO] Searching for ball...
-2026-06-24 12:54:24,568 [INFO] Target detected (dist=28.7cm, x=199.8). Switching immediately to approach.
-2026-06-24 12:54:24,585 [INFO] Approaching the ball...
-2026-06-24 12:54:24,589 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-24 12:54:24,595 [INFO] Grabbing the ball...
-2026-06-24 12:54:26,682 [INFO] PiCamera wall distance during arm-down capture: 77.4cm
-2026-06-24 12:54:27,787 [INFO] Moving forward for 1.5s while opening/closing gripper 0 times...
-2026-06-24 12:54:32,741 [INFO] Ball grab complete.
-2026-06-24 12:54:32,747 [INFO] Searching for ball...
-2026-06-24 12:54:32,755 [INFO] Target detected (dist=66.0cm, x=167.9). Switching immediately to approach.
-2026-06-24 12:54:32,776 [INFO] Approaching the ball...
-2026-06-24 12:54:32,778 [WARNING] Obstacle detected (L:9 C:74 R:98) -> evasive maneuver
-2026-06-24 12:54:51,674 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
-2026-06-24 12:54:51,680 [INFO] Grabbing the ball...
-2026-06-24 12:54:53,760 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=54.0cm.
-2026-06-24 12:54:54,797 [INFO] Moving forward for 1.5s while opening/closing gripper 0 times...
-2026-06-24 12:54:59,689 [INFO] Ball grab complete.
-2026-06-24 12:54:59,692 [INFO] Completion of Step 4. Elapsed time: 76.0s
-2026-06-24 12:54:59,695 [INFO] --- Step 5: Returning home ---
-2026-06-24 12:54:59,699 [INFO] Moving to Home tag
-2026-06-24 12:55:05,500 [INFO] Pose: x=1.95, y=1.23, head=94.7, dist=155.4cm, turn=+137.5deg
-2026-06-24 12:55:05,513 [INFO] Step 5 align: turning L (error=+137.5deg)
-2026-06-24 12:55:06,281 [INFO] Pose: x=1.95, y=1.23, head=94.6, dist=155.3cm, turn=+137.6deg
-2026-06-24 12:55:06,285 [INFO] Step 5 align: turning L (error=+137.6deg)
-2026-06-24 12:55:07,216 [INFO] Pose: x=1.72, y=1.21, head=97.7, dist=140.9cm, turn=+141.7deg
-2026-06-24 12:55:07,221 [INFO] Step 5 align: turning L (error=+141.7deg)
-2026-06-24 12:55:07,840 [INFO] Pose: x=1.71, y=1.23, head=98.4, dist=142.3cm, turn=+141.8deg
-2026-06-24 12:55:07,848 [INFO] Step 5 align: turning L (error=+141.8deg)
-2026-06-24 12:55:08,630 [INFO] Pose: x=1.66, y=1.24, head=96.9, dist=140.3cm, turn=+144.9deg
-2026-06-24 12:55:08,646 [INFO] Step 5 align: turning L (error=+144.9deg)
-2026-06-24 12:55:09,295 [INFO] Pose: x=1.83, y=1.15, head=110.5, dist=141.4cm, turn=+123.6deg
-2026-06-24 12:55:09,308 [INFO] Step 5 align: turning L (error=+123.6deg)
-2026-06-24 12:55:09,900 [INFO] Pose: x=1.83, y=1.15, head=110.6, dist=141.8cm, turn=+123.7deg
-2026-06-24 12:55:09,913 [INFO] Step 5 align: turning L (error=+123.7deg)
-2026-06-24 12:55:10,369 [INFO] Pose: x=1.84, y=1.16, head=112.3, dist=142.7cm, turn=+121.7deg
-2026-06-24 12:55:10,394 [INFO] Step 5 align: turning L (error=+121.7deg)
-2026-06-24 12:55:11,124 [INFO] Pose: x=1.82, y=1.16, head=113.2, dist=141.7cm, turn=+121.6deg
-2026-06-24 12:55:11,126 [INFO] Step 5 align: turning L (error=+121.6deg)
-2026-06-24 12:55:12,206 [INFO] Pose: x=1.73, y=1.13, head=112.0, dist=134.9cm, turn=+125.2deg
-2026-06-24 12:55:12,222 [INFO] Step 5 align: turning L (error=+125.2deg)
-2026-06-24 12:55:13,269 [INFO] Pose: x=1.98, y=1.12, head=130.1, dist=149.2cm, turn=+98.6deg
-2026-06-24 12:55:13,321 [INFO] Step 5 align: turning L (error=+98.6deg)
-2026-06-24 12:55:13,972 [INFO] Pose: x=1.33, y=1.55, head=151.9, dist=158.0cm, turn=+106.1deg
-2026-06-24 12:55:13,976 [INFO] Step 5 align: turning L (error=+106.1deg)
-2026-06-24 12:55:14,787 [INFO] Pose: x=2.00, y=0.83, head=138.4, dist=130.1cm, turn=+81.4deg
-2026-06-24 12:55:14,789 [INFO] Step 5 align: turning L (error=+81.4deg)
-2026-06-24 12:55:15,730 [INFO] Pose: x=2.00, y=0.82, head=139.2, dist=129.4cm, turn=+80.1deg
-2026-06-24 12:55:15,769 [INFO] Step 5 align: turning L (error=+80.1deg)
-2026-06-24 12:55:16,670 [INFO] Pose: x=1.96, y=1.10, head=147.2, dist=145.7cm, turn=+81.7deg
-2026-06-24 12:55:16,673 [INFO] Step 5 align: turning L (error=+81.7deg)
-2026-06-24 12:55:17,775 [INFO] Pose: x=2.00, y=1.11, head=151.4, dist=149.2cm, turn=+76.5deg
-2026-06-24 12:55:17,783 [INFO] Step 5 align: turning L (error=+76.5deg)
-2026-06-24 12:55:18,570 [INFO] Pose: x=2.00, y=1.24, head=172.1, dist=159.1cm, turn=+58.9deg
-2026-06-24 12:55:18,572 [INFO] Step 5 align: turning L (error=+58.9deg)
-2026-06-24 12:55:19,567 [INFO] Pose: x=1.97, y=2.00, head=183.1, dist=222.2cm, turn=+61.1deg
-2026-06-24 12:55:19,667 [INFO] Step 5 align: turning L (error=+61.1deg)
-2026-06-24 12:55:20,490 [INFO] Pose: x=1.97, y=1.73, head=186.6, dist=198.3cm, turn=+54.0deg
-2026-06-24 12:55:20,502 [INFO] Step 5 align: turning L (error=+54.0deg)
-2026-06-24 12:55:21,317 [INFO] Pose: x=1.89, y=1.39, head=172.0, dist=164.9cm, turn=+65.6deg
-2026-06-24 12:55:21,321 [INFO] Step 5 align: turning L (error=+65.6deg)
-2026-06-24 12:55:21,819 [INFO] Pose: x=1.89, y=1.51, head=181.9, dist=175.2cm, turn=+57.5deg
-2026-06-24 12:55:21,825 [INFO] Step 5 align: turning L (error=+57.5deg)
-2026-06-24 12:55:22,837 [INFO] Pose: x=1.97, y=1.72, head=186.6, dist=197.9cm, turn=+54.0deg
-2026-06-24 12:55:22,848 [INFO] Step 5 align: turning L (error=+54.0deg)
-2026-06-24 12:55:23,966 [INFO] Pose: x=2.00, y=1.64, head=192.5, dist=192.2cm, turn=+46.2deg
-2026-06-24 12:55:23,996 [INFO] Step 5 align: turning L (error=+46.2deg)
-2026-06-24 12:55:24,710 [INFO] Pose: x=2.00, y=0.00, head=149.0, dist=100.0cm, turn=+31.0deg
-2026-06-24 12:55:24,717 [INFO] Step 5 align: turning L (error=+31.0deg)
-2026-06-24 12:55:25,736 [INFO] Pose: x=2.00, y=1.55, head=192.8, dist=184.3cm, turn=+44.4deg
-2026-06-24 12:55:25,744 [INFO] Step 5 align: turning L (error=+44.4deg)
-2026-06-24 12:55:26,486 [INFO] Pose: x=2.00, y=1.05, head=181.6, dist=144.7cm, turn=+44.6deg
-2026-06-24 12:55:26,564 [INFO] Step 5 align: turning L (error=+44.6deg)
-2026-06-24 12:55:27,335 [INFO] Pose: x=2.00, y=0.44, head=167.9, dist=109.1cm, turn=+35.7deg
-2026-06-24 12:55:27,636 [INFO] Step 5 align: turning L (error=+35.7deg)
-2026-06-24 12:55:28,180 [INFO] Pose: x=2.00, y=1.54, head=197.1, dist=183.3cm, turn=+39.8deg
-2026-06-24 12:55:28,192 [INFO] Step 5 align: turning L (error=+39.8deg)
-2026-06-24 12:55:28,986 [INFO] Pose: x=2.00, y=1.02, head=185.1, dist=143.0cm, turn=+40.5deg
-2026-06-24 12:55:28,990 [INFO] Step 5 align: turning L (error=+40.5deg)
-2026-06-24 12:55:29,927 [INFO] Pose: x=2.00, y=1.51, head=203.5, dist=181.0cm, turn=+33.0deg
-2026-06-24 12:55:29,972 [INFO] Step 5 align: turning L (error=+33.0deg)
-2026-06-24 12:55:30,753 [INFO] Pose: x=2.00, y=1.51, head=204.0, dist=180.9cm, turn=+32.5deg
-2026-06-24 12:55:30,771 [INFO] Step 5 align: turning L (error=+32.5deg)
-2026-06-24 12:55:31,734 [INFO] Pose: x=2.00, y=1.55, head=205.1, dist=184.8cm, turn=+32.1deg
-2026-06-24 12:55:31,737 [INFO] Step 5 align: turning L (error=+32.1deg)
-2026-06-24 12:55:32,377 [INFO] Pose: x=2.00, y=1.70, head=211.6, dist=197.6cm, turn=+28.0deg
-2026-06-24 12:55:32,380 [INFO] Step 5 align: turning L (error=+28.0deg)
-2026-06-24 12:55:33,329 [INFO] Pose: x=2.00, y=1.51, head=206.9, dist=180.7cm, turn=+29.5deg
-2026-06-24 12:55:33,361 [INFO] Step 5 align: turning L (error=+29.5deg)
-2026-06-24 12:55:34,589 [INFO] Pose: x=2.00, y=1.61, head=211.0, dist=189.5cm, turn=+27.2deg
-2026-06-24 12:55:34,979 [INFO] Step 5 align: turning L (error=+27.2deg)
-2026-06-24 12:55:35,557 [INFO] Pose: x=1.96, y=1.45, head=215.7, dist=174.2cm, turn=+20.9deg
-2026-06-24 12:55:35,562 [INFO] Step 5 align: turning L (error=+20.9deg)
-2026-06-24 12:55:36,278 [INFO] Pose: x=1.99, y=1.46, head=216.9, dist=175.9cm, turn=+19.1deg
-2026-06-24 12:55:36,281 [INFO] Step 5 align: turning L (error=+19.1deg)
-2026-06-24 12:55:37,322 [INFO] Pose: x=2.00, y=1.47, head=217.9, dist=177.5cm, turn=+17.8deg
-2026-06-24 12:55:37,416 [INFO] Step 5 align: turning L (error=+17.8deg)
-2026-06-24 12:55:38,442 [INFO] Pose: x=2.00, y=1.47, head=221.2, dist=178.0cm, turn=+14.7deg
-2026-06-24 12:55:38,491 [INFO] Step 5 align: turning L (error=+14.7deg)
-2026-06-24 12:55:39,542 [INFO] Pose: x=2.00, y=1.47, head=222.0, dist=178.1cm, turn=+13.9deg
-2026-06-24 12:55:39,546 [INFO] Step 5 align: turning L (error=+13.9deg)
-2026-06-24 12:55:40,407 [INFO] Pose: x=2.00, y=1.50, head=223.8, dist=180.1cm, turn=+12.5deg
-2026-06-24 12:55:40,459 [INFO] Step 5 align: turning L (error=+12.5deg)
-2026-06-24 12:55:41,306 [INFO] Pose: x=2.00, y=1.49, head=226.2, dist=179.6cm, turn=+9.9deg
-2026-06-24 12:55:41,335 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:42,598 [INFO] Pose: x=1.95, y=1.43, head=228.0, dist=171.3cm, turn=+8.4deg
-2026-06-24 12:55:42,602 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:43,268 [INFO] Pose: x=1.98, y=1.47, head=223.9, dist=177.0cm, turn=+12.5deg
-2026-06-24 12:55:43,271 [INFO] Step 5 align: turning L (error=+12.5deg)
-2026-06-24 12:55:44,779 [INFO] Pose: x=1.67, y=0.73, head=249.5, dist=99.0cm, turn=-22.2deg
-2026-06-24 12:55:44,859 [INFO] Step 5 align: turning R (error=-22.2deg)
-2026-06-24 12:55:46,001 [INFO] Pose: x=2.00, y=1.36, head=236.7, dist=168.7cm, turn=-3.0deg
-2026-06-24 12:55:46,009 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:46,777 [INFO] Pose: x=1.10, y=1.41, head=263.0, dist=141.5cm, turn=+2.9deg
-2026-06-24 12:55:46,788 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:47,760 [INFO] Pose: x=1.98, y=1.41, head=231.7, dist=171.8cm, turn=+3.4deg
-2026-06-24 12:55:47,764 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:48,730 [INFO] Pose: x=1.58, y=1.34, head=255.0, dist=145.7cm, turn=-8.4deg
-2026-06-24 12:55:48,766 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:49,985 [INFO] Pose: x=2.00, y=1.32, head=240.3, dist=165.9cm, turn=-7.3deg
-2026-06-24 12:55:50,015 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:50,681 [INFO] Pose: x=1.28, y=1.29, head=272.4, dist=131.7cm, turn=-14.5deg
-2026-06-24 12:55:50,928 [INFO] Step 5 align: turning R (error=-14.5deg)
-2026-06-24 12:55:51,778 [INFO] Pose: x=1.30, y=1.18, head=277.7, dist=121.5cm, turn=-21.8deg
-2026-06-24 12:55:51,792 [INFO] Step 5 align: turning R (error=-21.8deg)
-2026-06-24 12:55:52,919 [INFO] Pose: x=1.61, y=1.21, head=254.4, dist=135.7cm, turn=-11.0deg
-2026-06-24 12:55:52,951 [INFO] Step 5 align: turning R (error=-11.0deg)
-2026-06-24 12:55:53,787 [INFO] Pose: x=1.72, y=1.26, head=248.3, dist=144.6cm, turn=-7.9deg
-2026-06-24 12:55:53,799 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:54,516 [INFO] Pose: x=1.89, y=1.22, head=230.6, dist=151.3cm, turn=+3.3deg
-2026-06-24 12:55:54,519 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:55,685 [INFO] Pose: x=1.88, y=1.22, head=233.9, dist=150.9cm, turn=+0.3deg
-2026-06-24 12:55:55,728 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:56,440 [INFO] Pose: x=1.89, y=1.18, head=232.4, dist=147.4cm, turn=+0.7deg
-2026-06-24 12:55:56,469 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:57,259 [INFO] Pose: x=1.26, y=1.16, head=256.2, dist=119.4cm, turn=+1.2deg
-2026-06-24 12:55:57,262 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:58,529 [INFO] Pose: x=1.84, y=1.06, head=228.6, dist=135.2cm, turn=+3.1deg
-2026-06-24 12:55:58,532 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:55:59,532 [INFO] Pose: x=1.80, y=1.06, head=226.5, dist=132.8cm, turn=+6.3deg
-2026-06-24 12:55:59,568 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:00,485 [INFO] Pose: x=1.78, y=1.03, head=226.3, dist=129.4cm, turn=+6.4deg
-2026-06-24 12:56:00,507 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:01,694 [INFO] Pose: x=1.77, y=1.00, head=225.8, dist=126.6cm, turn=+6.5deg
-2026-06-24 12:56:01,696 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:02,164 [INFO] Pose: x=1.74, y=0.95, head=225.4, dist=120.3cm, turn=+6.5deg
-2026-06-24 12:56:02,173 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:03,165 [INFO] Pose: x=1.73, y=0.92, head=225.1, dist=117.0cm, turn=+6.6deg
-2026-06-24 12:56:03,229 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:04,226 [INFO] Pose: x=1.71, y=0.89, head=224.6, dist=113.8cm, turn=+7.0deg
-2026-06-24 12:56:04,245 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:05,237 [INFO] Pose: x=1.69, y=0.87, head=224.4, dist=111.2cm, turn=+7.1deg
-2026-06-24 12:56:05,242 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:05,967 [INFO] Pose: x=1.68, y=0.84, head=223.9, dist=107.6cm, turn=+7.3deg
-2026-06-24 12:56:05,971 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:07,312 [INFO] Pose: x=1.65, y=0.81, head=223.7, dist=104.0cm, turn=+7.4deg
-2026-06-24 12:56:07,358 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:07,976 [INFO] Pose: x=1.64, y=0.79, head=223.4, dist=101.2cm, turn=+7.5deg
-2026-06-24 12:56:07,985 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:08,526 [INFO] Pose: x=1.63, y=0.78, head=223.8, dist=100.6cm, turn=+7.5deg
-2026-06-24 12:56:08,537 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:09,553 [INFO] Pose: x=1.58, y=0.72, head=223.3, dist=92.7cm, turn=+7.7deg
-2026-06-24 12:56:09,560 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:10,279 [INFO] Pose: x=1.55, y=0.67, head=222.9, dist=86.6cm, turn=+7.8deg
-2026-06-24 12:56:10,281 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:11,257 [INFO] Pose: x=1.52, y=0.64, head=223.0, dist=82.2cm, turn=+7.8deg
-2026-06-24 12:56:11,324 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:12,958 [INFO] Pose: x=1.49, y=0.60, head=223.1, dist=77.9cm, turn=+7.7deg
-2026-06-24 12:56:12,984 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:13,531 [INFO] Pose: x=1.48, y=0.60, head=223.4, dist=77.2cm, turn=+7.7deg
-2026-06-24 12:56:13,576 [INFO] Step 5 approach: moving forward toward home
-2026-06-24 12:56:14,387 [INFO] Pose: x=1.32, y=0.41, head=212.7, dist=51.9cm, turn=+57.3deg
-2026-06-24 12:56:14,655 [INFO] Step 5 align: turning L (error=+57.3deg)
-2026-06-24 12:56:15,269 [INFO] Pose: x=1.30, y=0.38, head=212.0, dist=48.1cm, turn=+58.0deg
-2026-06-24 12:56:15,273 [INFO] Step 5 align: turning L (error=+58.0deg)
-2026-06-24 12:56:16,085 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=76.0 C=81.0 R=97.0
-2026-06-24 12:56:17,376 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=74.0 C=79.0 R=174.0
-2026-06-24 12:56:18,960 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=70.0 C=72.0 R=173.0
-2026-06-24 12:56:19,651 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=68.0 C=69.0 R=167.0
-2026-06-24 12:56:20,754 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=66.0 C=71.0 R=152.0
-2026-06-24 12:56:21,718 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=65.0 C=73.0 R=92.0
-2026-06-24 12:56:22,814 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=61.0 C=999.0 R=126.0
-2026-06-24 12:56:23,739 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=59.0 C=249.0 R=159.0
-2026-06-24 12:56:24,563 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=57.0 C=113.0 R=149.0
-2026-06-24 12:56:25,196 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=55.0 C=999.0 R=130.0
-2026-06-24 12:56:26,058 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=247.0 C=142.0 R=120.0
-2026-06-24 12:56:27,238 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=48.0 C=151.0 R=145.0
-2026-06-24 12:56:28,487 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=46.0 C=999.0 R=138.0
-2026-06-24 12:56:29,412 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=34.0 C=131.0 R=123.0
-2026-06-24 12:56:30,270 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=30.0 C=129.0 R=123.0
-2026-06-24 12:56:31,134 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=28.0 C=129.0 R=121.0
-2026-06-24 12:56:32,121 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=28.0 C=259.0 R=121.0
-2026-06-24 12:56:32,996 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=26.0 C=187.0 R=121.0
-2026-06-24 12:56:33,961 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=26.0 C=254.0 R=122.0
-2026-06-24 12:56:35,036 [INFO] Step 5 blind approach (tag lost near 48.1cm): creeping forward. Ultrasonic: L=23.0 C=252.0 R=119.0
-2026-06-24 12:56:35,887 [INFO] Wall stop threshold reached! L=20.0 C=248.0 R=999.0
-2026-06-24 12:56:35,894 [INFO] Executing Ball drop...
-2026-06-24 12:56:39,072 [INFO] Completion of Step 5. Elapsed time: 99.4s
-2026-06-24 12:56:39,083 [INFO] Post-drop: turning around by 180 degrees, then waiting for button press to lower arm.
-2026-06-24 12:56:42,026 [INFO] Waiting for physical button press to exit program...
-2026-06-24 12:58:20,472 [WARNING] Stop command received via physical button on GPIO 25.
-2026-06-24 12:58:20,477 [INFO] Second press received: Lowering ARM to DOWN pose before exiting.
-2026-06-24 12:58:20,761 [INFO] Exit button press received.
-2026-06-24 12:58:20,764 [INFO] Lowering ARM to DOWN pose before exiting.
-2026-06-24 12:58:21,773 [ERROR] Mission crashed due to exception: write failed: [Errno 9] Bad file descriptor
-2026-06-24 12:58:21,774 [INFO] Moving ARM to DOWN pose before exit.
-2026-06-24 12:58:21,802 [INFO] Camera stopped
-2026-06-24 12:58:21,806 [INFO] Exiting immediately via STOP button.
+2026-06-24 13:28:07,064 [INFO] --- Step 1: Initialization phase ---
+2026-06-24 13:28:07,069 [INFO] Expected Home Tags: [2, 3]
+2026-06-24 13:28:20,223 [INFO] Motor status: OK
+2026-06-24 13:28:20,785 [INFO] Initialization successful.
+2026-06-24 13:28:20,787 [INFO] Camera now open.
+2026-06-24 13:28:20,805 [INFO] Camera configuration has been adjusted!
+2026-06-24 13:28:20,814 [INFO] Configuration successful!
+2026-06-24 13:28:20,869 [INFO] Camera started
+2026-06-24 13:28:22,713 [INFO] PiCamera started.
+2026-06-24 13:28:24,919 [INFO] USB Camera status: OK
+2026-06-24 13:28:24,921 [INFO] PiCamera status: OK
+2026-06-24 13:28:24,925 [INFO] Ultrasonic sensor status: OK (L:9 C:79 R:110)
+2026-06-24 13:28:24,975 [INFO] Physical start/stop button ready on GPIO 25.
+2026-06-24 13:28:24,976 [INFO] Button status: Listener running (press the physical button on GPIO 25 to start/stop).
+2026-06-24 13:28:24,977 [INFO] Assuming ARM starts in DOWN pose. Moving ARM to UP pose.
+2026-06-24 13:28:25,980 [INFO] System Online. Waiting for the physical button press on GPIO 25 to start the mission sequence...
+2026-06-24 13:28:45,580 [INFO] Start command received via physical button on GPIO 25.
+2026-06-24 13:28:45,582 [INFO] Button pressed. Mission Started!
+2026-06-24 13:28:45,586 [INFO] --- Step 2: Confirm Home Location ---
+2026-06-24 13:28:45,897 [INFO] Home tag(s) [2] confirmed via USB camera.
+2026-06-24 13:28:45,913 [INFO] Completion of Step 2. Elapsed time: 0.3s
+2026-06-24 13:28:45,916 [INFO] --- Step 3: Ready to Explore ---
+2026-06-24 13:28:48,972 [INFO] Completion of Step 3. Elapsed time: 3.1s
+2026-06-24 13:28:48,978 [INFO] --- Step 4: Search and Approach balls ---
+2026-06-24 13:28:48,984 [INFO] Searching for ball...
+2026-06-24 13:28:48,990 [INFO] Target detected (dist=90.0cm, x=310.3). Switching immediately to approach.
+2026-06-24 13:28:49,006 [INFO] Approaching the ball...
+2026-06-24 13:29:14,474 [INFO] Searching for ball...
+2026-06-24 13:29:14,479 [INFO] Target detected (dist=39.8cm, x=228.5). Switching immediately to approach.
+2026-06-24 13:29:14,500 [INFO] Approaching the ball...
+2026-06-24 13:29:24,469 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-24 13:29:24,478 [INFO] Grabbing the ball...
+2026-06-24 13:29:26,985 [WARNING] No AprilTag wall-distance available from PiCamera during arm-down capture. Falling back to C sensor: C=112.0cm.
+2026-06-24 13:29:28,168 [INFO] Moving forward for 1.5s while opening/closing gripper 0 times...
+2026-06-24 13:29:33,014 [INFO] Ball grab complete.
+2026-06-24 13:29:33,018 [INFO] Searching for ball...
+2026-06-24 13:29:33,025 [INFO] Target detected (dist=67.0cm, x=202.2). Switching immediately to approach.
+2026-06-24 13:29:33,044 [INFO] Approaching the ball...
+2026-06-24 13:29:33,049 [WARNING] Obstacle detected (L:9 C:69 R:115) -> evasive maneuver
+2026-06-24 13:29:59,148 [INFO] Searching for ball...
+2026-06-24 13:29:59,151 [INFO] Target detected (dist=47.9cm, x=179.7). Switching immediately to approach.
+2026-06-24 13:29:59,166 [INFO] Approaching the ball...
+2026-06-24 13:30:08,638 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-24 13:30:08,649 [WARNING] Too close to obstacle for arm-lower safety (< 35.0cm) [L:33.0cm]. Skipping arm down, running obstacle avoidance.
+2026-06-24 13:30:08,652 [WARNING] Obstacle detected (L:33 C:35 R:73) -> evasive maneuver
+2026-06-24 13:30:09,551 [INFO] Searching for ball...
+2026-06-24 13:30:09,558 [INFO] Target detected (dist=28.7cm, x=164.9). Switching immediately to approach.
+2026-06-24 13:30:09,575 [INFO] Approaching the ball...
+2026-06-24 13:30:16,113 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-24 13:30:16,121 [WARNING] Too close to obstacle for arm-lower safety (< 35.0cm) [L:31.0cm]. Skipping arm down, running obstacle avoidance.
+2026-06-24 13:30:16,124 [WARNING] Obstacle detected (L:31 C:205 R:69) -> evasive maneuver
+2026-06-24 13:30:17,114 [INFO] Searching for ball...
+2026-06-24 13:30:17,122 [INFO] Target detected (dist=26.3cm, x=172.2). Switching immediately to approach.
+2026-06-24 13:30:17,146 [INFO] Approaching the ball...
+2026-06-24 13:30:17,150 [INFO] Target reached BALL_PICK_DISTANCE (30.0cm).
+2026-06-24 13:30:17,155 [WARNING] Too close to obstacle for arm-lower safety (< 35.0cm) [L:33.0cm]. Skipping arm down, running obstacle avoidance.
+2026-06-24 13:30:17,157 [WARNING] Obstacle detected (L:33 C:72 R:70) -> evasive maneuver
+2026-06-24 13:30:18,732 [INFO] Searching for ball...
+2026-06-24 13:30:18,739 [INFO] Target detected (dist=27.3cm, x=65.6). Switching immediately to approach.
+2026-06-24 13:30:18,758 [INFO] Approaching the ball...
+2026-06-24 13:30:20,882 [INFO] Completion of Step 4. Elapsed time: 91.9s
+2026-06-24 13:30:20,886 [INFO] --- Step 5: Returning home ---
+2026-06-24 13:30:20,895 [INFO] Moving to Home tag
+2026-06-24 13:30:25,807 [INFO] Pose: x=1.29, y=1.59, head=49.1, dist=162.2cm, turn=-149.6deg
+2026-06-24 13:30:25,835 [INFO] Step 5 align: turning R (error=-149.6deg)
+2026-06-24 13:30:26,970 [INFO] Pose: x=1.29, y=1.60, head=49.0, dist=162.2cm, turn=-149.5deg
+2026-06-24 13:30:26,987 [INFO] Step 5 align: turning R (error=-149.5deg)
+2026-06-24 13:30:27,519 [INFO] Pose: x=1.28, y=1.59, head=45.5, dist=161.4cm, turn=-145.6deg
+2026-06-24 13:30:27,525 [INFO] Step 5 align: turning R (error=-145.6deg)
+2026-06-24 13:30:28,693 [INFO] Pose: x=1.28, y=1.59, head=44.1, dist=161.2cm, turn=-144.0deg
+2026-06-24 13:30:28,696 [INFO] Step 5 align: turning R (error=-144.0deg)
+2026-06-24 13:30:29,661 [INFO] Pose: x=1.28, y=1.58, head=37.9, dist=160.3cm, turn=-137.8deg
+2026-06-24 13:30:29,702 [INFO] Step 5 align: turning R (error=-137.8deg)
+2026-06-24 13:30:30,493 [INFO] Pose: x=1.28, y=1.57, head=37.3, dist=159.5cm, turn=-137.5deg
+2026-06-24 13:30:30,535 [INFO] Step 5 align: turning R (error=-137.5deg)
+2026-06-24 13:30:31,444 [INFO] Pose: x=1.28, y=1.57, head=36.3, dist=159.6cm, turn=-136.4deg
+2026-06-24 13:30:31,450 [INFO] Step 5 align: turning R (error=-136.4deg)
+2026-06-24 13:30:32,309 [INFO] Pose: x=1.28, y=1.57, head=34.8, dist=159.4cm, turn=-135.1deg
+2026-06-24 13:30:32,312 [INFO] Step 5 align: turning R (error=-135.1deg)
+2026-06-24 13:30:33,266 [INFO] Pose: x=1.26, y=1.56, head=25.8, dist=157.8cm, turn=-125.1deg
+2026-06-24 13:30:33,317 [INFO] Step 5 align: turning R (error=-125.1deg)
+2026-06-24 13:30:34,556 [INFO] Pose: x=1.25, y=1.54, head=24.8, dist=156.4cm, turn=-124.0deg
+2026-06-24 13:30:34,784 [INFO] Step 5 align: turning R (error=-124.0deg)
+2026-06-24 13:30:35,244 [INFO] Pose: x=1.25, y=1.55, head=24.1, dist=156.9cm, turn=-123.2deg
+2026-06-24 13:30:35,248 [INFO] Step 5 align: turning R (error=-123.2deg)
+2026-06-24 13:30:35,704 [INFO] Pose: x=1.25, y=1.55, head=23.8, dist=156.6cm, turn=-122.9deg
+2026-06-24 13:30:35,708 [INFO] Step 5 align: turning R (error=-122.9deg)
+2026-06-24 13:30:36,441 [INFO] Pose: x=1.25, y=1.54, head=21.4, dist=156.3cm, turn=-120.5deg
+2026-06-24 13:30:36,467 [INFO] Step 5 align: turning R (error=-120.5deg)
+2026-06-24 13:30:37,351 [INFO] Pose: x=1.25, y=1.53, head=20.7, dist=155.3cm, turn=-119.8deg
+2026-06-24 13:30:37,373 [INFO] Step 5 align: turning R (error=-119.8deg)
+2026-06-24 13:30:38,207 [INFO] Pose: x=1.25, y=1.53, head=20.0, dist=155.4cm, turn=-119.1deg
+2026-06-24 13:30:38,216 [INFO] Step 5 align: turning R (error=-119.1deg)
+2026-06-24 13:30:38,746 [INFO] Pose: x=1.25, y=1.53, head=19.9, dist=155.4cm, turn=-119.0deg
+2026-06-24 13:30:38,750 [INFO] Step 5 align: turning R (error=-119.0deg)
+2026-06-24 13:30:40,277 [INFO] Pose: x=1.25, y=1.53, head=19.7, dist=155.2cm, turn=-118.9deg
+2026-06-24 13:30:40,310 [INFO] Step 5 align: turning R (error=-118.9deg)
+2026-06-24 13:30:41,303 [INFO] Pose: x=1.25, y=1.53, head=19.5, dist=155.3cm, turn=-118.7deg
+2026-06-24 13:30:41,309 [INFO] Step 5 align: turning R (error=-118.7deg)
+2026-06-24 13:30:42,428 [INFO] Pose: x=1.25, y=1.53, head=19.4, dist=154.7cm, turn=-118.6deg
+2026-06-24 13:30:42,435 [INFO] Step 5 align: turning R (error=-118.6deg)
+2026-06-24 13:30:43,131 [INFO] Pose: x=1.25, y=1.52, head=18.6, dist=154.4cm, turn=-117.9deg
+2026-06-24 13:30:43,133 [INFO] Step 5 align: turning R (error=-117.9deg)
+2026-06-24 13:30:44,083 [INFO] Pose: x=1.25, y=1.52, head=18.5, dist=154.4cm, turn=-117.8deg
+2026-06-24 13:30:44,126 [INFO] Step 5 align: turning R (error=-117.8deg)
+2026-06-24 13:30:45,299 [INFO] Pose: x=1.25, y=1.53, head=18.3, dist=154.6cm, turn=-117.6deg
+2026-06-24 13:30:45,394 [INFO] Step 5 align: turning R (error=-117.6deg)
+2026-06-24 13:30:46,019 [INFO] Pose: x=1.25, y=1.53, head=18.3, dist=154.6cm, turn=-117.6deg
+2026-06-24 13:30:46,026 [INFO] Step 5 align: turning R (error=-117.6deg)
+2026-06-24 13:30:46,953 [INFO] Pose: x=1.25, y=1.52, head=18.2, dist=154.4cm, turn=-117.5deg
+2026-06-24 13:30:46,957 [INFO] Step 5 align: turning R (error=-117.5deg)
+2026-06-24 13:30:47,589 [INFO] Pose: x=1.25, y=1.52, head=18.2, dist=154.4cm, turn=-117.5deg
+2026-06-24 13:30:47,653 [INFO] Step 5 align: turning R (error=-117.5deg)
+2026-06-24 13:30:48,429 [INFO] Pose: x=1.25, y=1.52, head=18.4, dist=154.1cm, turn=-117.7deg
+2026-06-24 13:30:48,439 [INFO] Step 5 align: turning R (error=-117.7deg)
+2026-06-24 13:30:49,225 [INFO] Pose: x=1.25, y=1.52, head=18.4, dist=154.0cm, turn=-117.8deg
+2026-06-24 13:30:49,237 [INFO] Step 5 align: turning R (error=-117.8deg)
+2026-06-24 13:30:50,081 [INFO] Pose: x=1.25, y=1.52, head=18.1, dist=154.0cm, turn=-117.5deg
+2026-06-24 13:30:50,087 [INFO] Step 5 align: turning R (error=-117.5deg)
+2026-06-24 13:30:51,470 [INFO] Pose: x=1.25, y=1.52, head=17.8, dist=154.1cm, turn=-117.2deg
+2026-06-24 13:30:51,482 [INFO] Step 5 align: turning R (error=-117.2deg)
+2026-06-24 13:30:52,385 [INFO] Pose: x=1.25, y=1.52, head=17.7, dist=154.0cm, turn=-117.1deg
+2026-06-24 13:30:52,398 [INFO] Step 5 align: turning R (error=-117.1deg)
+2026-06-24 13:30:53,427 [INFO] Pose: x=1.26, y=1.52, head=17.0, dist=153.7cm, turn=-116.6deg
+2026-06-24 13:30:53,437 [INFO] Step 5 align: turning R (error=-116.6deg)
+2026-06-24 13:30:53,941 [INFO] Pose: x=1.26, y=1.51, head=16.8, dist=153.5cm, turn=-116.4deg
+2026-06-24 13:30:53,949 [INFO] Step 5 align: turning R (error=-116.4deg)
+2026-06-24 13:30:54,693 [INFO] Pose: x=1.26, y=1.52, head=16.3, dist=153.7cm, turn=-116.0deg
+2026-06-24 13:30:54,827 [INFO] Step 5 align: turning R (error=-116.0deg)
+2026-06-24 13:30:56,088 [INFO] Pose: x=1.26, y=1.51, head=16.2, dist=153.4cm, turn=-116.0deg
+2026-06-24 13:30:56,108 [INFO] Step 5 align: turning R (error=-116.0deg)
+2026-06-24 13:30:56,690 [INFO] Pose: x=1.26, y=1.51, head=16.1, dist=153.2cm, turn=-116.0deg
+2026-06-24 13:30:56,700 [INFO] Step 5 align: turning R (error=-116.0deg)
+2026-06-24 13:30:57,150 [INFO] Pose: x=1.26, y=1.51, head=16.1, dist=153.1cm, turn=-116.0deg
+2026-06-24 13:30:57,156 [INFO] Step 5 align: turning R (error=-116.0deg)
+2026-06-24 13:30:57,833 [INFO] Pose: x=1.27, y=1.51, head=16.0, dist=153.1cm, turn=-115.9deg
+2026-06-24 13:30:57,859 [INFO] Step 5 align: turning R (error=-115.9deg)
+2026-06-24 13:30:58,689 [INFO] Pose: x=1.27, y=1.51, head=15.9, dist=153.1cm, turn=-115.9deg
+2026-06-24 13:30:58,694 [INFO] Step 5 align: turning R (error=-115.9deg)
+2026-06-24 13:30:59,451 [INFO] Pose: x=1.24, y=1.56, head=11.2, dist=158.2cm, turn=-109.8deg
+2026-06-24 13:30:59,458 [INFO] Step 5 align: turning R (error=-109.8deg)
+2026-06-24 13:30:59,876 [INFO] Pose: x=1.22, y=1.52, head=10.8, dist=153.2cm, turn=-109.1deg
+2026-06-24 13:30:59,881 [INFO] Step 5 align: turning R (error=-109.1deg)
+2026-06-24 13:31:01,168 [INFO] Pose: x=1.23, y=1.50, head=11.4, dist=151.7cm, turn=-110.0deg
+2026-06-24 13:31:01,189 [INFO] Step 5 align: turning R (error=-110.0deg)
+2026-06-24 13:31:02,157 [INFO] Pose: x=1.22, y=1.51, head=9.9, dist=152.2cm, turn=-108.2deg
+2026-06-24 13:31:02,173 [INFO] Step 5 align: turning R (error=-108.2deg)
+2026-06-24 13:31:02,626 [INFO] Pose: x=1.22, y=1.51, head=9.8, dist=152.1cm, turn=-108.0deg
+2026-06-24 13:31:02,631 [INFO] Step 5 align: turning R (error=-108.0deg)
+2026-06-24 13:31:03,449 [INFO] Pose: x=1.28, y=1.48, head=2.2, dist=150.6cm, turn=-102.9deg
+2026-06-24 13:31:03,452 [INFO] Step 5 align: turning R (error=-102.9deg)
+2026-06-24 13:31:04,081 [INFO] Pose: x=1.26, y=1.48, head=0.9, dist=149.8cm, turn=-100.9deg
+2026-06-24 13:31:04,084 [INFO] Step 5 align: turning R (error=-100.9deg)
+2026-06-24 13:31:04,968 [INFO] Pose: x=1.24, y=1.43, head=357.8, dist=144.7cm, turn=-97.4deg
+2026-06-24 13:31:05,019 [INFO] Step 5 align: turning R (error=-97.4deg)
+2026-06-24 13:31:05,747 [INFO] Pose: x=1.22, y=1.44, head=354.5, dist=145.7cm, turn=-93.2deg
+2026-06-24 13:31:05,752 [INFO] Step 5 align: turning R (error=-93.2deg)
+2026-06-24 13:31:08,119 [INFO] Pose: x=1.22, y=1.43, head=354.6, dist=144.8cm, turn=-93.3deg
+2026-06-24 13:31:08,136 [INFO] Step 5 align: turning R (error=-93.3deg)
+2026-06-24 13:31:09,695 [INFO] Pose: x=1.22, y=1.71, head=327.6, dist=172.4cm, turn=-65.0deg
+2026-06-24 13:31:09,702 [INFO] Step 5 align: turning R (error=-65.0deg)
+2026-06-24 13:31:10,543 [INFO] Pose: x=1.19, y=1.47, head=343.3, dist=148.4cm, turn=-80.7deg
+2026-06-24 13:31:10,551 [INFO] Step 5 align: turning R (error=-80.7deg)
+2026-06-24 13:31:11,280 [INFO] Pose: x=1.18, y=1.61, head=327.3, dist=162.4cm, turn=-63.7deg
+2026-06-24 13:31:11,320 [INFO] Step 5 align: turning R (error=-63.7deg)
+2026-06-24 13:31:12,586 [INFO] Pose: x=1.19, y=1.64, head=325.2, dist=164.8cm, turn=-61.9deg
+2026-06-24 13:31:12,905 [INFO] Step 5 align: turning R (error=-61.9deg)
+2026-06-24 13:31:13,765 [INFO] Pose: x=1.17, y=1.67, head=309.0, dist=167.5cm, turn=-44.9deg
+2026-06-24 13:31:13,768 [INFO] Step 5 align: turning R (error=-44.9deg)
+2026-06-24 13:31:14,492 [INFO] Pose: x=1.17, y=1.65, head=310.0, dist=165.4cm, turn=-45.8deg
+2026-06-24 13:31:14,522 [INFO] Step 5 align: turning R (error=-45.8deg)
+2026-06-24 13:31:15,316 [INFO] Pose: x=1.18, y=1.66, head=306.4, dist=167.1cm, turn=-42.6deg
+2026-06-24 13:31:15,334 [INFO] Step 5 align: turning R (error=-42.6deg)
+2026-06-24 13:31:16,067 [INFO] Pose: x=1.19, y=1.80, head=295.3, dist=180.8cm, turn=-31.3deg
+2026-06-24 13:31:16,072 [INFO] Step 5 align: turning R (error=-31.3deg)
+2026-06-24 13:31:16,883 [INFO] Pose: x=1.19, y=1.80, head=294.8, dist=181.2cm, turn=-30.8deg
+2026-06-24 13:31:16,892 [INFO] Step 5 align: turning R (error=-30.8deg)
+2026-06-24 13:31:17,853 [INFO] Pose: x=1.19, y=1.81, head=293.5, dist=181.7cm, turn=-29.4deg
+2026-06-24 13:31:17,879 [INFO] Step 5 align: turning R (error=-29.4deg)
+2026-06-24 13:31:18,852 [INFO] Pose: x=1.18, y=1.81, head=293.4, dist=181.7cm, turn=-29.0deg
+2026-06-24 13:31:18,856 [INFO] Step 5 align: turning R (error=-29.0deg)
+2026-06-24 13:31:19,551 [INFO] Pose: x=1.17, y=1.81, head=291.6, dist=182.0cm, turn=-27.1deg
+2026-06-24 13:31:19,554 [INFO] Step 5 align: turning R (error=-27.1deg)
+2026-06-24 13:31:20,429 [INFO] Pose: x=1.18, y=1.82, head=291.9, dist=182.9cm, turn=-27.6deg
+2026-06-24 13:31:20,451 [INFO] Step 5 align: turning R (error=-27.6deg)
+2026-06-24 13:31:21,242 [INFO] Pose: x=1.18, y=1.82, head=290.5, dist=182.9cm, turn=-26.1deg
+2026-06-24 13:31:21,275 [INFO] Step 5 align: turning R (error=-26.1deg)
+2026-06-24 13:31:22,256 [INFO] Pose: x=1.17, y=1.82, head=289.1, dist=182.7cm, turn=-24.4deg
+2026-06-24 13:31:22,262 [INFO] Step 5 align: turning R (error=-24.4deg)
+2026-06-24 13:31:23,362 [INFO] Pose: x=1.16, y=1.81, head=288.1, dist=181.8cm, turn=-23.1deg
+2026-06-24 13:31:23,367 [INFO] Step 5 align: turning R (error=-23.1deg)
+2026-06-24 13:31:24,491 [INFO] Pose: x=1.15, y=1.80, head=287.3, dist=180.4cm, turn=-22.2deg
+2026-06-24 13:31:24,517 [INFO] Step 5 align: turning R (error=-22.2deg)
+2026-06-24 13:31:25,727 [INFO] Pose: x=1.24, y=1.53, head=268.6, dist=154.7cm, turn=-7.5deg
+2026-06-24 13:31:25,731 [INFO] Step 5 approach: moving forward toward home
+2026-06-24 13:31:26,450 [INFO] Pose: x=1.07, y=1.80, head=268.1, dist=180.5cm, turn=-0.4deg
+2026-06-24 13:31:26,457 [INFO] Step 5 approach: moving forward toward home
+2026-06-24 13:31:27,100 [INFO] Pose: x=1.25, y=1.86, head=262.6, dist=187.5cm, turn=-0.2deg
+2026-06-24 13:31:27,133 [INFO] Step 5 approach: moving forward toward home
+2026-06-24 13:31:28,594 [INFO] Pose: x=1.12, y=1.83, head=276.9, dist=183.9cm, turn=-10.8deg
+2026-06-24 13:31:28,636 [INFO] Step 5 align: turning R (error=-10.8deg)
+2026-06-24 13:31:29,265 [INFO] Pose: x=1.12, y=1.79, head=277.1, dist=179.6cm, turn=-11.0deg
+2026-06-24 13:31:29,269 [INFO] Step 5 align: turning R (error=-11.0deg)
+2026-06-24 13:31:45,109 [INFO] Pose: x=1.13, y=1.79, head=274.9, dist=179.5cm, turn=-9.1deg
+2026-06-24 13:31:45,299 [INFO] Step 5 approach: moving forward toward home
+2026-06-24 13:31:47,341 [INFO] Pose: x=0.74, y=1.19, head=225.3, dist=121.9cm, turn=+56.9deg
+2026-06-24 13:31:47,345 [INFO] Step 5 align: turning L (error=+56.9deg)
+2026-06-24 13:31:48,187 [INFO] Pose: x=1.50, y=1.55, head=201.6, dist=163.1cm, turn=+50.6deg
+2026-06-24 13:31:48,339 [INFO] Step 5 align: turning L (error=+50.6deg)
+2026-06-24 13:31:49,380 [INFO] Pose: x=1.34, y=1.76, head=223.7, dist=179.5cm, turn=+35.2deg
+2026-06-24 13:31:49,385 [INFO] Step 5 align: turning L (error=+35.2deg)
+2026-06-24 13:31:50,270 [INFO] Pose: x=1.49, y=1.57, head=217.9, dist=164.6cm, turn=+34.7deg
+2026-06-24 13:31:50,274 [INFO] Step 5 align: turning L (error=+34.7deg)
+2026-06-24 13:31:50,936 [ERROR] Failed to reach home within time limit. Skipping drop sequence and keeping arm UP.
+2026-06-24 13:31:50,944 [INFO] Completion of Step 5. Elapsed time: 90.1s
+2026-06-24 13:31:50,954 [INFO] Waiting for physical button press to exit program...
+2026-06-24 13:32:54,161 [WARNING] Stop command received via physical button on GPIO 25.
+2026-06-24 13:32:54,169 [INFO] Second press received: Lowering ARM to DOWN pose before exiting.
+2026-06-24 13:32:54,710 [INFO] Exit button press received.
+2026-06-24 13:32:54,715 [INFO] Lowering ARM to DOWN pose before exiting.
+2026-06-24 13:32:55,493 [INFO] Camera stopped
+2026-06-24 13:32:55,495 [INFO] Exiting immediately via STOP button.

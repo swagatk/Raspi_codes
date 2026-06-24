@@ -56,7 +56,7 @@ TARGET_MATCH_MAX_DIST_PX = 110.0
 TARGET_SWITCH_AREA_GAIN = 2.2
 
 # Arm-down wall safety via PiCamera AprilTag pose (cm)
-SAFE_WALL_DISTANCE = 40.0
+SAFE_WALL_DISTANCE = 35.0
 
 # AprilTag detector family used across integration modules.
 # Common values: 'tag36h11', 'tagStandard41h12'
@@ -70,8 +70,8 @@ PICAM_TAG_POSE_SCALE = 2.0
 # Mission Timing (seconds)
 STEP2_CONFIRM_HOME_TIMEOUT_S = 5.0
 STEP3_READY_TO_EXPLORE_S = 5.0
-STEP4_SEARCH_AND_APPROACH_TIMEOUT_S = 65.0
-STEP5_RETURN_HOME_TIMEOUT_S = 110.0
+STEP4_SEARCH_AND_APPROACH_TIMEOUT_S = 85.0
+STEP5_RETURN_HOME_TIMEOUT_S = 90.0
 
 # Step 5 behavior (localize -> rotate -> coarse forward step)
 COURSE_FWD_MOTION_DIST_CM = 30.0
