@@ -15,9 +15,10 @@ import config
 from config import *
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log")
-if os.path.exists(LOG_DIR):
-    shutil.rmtree(LOG_DIR, ignore_errors=True)
-os.makedirs(LOG_DIR, exist_ok=True)
+if DEBUG_MODE:
+    if os.path.exists(LOG_DIR):
+        shutil.rmtree(LOG_DIR, ignore_errors=True)
+    os.makedirs(LOG_DIR, exist_ok=True)
 
 class TqdmLoggingHandler(logging.Handler):
     def emit(self, record):
@@ -28,13 +29,14 @@ class TqdmLoggingHandler(logging.Handler):
         except Exception:
             self.handleError(record)
 
+handlers = [TqdmLoggingHandler()]
+if DEBUG_MODE:
+    handlers.append(logging.FileHandler(os.path.join(LOG_DIR, "motion_plan.log")))
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(LOG_DIR, "motion_plan.log")),
-        TqdmLoggingHandler()
-    ]
+    handlers=handlers
 )
 
 button_pressed = False
@@ -315,11 +317,12 @@ def save_annotated_frame(vision, filename):
         cv2.putText(annotated, f"Dist: {ball_distance:.1f}cm", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     
-    try:
-        full_path = os.path.join(LOG_DIR, filename)
-        cv2.imwrite(full_path, annotated)
-    except Exception as e:
-        logging.error(f"Failed to save image {full_path}: {e}")
+    if DEBUG_MODE:
+        try:
+            full_path = os.path.join(LOG_DIR, filename)
+            cv2.imwrite(full_path, annotated)
+        except Exception as e:
+            logging.error(f"Failed to save image {full_path}: {e}")
 
 def save_home_tag_frame(vision, tag_id, filename):
     frame = getattr(vision, 'active_frame', None)
@@ -354,10 +357,11 @@ def save_home_tag_frame_from_source(frame, tags, tag_id, filename):
         except Exception:
             pass
 
-    try:
-        cv2.imwrite(os.path.join(LOG_DIR, filename), annotated)
-    except Exception as e:
-        logging.error(f"Failed to save image {filename}: {e}")
+    if DEBUG_MODE:
+        try:
+            cv2.imwrite(os.path.join(LOG_DIR, filename), annotated)
+        except Exception as e:
+            logging.error(f"Failed to save image {filename}: {e}")
 
 def get_pose_with_camera_fallback(vision, arena_map, estimate_robot_pose_func):
     # Try USB first, then PiCamera. Returns (pose, camera_name) where camera_name in {'usb','picam'}.
@@ -520,10 +524,11 @@ def save_tag_detection_frame_from_source(frame, tags, filename):
         except Exception:
             continue
 
-    try:
-        cv2.imwrite(os.path.join(LOG_DIR, filename), annotated)
-    except Exception as e:
-        logging.warning(f"Failed to save Step 5 tag detection image {filename}: {e}")
+    if DEBUG_MODE:
+        try:
+            cv2.imwrite(os.path.join(LOG_DIR, filename), annotated)
+        except Exception as e:
+            logging.warning(f"Failed to save Step 5 tag detection image {filename}: {e}")
 
 def get_confirmed_pose_with_camera_fallback(vision, arena_map, estimate_robot_pose_func):
     # Confirm pose across consecutive frames to reject one-off jitter.
@@ -770,6 +775,18 @@ def main():
         logging.error("Home tags not detected within time limit. Exiting mission.")
         sys.exit(1)
         
+    logging.info("Checking ultrasonic sensors before lowering arm.")
+    l_safe = is_valid_distance_cm(robot.latest_L) and robot.latest_L > config.SAFE_WALL_DISTANCE
+    c_safe = is_valid_distance_cm(robot.latest_C) and robot.latest_C > config.SAFE_WALL_DISTANCE
+    r_safe = is_valid_distance_cm(robot.latest_R) and robot.latest_R > config.SAFE_WALL_DISTANCE
+    
+    if l_safe and c_safe and r_safe:
+        logging.info("All sensor readings are greater than SAFE_WALL_DISTANCE. Lowering robot arm.")
+        robot.arm_down()
+        time.sleep(1.0)
+    else:
+        logging.warning(f"Obstacle detected within safe wall distance (L:{robot.latest_L:.1f}, C:{robot.latest_C:.1f}, R:{robot.latest_R:.1f}). Arm will not be lowered.")
+
     step2_elapsed_s = time.time() - start_time
     step2_saved_s = max(0.0, STEP2_CONFIRM_HOME_TIMEOUT_S - step2_elapsed_s)
     logging.info(f"Completion of Step 2. Elapsed time: {step2_elapsed_s:.1f}s")
@@ -1143,8 +1160,8 @@ def main():
                 logging.info(f"Step 5 blind approach (tag lost, but very close or within threshold): blind forward step. Ultrasonic: L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
                 execute_forward_with_sensor_guard(
                     STEP5_STEADY_FORWARD_SPEED,
-                    0.2,
-                    0.1,
+                    STEP5_STEADY_FORWARD_BURST_S,
+                    STEP5_STEADY_FORWARD_SETTLE_S,
                     "Step 5 blind forward",
                     check_line=True
                 )
@@ -1154,8 +1171,8 @@ def main():
                  logging.info(f"Step 5 blind approach (tag lost near {dist_to_home_cm:.1f}cm): creeping forward. Ultrasonic: L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
                  execute_forward_with_sensor_guard(
                     STEP5_STEADY_FORWARD_SPEED,
-                    0.2,
-                    0.1,
+                    STEP5_STEADY_FORWARD_BURST_S,
+                    STEP5_STEADY_FORWARD_SETTLE_S,
                     "Step 5 blind creep",
                     check_line=True
                  )
@@ -1172,8 +1189,8 @@ def main():
             logging.info(f"Step 5 blind approach (dist <= {MOV_ST_DIST_TH}cm): blind forward step. Ultrasonic: L={robot.latest_L:.1f} C={robot.latest_C:.1f} R={robot.latest_R:.1f}")
             execute_forward_with_sensor_guard(
                 STEP5_STEADY_FORWARD_SPEED,
-                0.2,
-                0.1,
+                STEP5_STEADY_FORWARD_BURST_S,
+                STEP5_STEADY_FORWARD_SETTLE_S,
                 "Step 5 blind forward",
                 check_line=True
             )
@@ -1189,18 +1206,36 @@ def main():
         if abs(route_turn) > STEP5_HEADING_TOL_DEG:
             turn_direction = 'L' if route_turn > 0 else 'R'
             search_turn_dir = turn_direction # Next blind search should be same direction
-            logging.info(f"Step 5 align: turning {turn_direction} (error={route_turn:+.1f}deg)")
-            execute_burst(turn_direction, STEP5_FINE_TURN_SPEED, 0.1, 0.2)
+            
+            if dist_to_home_cm <= ALIGN_DIST_TO_HOME:
+                logging.info(f"Step 5 align (fine): turning {turn_direction} (error={route_turn:+.1f}deg)")
+                execute_burst(turn_direction, STEP5_FINE_TURN_SPEED, STEP5_FINE_TURN_BURST_S, CENTERING_SETTLE_S)
+            else:
+                if abs(route_turn) >= STEP5_COARSE_TURN_THRESHOLD_DEG:
+                    logging.info(f"Step 5 align (coarse): turning {turn_direction} (error={route_turn:+.1f}deg)")
+                    execute_burst(turn_direction, STEP5_COARSE_TURN_SPEED, STEP5_COARSE_TURN_BURST_S, CENTERING_SETTLE_S)
+                else:
+                    logging.info(f"Step 5 align: turning {turn_direction} (error={route_turn:+.1f}deg)")
+                    execute_burst(turn_direction, STEP5_FINE_TURN_SPEED, STEP5_FINE_TURN_BURST_S, CENTERING_SETTLE_S)
         else:
-            logging.info(f"Step 5 approach: moving forward toward home")
-            # If we are close, check lines. If far, don't check lines.
-            execute_forward_with_sensor_guard(
-                STEP5_STEADY_FORWARD_SPEED,
-                0.2,
-                0.1,
-                "Step 5 forward",
-                check_line=(dist_to_home_cm <= ALIGN_DIST_TO_HOME)
-            )
+            if dist_to_home_cm <= ALIGN_DIST_TO_HOME:
+                logging.info(f"Step 5 approach (close): moving slowly forward toward home")
+                execute_forward_with_sensor_guard(
+                    STEP5_STEADY_FORWARD_SPEED,
+                    STEP5_STEADY_FORWARD_BURST_S,
+                    STEP5_STEADY_FORWARD_SETTLE_S,
+                    "Step 5 forward (close)",
+                    check_line=True
+                )
+            else:
+                logging.info(f"Step 5 approach (far): moving fast forward toward home")
+                execute_forward_with_sensor_guard(
+                    STEP5_STEADY_FORWARD_SPEED,
+                    STEP5_FAR_FORWARD_BURST_S,
+                    STEP5_STEADY_FORWARD_SETTLE_S,
+                    "Step 5 forward (far)",
+                    check_line=False
+                )
 
     if not mission_running:
         logging.info("Mission stopped before drop sequence.")

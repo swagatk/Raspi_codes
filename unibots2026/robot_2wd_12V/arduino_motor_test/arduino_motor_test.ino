@@ -351,7 +351,9 @@ void loop() {
   if (millis() - lastSensorTime > 100) {
     lastSensorTime = millis();
     int d1 = getDistance(leftTrig, leftEcho);
+    delay(15);
     int d2 = getDistance(centerTrig, centerEcho);
+    delay(15);
     int d3 = getDistance(rightTrig, rightEcho);
     int lineLeft = digitalRead(PIN_LINE_SENSOR_LEFT);
     int lineRight = digitalRead(PIN_LINE_SENSOR_RIGHT);

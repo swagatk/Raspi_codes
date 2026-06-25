@@ -34,21 +34,22 @@ class RobotController:
         while self.running:
             if self.ser and self.ser.in_waiting > 0:
                 try:
-                    line = self.ser.readline().decode('utf-8').rstrip()
-                    if line.startswith("D,"):
-                        parts = line.split(",")
-                        if len(parts) == 4:
-                            self.latest_L = int(parts[1])
-                            self.latest_C = int(parts[2])
-                            self.latest_R = int(parts[3])
-                        if len(parts) >= 6:
-                            self.line_L = int(parts[4])
-                            self.line_R = int(parts[5])
-                    elif line.startswith("L,"):
-                        parts = line.split(",")
-                        if len(parts) >= 3:
-                            self.line_L = int(parts[1])
-                            self.line_R = int(parts[2])
+                    while self.ser.in_waiting > 0:
+                        line = self.ser.readline().decode('utf-8').rstrip()
+                        if line.startswith("D,"):
+                            parts = line.split(",")
+                            if len(parts) == 4:
+                                self.latest_L = int(parts[1])
+                                self.latest_C = int(parts[2])
+                                self.latest_R = int(parts[3])
+                            if len(parts) >= 6:
+                                self.line_L = int(parts[4])
+                                self.line_R = int(parts[5])
+                        elif line.startswith("L,"):
+                            parts = line.split(",")
+                            if len(parts) >= 3:
+                                self.line_L = int(parts[1])
+                                self.line_R = int(parts[2])
                 except:
                     pass
             time.sleep(0.01)
