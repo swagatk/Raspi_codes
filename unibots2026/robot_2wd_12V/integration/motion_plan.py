@@ -809,9 +809,16 @@ def main():
     logging.info("--- Step 4: Search and Approach balls ---")
     exploration_start = time.time()
     step4_budget_s = STEP4_SEARCH_AND_APPROACH_TIMEOUT_S + step3_saved_s
+    impossible_pick_flag = False
     
     while mission_running and (time.time() - exploration_start < step4_budget_s):
         
+        if impossible_pick_flag:
+            logging.info(f"Impossible pick flagged. Rotating by {config.STEP4_IMPOSSIBLE_PICK_ROTATE} degrees to bypass target.")
+            duration_s = (config.STEP4_IMPOSSIBLE_PICK_ROTATE / 180.0) * config.STEP3_TURN_DURATION_S
+            execute_burst(config.SEARCH_TURN_DIR, config.STEP3_TURN_SPEED, duration_s, config.SEARCH_TURN_SETTLE_S)
+            impossible_pick_flag = False
+
         # 1. Search for target
         logging.info("Searching for ball...")
         ball_found = False
@@ -953,9 +960,9 @@ def main():
             if blocked_channels:
                 logging.warning(
                     f"Too close to obstacle for arm-lower safety (< {SAFE_WALL_DISTANCE:.1f}cm) "
-                    f"[{', '.join(blocked_channels)}]. Skipping arm down, running obstacle avoidance."
+                    f"[{', '.join(blocked_channels)}]. Skipping arm down, setting impossible pick flag."
                 )
-                run_obstacle_avoidance(robot)
+                impossible_pick_flag = True
                 reached = False
                 
                 # Discard current target so we search for a new ball.
