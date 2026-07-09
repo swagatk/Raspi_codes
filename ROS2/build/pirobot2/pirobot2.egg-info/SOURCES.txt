@@ -2,6 +2,7 @@ package.xml
 setup.cfg
 setup.py
 launch/imu_publisher.launch.py
+launch/lidar_imu_rviz_client.launch.py
 launch/lidar_publisher.launch.py
 launch/lidar_rviz_client.launch.py
 pirobot2/__init__.py
@@ -16,4 +17,5 @@ pirobot2.egg-info/requires.txt
 pirobot2.egg-info/top_level.txt
 pirobot2.egg-info/zip-safe
 resource/pirobot2
+rviz/lidar_imu_combined.rviz
 rviz/lidar_scan.rviz

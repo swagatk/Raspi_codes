@@ -1,0 +1,21 @@
+[3.941s] Invoking command in '/home/pi/Raspi_codes/ROS2/build/pirobot2': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data
+[5.283s] running develop
+[6.127s] running egg_info
+[6.191s] writing pirobot2.egg-info/PKG-INFO
+[6.192s] writing dependency_links to pirobot2.egg-info/dependency_links.txt
+[6.196s] writing entry points to pirobot2.egg-info/entry_points.txt
+[6.197s] writing requirements to pirobot2.egg-info/requires.txt
+[6.197s] writing top-level names to pirobot2.egg-info/top_level.txt
+[6.331s] reading manifest file 'pirobot2.egg-info/SOURCES.txt'
+[6.334s] writing manifest file 'pirobot2.egg-info/SOURCES.txt'
+[6.421s] running build_ext
+[6.424s] Creating /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2.egg-link (link to .)
+[6.427s] Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[6.427s] Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[6.429s] Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[6.429s] 
+[6.433s] Installed /home/pi/Raspi_codes/ROS2/build/pirobot2
+[6.433s] running symlink_data
+[6.434s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_imu_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[6.434s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/rviz/lidar_imu_combined.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+[6.671s] Invoked command in '/home/pi/Raspi_codes/ROS2/build/pirobot2' returned '0': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data
