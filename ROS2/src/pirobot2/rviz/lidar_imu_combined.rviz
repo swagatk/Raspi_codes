@@ -31,7 +31,7 @@ Visualization Manager:
         Reliability Policy: Best Effort
         Value: /scan
       Use Fixed Frame: true
-    - Class: rviz_default_plugins/Imu
+    - Class: rviz_imu_plugin/Imu
       Enabled: true
       Name: IMU
       Topic:
