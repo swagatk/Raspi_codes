@@ -19,8 +19,28 @@ def generate_launch_description():
 
     fixed_frame_arg = DeclareLaunchArgument(
         'fixed_frame',
-        default_value='base_link',
+        default_value='map',
         description='RViz fixed frame; should match publisher frame_id or available TF frame',
+    )
+
+    tf_parent_arg = DeclareLaunchArgument(
+        'tf_parent_frame',
+        default_value='map',
+        description='Parent frame for static transform used by RViz',
+    )
+
+    tf_child_arg = DeclareLaunchArgument(
+        'tf_child_frame',
+        default_value='base_link',
+        description='Child frame for static transform used by RViz',
+    )
+
+    static_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='pirobot2_rviz_static_tf',
+        output='screen',
+        arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_parent_frame'), LaunchConfiguration('tf_child_frame')],
     )
 
     rviz_node = Node(
@@ -34,5 +54,8 @@ def generate_launch_description():
     return LaunchDescription([
         rviz_config_arg,
         fixed_frame_arg,
+        tf_parent_arg,
+        tf_child_arg,
+        static_tf_node,
         rviz_node,
     ])
