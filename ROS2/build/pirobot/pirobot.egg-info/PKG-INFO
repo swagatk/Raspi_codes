@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: pirobot
+Version: 0.0.0
+Summary: ROS2 Control Interface for PiRobot
+Maintainer: Swagat Kumar
+Maintainer-email: swagat.kumar@gmail.com
+License: Apache-2.0

@@ -1,0 +1,8 @@
+[console_scripts]
+aoclient = pirobot.avoid_obstacle_client:main
+aoservice = pirobot.avoid_obstacle_service:main
+handpub = pirobot.hand_recogn_publisher:main
+imagepub = pirobot.image_publisher:main
+imagesub = pirobot.image_subscriber:main
+keypub = pirobot.keyboard_publisher:main
+motionsub = pirobot.motion_subscriber:main

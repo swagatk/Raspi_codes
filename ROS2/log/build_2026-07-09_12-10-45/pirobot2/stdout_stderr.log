@@ -1,0 +1,20 @@
+running develop
+running egg_info
+writing pirobot2.egg-info/PKG-INFO
+writing dependency_links to pirobot2.egg-info/dependency_links.txt
+writing entry points to pirobot2.egg-info/entry_points.txt
+writing requirements to pirobot2.egg-info/requires.txt
+writing top-level names to pirobot2.egg-info/top_level.txt
+reading manifest file 'pirobot2.egg-info/SOURCES.txt'
+writing manifest file 'pirobot2.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2.egg-link (link to .)
+Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+
+Installed /home/pi/Raspi_codes/ROS2/build/pirobot2
+running symlink_data
+symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+creating /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/rviz/lidar_scan.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz

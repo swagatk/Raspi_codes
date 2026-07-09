@@ -2,6 +2,8 @@
 
 import importlib
 import math
+import os
+import sys
 import threading
 import time
 
@@ -9,6 +11,20 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
+
+
+def load_rplidar_class():
+    try:
+        return importlib.import_module('rplidar').RPLidar
+    except ImportError:
+        venv_path = os.environ.get('VIRTUAL_ENV')
+        if venv_path:
+            version = f'python{sys.version_info.major}.{sys.version_info.minor}'
+            site_packages = os.path.join(venv_path, 'lib', version, 'site-packages')
+            if os.path.isdir(site_packages) and site_packages not in sys.path:
+                sys.path.insert(0, site_packages)
+                return importlib.import_module('rplidar').RPLidar
+        raise
 
 
 class RPLidarScanNode(Node):
@@ -37,10 +53,13 @@ class RPLidarScanNode(Node):
         self.last_scan_time = None
 
         try:
-            self.rplidar_class = importlib.import_module('rplidar').RPLidar
+            self.rplidar_class = load_rplidar_class()
         except ImportError as exc:
             raise RuntimeError(
-                'Python package "rplidar" is not installed. Run: python3 -m pip install rplidar'
+                'Python package "rplidar" is not available for this interpreter. '
+                f'Interpreter: {sys.executable}. '
+                'If using a virtualenv, activate it before launch or rebuild after activation. '
+                'Install command: python3 -m pip install rplidar'
             ) from exc
 
         self.reader_thread = threading.Thread(target=self._read_loop, daemon=True)

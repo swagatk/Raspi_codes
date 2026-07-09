@@ -13,4 +13,13 @@ launch/lidar_rviz_client.launch.py
 launch/rviz_only.launch.py
 launch/view_lidar.launch.py
 resource/rplidar_scan
+rplidar_scan/__init__.py
+rplidar_scan/rplidar_scan_node.py
+rplidar_scan.egg-info/PKG-INFO
+rplidar_scan.egg-info/SOURCES.txt
+rplidar_scan.egg-info/dependency_links.txt
+rplidar_scan.egg-info/entry_points.txt
+rplidar_scan.egg-info/requires.txt
+rplidar_scan.egg-info/top_level.txt
+rplidar_scan.egg-info/zip-safe
 rviz/rplidar_scan.rviz

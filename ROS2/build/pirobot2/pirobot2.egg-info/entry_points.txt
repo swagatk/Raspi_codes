@@ -1,0 +1,4 @@
+[console_scripts]
+imu_publisher_node = pirobot2.imu_publisher:main
+lidar_publisher_node = pirobot2.lidar_publisher:main
+pirobot2 = pirobot2.pirobot2:main
