@@ -1,0 +1,19 @@
+[4.400s] Invoking command in '/home/pi/Raspi_codes/ROS2/build/pirobot2': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data
+[5.724s] running develop
+[6.569s] running egg_info
+[6.638s] writing pirobot2.egg-info/PKG-INFO
+[6.639s] writing dependency_links to pirobot2.egg-info/dependency_links.txt
+[6.643s] writing entry points to pirobot2.egg-info/entry_points.txt
+[6.644s] writing requirements to pirobot2.egg-info/requires.txt
+[6.644s] writing top-level names to pirobot2.egg-info/top_level.txt
+[6.795s] reading manifest file 'pirobot2.egg-info/SOURCES.txt'
+[6.801s] writing manifest file 'pirobot2.egg-info/SOURCES.txt'
+[6.870s] running build_ext
+[6.871s] Creating /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2.egg-link (link to .)
+[6.874s] Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[6.874s] Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[6.875s] Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[6.876s] 
+[6.876s] Installed /home/pi/Raspi_codes/ROS2/build/pirobot2
+[6.877s] running symlink_data
+[7.097s] Invoked command in '/home/pi/Raspi_codes/ROS2/build/pirobot2' returned '0': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data

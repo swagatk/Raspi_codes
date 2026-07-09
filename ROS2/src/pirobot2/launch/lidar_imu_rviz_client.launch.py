@@ -19,7 +19,7 @@ def generate_launch_description():
 
     fixed_frame_arg = DeclareLaunchArgument(
         'fixed_frame',
-        default_value='map',
+        default_value='base_link',
         description='RViz fixed frame; should match publisher frame_id or available TF frame',
     )
 
@@ -35,12 +35,40 @@ def generate_launch_description():
         description='Child frame for static transform used by RViz',
     )
 
+    lidar_frame_arg = DeclareLaunchArgument(
+        'lidar_frame',
+        default_value='laser',
+        description='Frame ID used by lidar scans',
+    )
+
+    imu_frame_arg = DeclareLaunchArgument(
+        'imu_frame',
+        default_value='imu_link',
+        description='Frame ID used by IMU messages',
+    )
+
     static_tf_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='pirobot2_rviz_static_tf',
         output='screen',
         arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_parent_frame'), LaunchConfiguration('tf_child_frame')],
+    )
+
+    lidar_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='pirobot2_rviz_lidar_tf',
+        output='screen',
+        arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_child_frame'), LaunchConfiguration('lidar_frame')],
+    )
+
+    imu_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='pirobot2_rviz_imu_tf',
+        output='screen',
+        arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_child_frame'), LaunchConfiguration('imu_frame')],
     )
 
     rviz_node = Node(
@@ -56,6 +84,10 @@ def generate_launch_description():
         fixed_frame_arg,
         tf_parent_arg,
         tf_child_arg,
+        lidar_frame_arg,
+        imu_frame_arg,
         static_tf_node,
+        lidar_tf_node,
+        imu_tf_node,
         rviz_node,
     ])
