@@ -1,0 +1,3 @@
+[console_scripts]
+publisher = hello_world.publisher:main
+subscriber = hello_world.subscriber:main

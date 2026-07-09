@@ -1,0 +1,2 @@
+[console_scripts]
+rplidar_scan_node = rplidar_scan.rplidar_scan_node:main

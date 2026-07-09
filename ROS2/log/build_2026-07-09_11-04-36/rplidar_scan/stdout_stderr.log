@@ -1,0 +1,19 @@
+running egg_info
+writing ../../build/rplidar_scan/rplidar_scan.egg-info/PKG-INFO
+writing dependency_links to ../../build/rplidar_scan/rplidar_scan.egg-info/dependency_links.txt
+writing entry points to ../../build/rplidar_scan/rplidar_scan.egg-info/entry_points.txt
+writing requirements to ../../build/rplidar_scan/rplidar_scan.egg-info/requires.txt
+writing top-level names to ../../build/rplidar_scan/rplidar_scan.egg-info/top_level.txt
+reading manifest file '../../build/rplidar_scan/rplidar_scan.egg-info/SOURCES.txt'
+writing manifest file '../../build/rplidar_scan/rplidar_scan.egg-info/SOURCES.txt'
+running build
+running install
+running install_data
+copying launch/lidar_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/rplidar_scan/share/rplidar_scan/launch
+copying launch/lidar_publisher.launch.py -> /home/pi/Raspi_codes/ROS2/install/rplidar_scan/share/rplidar_scan/launch
+running install_egg_info
+removing '/home/pi/Raspi_codes/ROS2/install/rplidar_scan/lib/python3.11/site-packages/rplidar_scan-0.0.0-py3.11.egg-info' (and everything under it)
+Copying ../../build/rplidar_scan/rplidar_scan.egg-info to /home/pi/Raspi_codes/ROS2/install/rplidar_scan/lib/python3.11/site-packages/rplidar_scan-0.0.0-py3.11.egg-info
+running install_scripts
+Installing rplidar_scan_node script to /home/pi/Raspi_codes/ROS2/install/rplidar_scan/lib/rplidar_scan
+writing list of installed files to '/home/pi/Raspi_codes/ROS2/build/rplidar_scan/install.log'

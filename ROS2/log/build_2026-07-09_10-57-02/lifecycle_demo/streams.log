@@ -1,0 +1,42 @@
+[9.621s] Invoking command in '/home/pi/Raspi_codes/ROS2/src/ros2_tutorials/tutorial_2/lifecycle_demo': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/lifecycle_demo/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../build/lifecycle_demo build --build-base /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build install --record /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/install.log --single-version-externally-managed install_data
+[13.252s] running egg_info
+[13.252s] creating ../../../../build/lifecycle_demo/lifecycle_demo.egg-info
+[13.381s] writing ../../../../build/lifecycle_demo/lifecycle_demo.egg-info/PKG-INFO
+[13.381s] writing dependency_links to ../../../../build/lifecycle_demo/lifecycle_demo.egg-info/dependency_links.txt
+[13.382s] writing entry points to ../../../../build/lifecycle_demo/lifecycle_demo.egg-info/entry_points.txt
+[13.384s] writing requirements to ../../../../build/lifecycle_demo/lifecycle_demo.egg-info/requires.txt
+[13.388s] writing top-level names to ../../../../build/lifecycle_demo/lifecycle_demo.egg-info/top_level.txt
+[13.389s] writing manifest file '../../../../build/lifecycle_demo/lifecycle_demo.egg-info/SOURCES.txt'
+[13.797s] reading manifest file '../../../../build/lifecycle_demo/lifecycle_demo.egg-info/SOURCES.txt'
+[13.799s] adding license file 'LICENSE'
+[13.801s] writing manifest file '../../../../build/lifecycle_demo/lifecycle_demo.egg-info/SOURCES.txt'
+[13.803s] running build
+[13.805s] running build_py
+[13.806s] creating /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build
+[13.807s] creating /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib
+[13.807s] creating /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo
+[13.812s] copying lifecycle_demo/lc_talker.py -> /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo
+[13.812s] copying lifecycle_demo/supervisor.py -> /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo
+[13.813s] copying lifecycle_demo/__init__.py -> /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo
+[13.813s] running install
+[13.833s] running install_lib
+[13.933s] creating /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo
+[13.933s] copying /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo/lc_talker.py -> /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo
+[13.934s] copying /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo/supervisor.py -> /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo
+[13.936s] copying /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build/lib/lifecycle_demo/__init__.py -> /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo
+[13.940s] byte-compiling /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo/lc_talker.py to lc_talker.cpython-311.pyc
+[13.942s] byte-compiling /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo/supervisor.py to supervisor.cpython-311.pyc
+[13.947s] byte-compiling /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo/__init__.py to __init__.cpython-311.pyc
+[13.947s] running install_data
+[13.949s] creating /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/share/ament_index
+[13.956s] creating /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/share/ament_index/resource_index
+[13.956s] creating /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/share/ament_index/resource_index/packages
+[13.957s] copying resource/lifecycle_demo -> /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/share/ament_index/resource_index/packages
+[13.957s] copying package.xml -> /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/share/lifecycle_demo
+[13.961s] running install_egg_info
+[14.110s] Copying ../../../../build/lifecycle_demo/lifecycle_demo.egg-info to /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages/lifecycle_demo-0.0.0-py3.11.egg-info
+[14.116s] running install_scripts
+[14.571s] Installing supervisor script to /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/lifecycle_demo
+[14.573s] Installing talker script to /home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/lifecycle_demo
+[14.580s] writing list of installed files to '/home/pi/Raspi_codes/ROS2/build/lifecycle_demo/install.log'
+[14.853s] Invoked command in '/home/pi/Raspi_codes/ROS2/src/ros2_tutorials/tutorial_2/lifecycle_demo' returned '0': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/lifecycle_demo/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/lifecycle_demo/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../build/lifecycle_demo build --build-base /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/build install --record /home/pi/Raspi_codes/ROS2/build/lifecycle_demo/install.log --single-version-externally-managed install_data

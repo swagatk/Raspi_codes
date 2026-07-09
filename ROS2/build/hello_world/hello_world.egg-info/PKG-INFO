@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: hello-world
+Version: 0.0.0
+Summary: A simple Hello World publisher and subscriber package
+Maintainer: user
+Maintainer-email: user@todo.todo
+License: Apache-2.0
+License-File: LICENSE

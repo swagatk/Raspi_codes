@@ -1,0 +1,41 @@
+[10.127s] Invoking command in '/home/pi/Raspi_codes/ROS2/src/ros2_tutorials/tutorial_1/hello_world': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/hello_world/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../build/hello_world build --build-base /home/pi/Raspi_codes/ROS2/build/hello_world/build install --record /home/pi/Raspi_codes/ROS2/build/hello_world/install.log --single-version-externally-managed install_data
+[13.457s] running egg_info
+[13.458s] creating ../../../../build/hello_world/hello_world.egg-info
+[13.577s] writing ../../../../build/hello_world/hello_world.egg-info/PKG-INFO
+[13.578s] writing dependency_links to ../../../../build/hello_world/hello_world.egg-info/dependency_links.txt
+[13.583s] writing entry points to ../../../../build/hello_world/hello_world.egg-info/entry_points.txt
+[13.583s] writing requirements to ../../../../build/hello_world/hello_world.egg-info/requires.txt
+[13.583s] writing top-level names to ../../../../build/hello_world/hello_world.egg-info/top_level.txt
+[13.584s] writing manifest file '../../../../build/hello_world/hello_world.egg-info/SOURCES.txt'
+[14.070s] reading manifest file '../../../../build/hello_world/hello_world.egg-info/SOURCES.txt'
+[14.075s] adding license file 'LICENSE'
+[14.080s] writing manifest file '../../../../build/hello_world/hello_world.egg-info/SOURCES.txt'
+[14.080s] running build
+[14.080s] running build_py
+[14.081s] creating /home/pi/Raspi_codes/ROS2/build/hello_world/build
+[14.085s] creating /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib
+[14.085s] creating /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world
+[14.086s] copying hello_world/subscriber.py -> /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world
+[14.090s] copying hello_world/publisher.py -> /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world
+[14.091s] copying hello_world/__init__.py -> /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world
+[14.092s] running install
+[14.142s] running install_lib
+[14.397s] creating /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world
+[14.410s] copying /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world/subscriber.py -> /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world
+[14.410s] copying /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world/publisher.py -> /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world
+[14.411s] copying /home/pi/Raspi_codes/ROS2/build/hello_world/build/lib/hello_world/__init__.py -> /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world
+[14.415s] byte-compiling /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world/subscriber.py to subscriber.cpython-311.pyc
+[14.416s] byte-compiling /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world/publisher.py to publisher.cpython-311.pyc
+[14.418s] byte-compiling /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world/__init__.py to __init__.cpython-311.pyc
+[14.422s] running install_data
+[14.423s] creating /home/pi/Raspi_codes/ROS2/install/hello_world/share/ament_index
+[14.423s] creating /home/pi/Raspi_codes/ROS2/install/hello_world/share/ament_index/resource_index
+[14.423s] creating /home/pi/Raspi_codes/ROS2/install/hello_world/share/ament_index/resource_index/packages
+[14.424s] copying resource/hello_world -> /home/pi/Raspi_codes/ROS2/install/hello_world/share/ament_index/resource_index/packages
+[14.424s] copying package.xml -> /home/pi/Raspi_codes/ROS2/install/hello_world/share/hello_world
+[14.424s] running install_egg_info
+[14.521s] Copying ../../../../build/hello_world/hello_world.egg-info to /home/pi/Raspi_codes/ROS2/install/hello_world/lib/python3.11/site-packages/hello_world-0.0.0-py3.11.egg-info
+[14.527s] running install_scripts
+[14.982s] Installing publisher script to /home/pi/Raspi_codes/ROS2/install/hello_world/lib/hello_world
+[14.983s] Installing subscriber script to /home/pi/Raspi_codes/ROS2/install/hello_world/lib/hello_world
+[14.986s] writing list of installed files to '/home/pi/Raspi_codes/ROS2/build/hello_world/install.log'

@@ -1,0 +1,3 @@
+[console_scripts]
+supervisor = lifecycle_demo.supervisor:main
+talker = lifecycle_demo.lc_talker:main
