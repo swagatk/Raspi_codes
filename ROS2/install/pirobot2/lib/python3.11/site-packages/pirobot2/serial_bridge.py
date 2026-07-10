@@ -39,7 +39,7 @@ class SerialBridge(Node):
         self.declare_parameter('deadband', 0.02)
         self.declare_parameter('speed_1_max', 0.12)
         self.declare_parameter('speed_2_max', 0.22)
-        self.declare_parameter('default_speed_command', '2')
+        self.declare_parameter('default_speed_command', 2)
 
         self.cmd_vel_topic = str(self.get_parameter('cmd_vel_topic').value)
         self.ultrasonic_topic = str(self.get_parameter('ultrasonic_topic').value)
@@ -51,7 +51,7 @@ class SerialBridge(Node):
         self.deadband = float(self.get_parameter('deadband').value)
         self.speed_1_max = float(self.get_parameter('speed_1_max').value)
         self.speed_2_max = float(self.get_parameter('speed_2_max').value)
-        self.default_speed_command = str(self.get_parameter('default_speed_command').value)
+        self.default_speed_command = str(int(self.get_parameter('default_speed_command').value))
 
         serial_module = load_serial_module()
         self.ser = serial_module.Serial(

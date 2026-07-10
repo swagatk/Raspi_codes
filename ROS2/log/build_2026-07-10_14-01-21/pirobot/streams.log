@@ -1,0 +1,23 @@
+[3.567s] Invoking command in '/home/pi/Raspi_codes/ROS2/build/pirobot': PS1=(yolov8env) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot/build --no-deps symlink_data
+[4.819s] running develop
+[5.649s] running egg_info
+[5.727s] writing pirobot.egg-info/PKG-INFO
+[5.728s] writing dependency_links to pirobot.egg-info/dependency_links.txt
+[5.731s] writing entry points to pirobot.egg-info/entry_points.txt
+[5.732s] writing requirements to pirobot.egg-info/requires.txt
+[5.733s] writing top-level names to pirobot.egg-info/top_level.txt
+[5.896s] reading manifest file 'pirobot.egg-info/SOURCES.txt'
+[5.900s] writing manifest file 'pirobot.egg-info/SOURCES.txt'
+[5.986s] running build_ext
+[5.986s] Creating /home/pi/Raspi_codes/ROS2/install/pirobot/lib/python3.11/site-packages/pirobot.egg-link (link to .)
+[5.989s] Installing aoclient script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.989s] Installing aoservice script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.990s] Installing handpub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.991s] Installing imagepub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.993s] Installing imagesub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.993s] Installing keypub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.994s] Installing motionsub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+[5.994s] 
+[5.995s] Installed /home/pi/Raspi_codes/ROS2/build/pirobot
+[5.996s] running symlink_data
+[6.204s] Invoked command in '/home/pi/Raspi_codes/ROS2/build/pirobot' returned '0': PS1=(yolov8env) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot/build --no-deps symlink_data

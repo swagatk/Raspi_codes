@@ -1,0 +1,21 @@
+running develop
+running egg_info
+writing pirobot.egg-info/PKG-INFO
+writing dependency_links to pirobot.egg-info/dependency_links.txt
+writing entry points to pirobot.egg-info/entry_points.txt
+writing requirements to pirobot.egg-info/requires.txt
+writing top-level names to pirobot.egg-info/top_level.txt
+reading manifest file 'pirobot.egg-info/SOURCES.txt'
+writing manifest file 'pirobot.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/pi/Raspi_codes/ROS2/install/pirobot/lib/python3.11/site-packages/pirobot.egg-link (link to .)
+Installing aoclient script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+Installing aoservice script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+Installing handpub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+Installing imagepub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+Installing imagesub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+Installing keypub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+Installing motionsub script to /home/pi/Raspi_codes/ROS2/install/pirobot/lib/pirobot
+
+Installed /home/pi/Raspi_codes/ROS2/build/pirobot
+running symlink_data
