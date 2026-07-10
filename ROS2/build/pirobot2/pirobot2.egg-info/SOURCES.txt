@@ -1,4 +1,3 @@
-LICENSE
 package.xml
 setup.cfg
 setup.py
@@ -25,9 +24,13 @@ pirobot2/pirobot2.py
 pirobot2/serial_bridge.py
 pirobot2/teleop_keyboard.py
 pirobot2/ultrasonic_publisher.py
+pirobot2.egg-info/PKG-INFO
+pirobot2.egg-info/SOURCES.txt
+pirobot2.egg-info/dependency_links.txt
+pirobot2.egg-info/entry_points.txt
+pirobot2.egg-info/requires.txt
+pirobot2.egg-info/top_level.txt
+pirobot2.egg-info/zip-safe
 resource/pirobot2
 rviz/lidar_imu_combined.rviz
 rviz/lidar_scan.rviz
-test/test_copyright.py
-test/test_flake8.py
-test/test_pep257.py

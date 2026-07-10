@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import atexit
 import select
+import signal
 import sys
 import termios
 import tty
@@ -38,7 +40,7 @@ class TeleopKeyboard(Node):
         self.publisher = self.create_publisher(Twist, self.topic, 20)
 
         self.get_logger().info(
-            'Keyboard control: w=forward, s=backward, a=left, b=right, 1/2/3=speed, '
+            'Keyboard control: w=forward, s=backward, a=left, d=right (b also works), 1/2/3=speed, '
             'space=stop, q=quit'
         )
         self.get_logger().info(
@@ -64,7 +66,7 @@ class TeleopKeyboard(Node):
             self._publish_twist(0.0, self.current_speed * self.angular_scale)
             self.sent_stop = False
             return True
-        if key == 'b':
+        if key in ('d', 'b'):
             self._publish_twist(0.0, -self.current_speed * self.angular_scale)
             self.sent_stop = False
             return True
@@ -96,12 +98,60 @@ def main(args=None):
     rclpy.init(args=args)
     node = TeleopKeyboard()
 
-    old_settings = termios.tcgetattr(sys.stdin)
-    tty.setcbreak(sys.stdin.fileno())
+    keyboard_stream = sys.stdin
+    keyboard_file = None
+    old_settings = None
+    restored = False
+    previous_sigint = None
+    previous_sigterm = None
+
+    def restore_terminal():
+        nonlocal restored
+        if restored:
+            return
+        if old_settings is not None:
+            try:
+                termios.tcsetattr(keyboard_stream, termios.TCSADRAIN, old_settings)
+            except Exception:
+                pass
+        if keyboard_file is not None:
+            try:
+                keyboard_file.close()
+            except Exception:
+                pass
+        restored = True
+
+    def on_signal(signum, _frame):
+        restore_terminal()
+        raise KeyboardInterrupt()
+
+    # ros2 launch may not attach a TTY to stdin; use the controlling terminal directly.
+    if not keyboard_stream.isatty():
+        try:
+            keyboard_file = open('/dev/tty', 'r')
+            keyboard_stream = keyboard_file
+        except OSError:
+            node.get_logger().error(
+                'Keyboard teleop requires a TTY. Run this node from an interactive terminal.'
+            )
+            node.destroy_node()
+            rclpy.shutdown()
+            return
+
+    old_settings = termios.tcgetattr(keyboard_stream)
+    tty.setcbreak(keyboard_stream.fileno())
+    atexit.register(restore_terminal)
+    previous_sigint = signal.getsignal(signal.SIGINT)
+    previous_sigterm = signal.getsignal(signal.SIGTERM)
+    signal.signal(signal.SIGINT, on_signal)
+    signal.signal(signal.SIGTERM, on_signal)
 
     try:
         while rclpy.ok():
-            key = read_key()
+            key = None
+            readable, _, _ = select.select([keyboard_stream], [], [], 0.05)
+            if readable:
+                key = keyboard_stream.read(1)
             now = node.get_clock().now()
 
             if key == 'q':
@@ -114,7 +164,7 @@ def main(args=None):
                 if not key_handled:
                     key_handled = node._apply_motion_key(key)
 
-                if key_handled and key in ('w', 's', 'a', 'b'):
+                if key_handled and key in ('w', 's', 'a', 'd', 'b'):
                     node.last_motion_time = now
 
             elapsed = (now - node.last_motion_time).nanoseconds / 1e9
@@ -127,7 +177,11 @@ def main(args=None):
         pass
     finally:
         node._publish_twist(0.0, 0.0)
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+        restore_terminal()
+        if previous_sigint is not None:
+            signal.signal(signal.SIGINT, previous_sigint)
+        if previous_sigterm is not None:
+            signal.signal(signal.SIGTERM, previous_sigterm)
         node.destroy_node()
         rclpy.shutdown()
 
