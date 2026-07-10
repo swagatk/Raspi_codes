@@ -36,6 +36,7 @@ class SerialBridge(Node):
         self.declare_parameter('serial_timeout', 0.1)
         self.declare_parameter('poll_hz', 50.0)
         self.declare_parameter('command_keepalive_sec', 0.5)
+        self.declare_parameter('cmd_vel_timeout_sec', 0.8)
         self.declare_parameter('deadband', 0.02)
         self.declare_parameter('speed_1_max', 0.12)
         self.declare_parameter('speed_2_max', 0.22)
@@ -48,6 +49,7 @@ class SerialBridge(Node):
         self.serial_timeout = float(self.get_parameter('serial_timeout').value)
         self.poll_hz = float(self.get_parameter('poll_hz').value)
         self.command_keepalive_sec = float(self.get_parameter('command_keepalive_sec').value)
+        self.cmd_vel_timeout_sec = float(self.get_parameter('cmd_vel_timeout_sec').value)
         self.deadband = float(self.get_parameter('deadband').value)
         self.speed_1_max = float(self.get_parameter('speed_1_max').value)
         self.speed_2_max = float(self.get_parameter('speed_2_max').value)
@@ -64,6 +66,7 @@ class SerialBridge(Node):
         self.current_motion_command = None
         self.current_speed_command = None
         self.ultrasonic_publish_count = 0
+        self.last_cmd_vel_time = None
 
         self.cmd_vel_sub = self.create_subscription(Twist, self.cmd_vel_topic, self.cmd_vel_callback, 20)
         self.ultrasonic_pub = self.create_publisher(Int32MultiArray, self.ultrasonic_topic, 20)
@@ -111,6 +114,7 @@ class SerialBridge(Node):
     def cmd_vel_callback(self, msg):
         linear_x = float(msg.linear.x)
         angular_z = float(msg.angular.z)
+        self.last_cmd_vel_time = self.get_clock().now()
 
         speed_command = self._select_speed_command(linear_x, angular_z)
         if speed_command in ('1', '2', '3') and speed_command != self.current_speed_command:
@@ -143,6 +147,16 @@ class SerialBridge(Node):
     def send_keepalive(self):
         if self.current_motion_command is None:
             return
+        if self.last_cmd_vel_time is None:
+            return
+
+        age_sec = (self.get_clock().now() - self.last_cmd_vel_time).nanoseconds / 1e9
+        if age_sec > self.cmd_vel_timeout_sec:
+            if self.current_motion_command != 'S':
+                self._send_serial('S')
+                self.current_motion_command = 'S'
+            return
+
         self._send_serial(self.current_motion_command)
 
     def poll_serial(self):

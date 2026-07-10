@@ -41,6 +41,12 @@ def generate_launch_description():
         description='Serial polling frequency for incoming sensor lines',
     )
 
+    cmd_vel_timeout_arg = DeclareLaunchArgument(
+        'cmd_vel_timeout_sec',
+        default_value='0.8',
+        description='How long to wait for cmd_vel before forcing a stop',
+    )
+
     deadband_arg = DeclareLaunchArgument(
         'deadband',
         default_value='0.02',
@@ -77,6 +83,7 @@ def generate_launch_description():
             'baudrate': LaunchConfiguration('baudrate'),
             'serial_timeout': LaunchConfiguration('serial_timeout'),
             'poll_hz': LaunchConfiguration('poll_hz'),
+            'cmd_vel_timeout_sec': LaunchConfiguration('cmd_vel_timeout_sec'),
             'deadband': LaunchConfiguration('deadband'),
             'speed_1_max': LaunchConfiguration('speed_1_max'),
             'speed_2_max': LaunchConfiguration('speed_2_max'),
@@ -91,6 +98,7 @@ def generate_launch_description():
         baudrate_arg,
         serial_timeout_arg,
         poll_hz_arg,
+        cmd_vel_timeout_arg,
         deadband_arg,
         speed_1_max_arg,
         speed_2_max_arg,

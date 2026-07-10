@@ -47,6 +47,12 @@ def generate_launch_description():
         description='Interval to resend current motion command so Arduino watchdog does not stop motors',
     )
 
+    cmd_vel_timeout_arg = DeclareLaunchArgument(
+        'cmd_vel_timeout_sec',
+        default_value='0.8',
+        description='How long to wait for cmd_vel before forcing a stop',
+    )
+
     deadband_arg = DeclareLaunchArgument(
         'deadband',
         default_value='0.02',
@@ -132,6 +138,7 @@ def generate_launch_description():
             'serial_timeout': LaunchConfiguration('serial_timeout'),
             'poll_hz': LaunchConfiguration('poll_hz'),
             'command_keepalive_sec': LaunchConfiguration('command_keepalive_sec'),
+            'cmd_vel_timeout_sec': LaunchConfiguration('cmd_vel_timeout_sec'),
             'deadband': LaunchConfiguration('deadband'),
             'speed_1_max': LaunchConfiguration('speed_1_max'),
             'speed_2_max': LaunchConfiguration('speed_2_max'),
@@ -166,6 +173,7 @@ def generate_launch_description():
         serial_timeout_arg,
         poll_hz_arg,
         keepalive_arg,
+        cmd_vel_timeout_arg,
         deadband_arg,
         speed_1_max_arg,
         speed_2_max_arg,
