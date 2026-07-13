@@ -1,0 +1,38 @@
+[3.568s] Invoking command in '/home/pi/Raspi_codes/ROS2/build/pirobot2': PS1=(yolov8env) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data --force
+[4.805s] running develop
+[5.577s] running egg_info
+[5.636s] writing pirobot2.egg-info/PKG-INFO
+[5.637s] writing dependency_links to pirobot2.egg-info/dependency_links.txt
+[5.640s] writing entry points to pirobot2.egg-info/entry_points.txt
+[5.641s] writing requirements to pirobot2.egg-info/requires.txt
+[5.642s] writing top-level names to pirobot2.egg-info/top_level.txt
+[5.778s] reading manifest file 'pirobot2.egg-info/SOURCES.txt'
+[5.782s] writing manifest file 'pirobot2.egg-info/SOURCES.txt'
+[5.856s] running build_ext
+[5.857s] Creating /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2.egg-link (link to .)
+[5.860s] Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.860s] Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.861s] Installing motion_subscriber_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.861s] Installing obstacle_avoidance_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.862s] Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.863s] Installing scan_imu_slam_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.864s] Installing serial_bridge_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.865s] Installing teleop_keyboard_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.865s] Installing ultrasonic_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.866s] 
+[5.866s] Installed /home/pi/Raspi_codes/ROS2/build/pirobot2
+[5.867s] running symlink_data
+[5.868s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/resource/pirobot2 -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/ament_index/resource_index/packages
+[5.868s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/package.xml -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2
+[5.869s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.870s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/imu_publisher.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.870s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/obstacle_avoidance.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.871s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_imu_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.871s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/serial_bridge.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.872s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_publisher.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.873s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/motion_teleop.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.874s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/scan_imu_slam.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.874s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/rviz/lidar_imu_combined.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+[5.875s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/rviz/lidar_scan.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+[5.877s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/rviz/slam_map.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+[6.088s] Invoked command in '/home/pi/Raspi_codes/ROS2/build/pirobot2' returned '0': PS1=(yolov8env) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolov8env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data --force

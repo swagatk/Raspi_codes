@@ -1,0 +1,108 @@
+[0.000000] (-) TimerEvent: {}
+[0.000835] (-) JobUnselected: {'identifier': 'hello_world'}
+[0.001083] (-) JobUnselected: {'identifier': 'lifecycle_demo'}
+[0.001702] (-) JobUnselected: {'identifier': 'pirobot'}
+[0.002159] (-) JobUnselected: {'identifier': 'qos_demo'}
+[0.002646] (-) JobUnselected: {'identifier': 'rplidar_scan'}
+[0.002798] (pirobot2) JobQueued: {'identifier': 'pirobot2', 'dependencies': OrderedDict()}
+[0.003062] (pirobot2) JobStarted: {'identifier': 'pirobot2'}
+[0.099316] (-) TimerEvent: {}
+[0.200007] (-) TimerEvent: {}
+[0.300825] (-) TimerEvent: {}
+[0.401644] (-) TimerEvent: {}
+[0.502457] (-) TimerEvent: {}
+[0.603187] (-) TimerEvent: {}
+[0.703933] (-) TimerEvent: {}
+[0.805224] (-) TimerEvent: {}
+[0.906706] (-) TimerEvent: {}
+[1.007890] (-) TimerEvent: {}
+[1.108620] (-) TimerEvent: {}
+[1.209425] (-) TimerEvent: {}
+[1.310836] (-) TimerEvent: {}
+[1.412129] (-) TimerEvent: {}
+[1.513057] (-) TimerEvent: {}
+[1.614236] (-) TimerEvent: {}
+[1.715407] (-) TimerEvent: {}
+[1.816567] (-) TimerEvent: {}
+[1.917698] (-) TimerEvent: {}
+[2.018791] (-) TimerEvent: {}
+[2.120074] (-) TimerEvent: {}
+[2.221244] (-) TimerEvent: {}
+[2.322377] (-) TimerEvent: {}
+[2.423692] (-) TimerEvent: {}
+[2.524929] (-) TimerEvent: {}
+[2.627814] (-) TimerEvent: {}
+[2.728824] (-) TimerEvent: {}
+[2.829878] (-) TimerEvent: {}
+[2.930965] (-) TimerEvent: {}
+[3.032159] (-) TimerEvent: {}
+[3.133357] (-) TimerEvent: {}
+[3.234366] (-) TimerEvent: {}
+[3.335492] (-) TimerEvent: {}
+[3.436621] (-) TimerEvent: {}
+[3.537715] (-) TimerEvent: {}
+[3.638829] (-) TimerEvent: {}
+[3.740204] (-) TimerEvent: {}
+[3.841284] (-) TimerEvent: {}
+[3.942564] (-) TimerEvent: {}
+[4.043913] (-) TimerEvent: {}
+[4.116584] (pirobot2) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/pirobot2', 'build', '--build-base', '/home/pi/Raspi_codes/ROS2/build/pirobot2/build', 'install', '--record', '/home/pi/Raspi_codes/ROS2/build/pirobot2/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/pi/Raspi_codes/ROS2/src/pirobot2', 'env': {'PYTHON_BASIC_REPL': '1', 'USER': 'pi', 'SSH_CLIENT': '192.168.1.188 56704 22', 'GIT_EDITOR': ':', 'TEXTDOMAIN': 'Linux-PAM', 'XDG_SESSION_TYPE': 'tty', 'GIT_ASKPASS': '/home/pi/.vscode-server/cli/servers/Stable-6a44c352bd24569c417e530095901b649960f9f8/server/extensions/git/dist/askpass.sh', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/yaml_cpp_vendor/lib:/opt/ros/jazzy/opt/spdlog_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/opt/rviz_assimp_vendor/lib:/opt/ros/jazzy/opt/orocos_kdl_vendor/lib:/opt/ros/jazzy/opt/mimick_vendor/lib:/opt/ros/jazzy/opt/libyaml_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'COPILOT_AGENT': '1', 'BROWSER': '/home/pi/.vscode-server/cli/servers/Stable-6a44c352bd24569c417e530095901b649960f9f8/server/bin/helpers/browser.sh', 'MOTD_SHOWN': 'pam', 'HOME': '/home/pi', 'OLDPWD': '/home/pi/Raspi_codes', 'TERM_PROGRAM_VERSION': '1.123.0', 'VSCODE_IPC_HOOK_CLI': '/run/user/1000/vscode-ipc-27b7a8b3-5002-4116-8d3b-421fec0e9b21.sock', 'ROS_PYTHON_VERSION': '3', 'VSCODE_GIT_ASKPASS_MAIN': '/home/pi/.vscode-server/cli/servers/Stable-6a44c352bd24569c417e530095901b649960f9f8/server/extensions/git/dist/askpass-main.js', 'VSCODE_GIT_ASKPASS_NODE': '/home/pi/.vscode-server/cli/servers/Stable-6a44c352bd24569c417e530095901b649960f9f8/server/node', 'PYDEVD_DISABLE_FILE_VALIDATION': '1', 'BUNDLED_DEBUGPY_PATH': '/home/pi/.vscode-server/extensions/ms-python.debugpy-2026.6.0-linux-arm64/bundled/libs/debugpy', 'VSCODE_PYTHON_AUTOACTIVATE_GUARD': '1', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'COLCON_PREFIX_PATH': '/home/pi/ros2_ws/install:/opt/ros/jazzy', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'pi', '_': '/usr/local/bin/colcon', 'ROS_VERSION': '2', 'PKG_CONFIG_PATH': '/opt/ros/jazzy/lib/aarch64-linux-gnu/pkgconfig:/opt/ros/jazzy/lib/pkgconfig', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '4', 'HISTCONTROL': 'ignorespace', 'PATH': '/home/pi/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/pi/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/pi/.vscode-server/cli/servers/Stable-6a44c352bd24569c417e530095901b649960f9f8/server/bin/remote-cli:/home/pi/.local/bin:/opt/ros/jazzy/opt/uncrustify_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games:/home/pi/.vscode-server/extensions/ms-python.debugpy-2026.6.0-linux-arm64/bundled/scripts/noConfigScripts', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': 'localhost:10.0', 'VSCODE_DEBUGPY_ADAPTER_ENDPOINTS': '/home/pi/.vscode-server/extensions/ms-python.debugpy-2026.6.0-linux-arm64/.noConfigDebugAdapterEndpoints/endpoint-ac4f082c95441a51.txt', 'LANG': 'en_GB.UTF-8', 'PYTHONSTARTUP': '/home/pi/.vscode-server/data/User/workspaceStorage/478d54b16470fde88e408e0e461abf10/ms-python.python/pythonrc.py', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.swp=00;90:*.tmp=00;90:*.dpkg-dist=00;90:*.dpkg-old=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:', 'VSCODE_GIT_IPC_HANDLE': '/run/user/1000/vscode-git-217a9c6cd3.sock', 'TERM_PROGRAM': 'vscode', 'ROS_DOMAIN_ID': '23', 'AMENT_PREFIX_PATH': '/home/pi/ros2_ws/install/pirobot:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'NO_AT_BRIDGE': '1', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'VSCODE_GIT_ASKPASS_EXTRA_ARGS': '', 'GIT_PAGER': 'cat', 'PWD': '/home/pi/Raspi_codes/ROS2/build/pirobot2', 'GIT_MERGE_AUTOEDIT': 'no', 'COPILOT_DEBUG_NONCE': 'fdf6a101f958e5abd3918097739745ed', 'GEMINI_API_KEY': 'AIzaSyCPYb7THL9HPTC7Q0MZci1uOx_A3ThoG7I', 'SSH_CONNECTION': '192.168.1.188 56704 192.168.1.159 22', 'PYTHONPATH': '/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:/home/pi/ros2_ws/install/pirobot/lib/python3.11/site-packages:/ros2_ws/jazzy/lib/python3.11/dist-packages:/opt/ros/jazzy/lib/python3.11/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/yaml_cpp_vendor:/opt/ros/jazzy/opt/pybind11_vendor:/opt/ros/jazzy/opt/orocos_kdl_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy'}, 'shell': False}
+[4.143994] (-) TimerEvent: {}
+[4.244720] (-) TimerEvent: {}
+[4.345430] (-) TimerEvent: {}
+[4.446167] (-) TimerEvent: {}
+[4.546905] (-) TimerEvent: {}
+[4.647617] (-) TimerEvent: {}
+[4.748271] (-) TimerEvent: {}
+[4.848961] (-) TimerEvent: {}
+[4.950643] (-) TimerEvent: {}
+[5.051972] (-) TimerEvent: {}
+[5.153148] (-) TimerEvent: {}
+[5.254310] (-) TimerEvent: {}
+[5.355491] (-) TimerEvent: {}
+[5.449500] (pirobot2) StdoutLine: {'line': b'running egg_info\n'}
+[5.455645] (-) TimerEvent: {}
+[5.513850] (pirobot2) StdoutLine: {'line': b'writing ../../build/pirobot2/pirobot2.egg-info/PKG-INFO\n'}
+[5.514900] (pirobot2) StdoutLine: {'line': b'writing dependency_links to ../../build/pirobot2/pirobot2.egg-info/dependency_links.txt\n'}
+[5.519650] (pirobot2) StdoutLine: {'line': b'writing entry points to ../../build/pirobot2/pirobot2.egg-info/entry_points.txt\n'}
+[5.520399] (pirobot2) StdoutLine: {'line': b'writing requirements to ../../build/pirobot2/pirobot2.egg-info/requires.txt\n'}
+[5.521066] (pirobot2) StdoutLine: {'line': b'writing top-level names to ../../build/pirobot2/pirobot2.egg-info/top_level.txt\n'}
+[5.555787] (-) TimerEvent: {}
+[5.647750] (pirobot2) StdoutLine: {'line': b"reading manifest file '../../build/pirobot2/pirobot2.egg-info/SOURCES.txt'\n"}
+[5.652384] (pirobot2) StdoutLine: {'line': b"adding license file 'LICENSE'\n"}
+[5.654666] (pirobot2) StdoutLine: {'line': b"writing manifest file '../../build/pirobot2/pirobot2.egg-info/SOURCES.txt'\n"}
+[5.655441] (pirobot2) StdoutLine: {'line': b'running build\n'}
+[5.655786] (-) TimerEvent: {}
+[5.656709] (pirobot2) StdoutLine: {'line': b'running build_py\n'}
+[5.657590] (pirobot2) StdoutLine: {'line': b'copying pirobot2/scan_imu_slam.py -> /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2\n'}
+[5.658590] (pirobot2) StdoutLine: {'line': b'running install\n'}
+[5.679664] (pirobot2) StdoutLine: {'line': b'running install_lib\n'}
+[5.743143] (pirobot2) StdoutLine: {'line': b'copying /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2/scan_imu_slam.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2\n'}
+[5.745730] (pirobot2) StdoutLine: {'line': b'byte-compiling /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2/scan_imu_slam.py to scan_imu_slam.cpython-311.pyc\n'}
+[5.753505] (pirobot2) StdoutLine: {'line': b'running install_data\n'}
+[5.754155] (pirobot2) StdoutLine: {'line': b'copying package.xml -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2\n'}
+[5.755279] (pirobot2) StdoutLine: {'line': b'copying launch/scan_imu_slam.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch\n'}
+[5.755900] (-) TimerEvent: {}
+[5.756915] (pirobot2) StdoutLine: {'line': b'copying rviz/slam_map.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz\n'}
+[5.757279] (pirobot2) StdoutLine: {'line': b'running install_egg_info\n'}
+[5.822857] (pirobot2) StdoutLine: {'line': b"removing '/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2-0.0.0-py3.11.egg-info' (and everything under it)\n"}
+[5.824128] (pirobot2) StdoutLine: {'line': b'Copying ../../build/pirobot2/pirobot2.egg-info to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2-0.0.0-py3.11.egg-info\n'}
+[5.830792] (pirobot2) StdoutLine: {'line': b'running install_scripts\n'}
+[5.856058] (-) TimerEvent: {}
+[5.957318] (-) TimerEvent: {}
+[6.058672] (-) TimerEvent: {}
+[6.090006] (pirobot2) StdoutLine: {'line': b'Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.090843] (pirobot2) StdoutLine: {'line': b'Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.094617] (pirobot2) StdoutLine: {'line': b'Installing motion_subscriber_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.095368] (pirobot2) StdoutLine: {'line': b'Installing obstacle_avoidance_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.096215] (pirobot2) StdoutLine: {'line': b'Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.099135] (pirobot2) StdoutLine: {'line': b'Installing scan_imu_slam_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.099791] (pirobot2) StdoutLine: {'line': b'Installing serial_bridge_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.100507] (pirobot2) StdoutLine: {'line': b'Installing teleop_keyboard_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.101514] (pirobot2) StdoutLine: {'line': b'Installing ultrasonic_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2\n'}
+[6.103349] (pirobot2) StdoutLine: {'line': b"writing list of installed files to '/home/pi/Raspi_codes/ROS2/build/pirobot2/install.log'\n"}
+[6.158943] (-) TimerEvent: {}
+[6.260640] (-) TimerEvent: {}
+[6.291721] (pirobot2) CommandEnded: {'returncode': 0}
+[6.338737] (pirobot2) JobEnded: {'identifier': 'pirobot2', 'rc': 0}
+[6.341552] (-) EventReactorShutdown: {}
