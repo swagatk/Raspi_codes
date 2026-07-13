@@ -1,7 +1,8 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.actions import LogInfo
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
@@ -28,6 +29,12 @@ def generate_launch_description():
         'map_topic',
         default_value='/map',
         description='OccupancyGrid map output topic',
+    )
+
+    deployment_arg = DeclareLaunchArgument(
+        'deployment',
+        default_value='robot',
+        description='Deployment profile: robot or remote. In remote mode local lidar/imu publishers are not started.',
     )
 
     start_lidar_arg = DeclareLaunchArgument(
@@ -71,7 +78,9 @@ def generate_launch_description():
         executable='lidar_publisher_node',
         name='lidar_publisher_node',
         output='screen',
-        condition=IfCondition(LaunchConfiguration('start_lidar')),
+        condition=IfCondition(PythonExpression([
+            "'", LaunchConfiguration('deployment'), "' == 'robot' and '", LaunchConfiguration('start_lidar'), "' != 'false'"
+        ])),
         parameters=[{
             'scan_topic': LaunchConfiguration('scan_topic'),
         }],
@@ -82,10 +91,27 @@ def generate_launch_description():
         executable='imu_publisher_node',
         name='imu_publisher_node',
         output='screen',
-        condition=IfCondition(LaunchConfiguration('start_imu')),
+        condition=IfCondition(PythonExpression([
+            "'", LaunchConfiguration('deployment'), "' == 'robot' and '", LaunchConfiguration('start_imu'), "' != 'false'"
+        ])),
         parameters=[{
             'topic': LaunchConfiguration('imu_topic'),
         }],
+    )
+
+    remote_mode_notice = LogInfo(
+        condition=IfCondition(PythonExpression(["'", LaunchConfiguration('deployment'), "' == 'remote'"])),
+        msg='scan_imu_slam: deployment=remote, local lidar/imu publishers are disabled. Expect external /scan and /imu/data_raw publishers.',
+    )
+
+    lidar_disabled_notice = LogInfo(
+        condition=IfCondition(PythonExpression(["'", LaunchConfiguration('start_lidar'), "' == 'false'"])),
+        msg='scan_imu_slam: start_lidar=false, no local /scan publisher will be started.',
+    )
+
+    imu_disabled_notice = LogInfo(
+        condition=IfCondition(PythonExpression(["'", LaunchConfiguration('start_imu'), "' == 'false'"])),
+        msg='scan_imu_slam: start_imu=false, no local /imu/data_raw publisher will be started.',
     )
 
     laser_tf_node = Node(
@@ -94,7 +120,16 @@ def generate_launch_description():
         name='base_to_laser_tf',
         output='screen',
         condition=IfCondition(LaunchConfiguration('start_static_tf')),
-        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'laser'],
+        arguments=[
+            '--x', '0',
+            '--y', '0',
+            '--z', '0',
+            '--roll', '0',
+            '--pitch', '0',
+            '--yaw', '0',
+            '--frame-id', 'base_link',
+            '--child-frame-id', 'laser',
+        ],
     )
 
     imu_tf_node = Node(
@@ -103,7 +138,16 @@ def generate_launch_description():
         name='base_to_imu_tf',
         output='screen',
         condition=IfCondition(LaunchConfiguration('start_static_tf')),
-        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'imu_link'],
+        arguments=[
+            '--x', '0',
+            '--y', '0',
+            '--z', '0',
+            '--roll', '0',
+            '--pitch', '0',
+            '--yaw', '0',
+            '--frame-id', 'base_link',
+            '--child-frame-id', 'imu_link',
+        ],
     )
 
     slam_node = Node(
@@ -134,12 +178,16 @@ def generate_launch_description():
         scan_topic_arg,
         imu_topic_arg,
         map_topic_arg,
+        deployment_arg,
         start_lidar_arg,
         start_imu_arg,
         publish_tf_arg,
         start_static_tf_arg,
         start_rviz_arg,
         rviz_config_arg,
+        remote_mode_notice,
+        lidar_disabled_notice,
+        imu_disabled_notice,
         lidar_node,
         imu_node,
         laser_tf_node,
