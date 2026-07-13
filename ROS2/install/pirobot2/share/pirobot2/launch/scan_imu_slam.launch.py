@@ -15,20 +15,32 @@ def generate_launch_description():
 
     scan_topic_arg = DeclareLaunchArgument(
         'scan_topic',
-        default_value='/scan',
+        default_value='/pirobot2/scan',
         description='LaserScan topic used by the SLAM node',
     )
 
     imu_topic_arg = DeclareLaunchArgument(
         'imu_topic',
-        default_value='/imu/data_raw',
+        default_value='/pirobot2/imu/data_raw',
         description='IMU topic used by the SLAM node',
     )
 
     map_topic_arg = DeclareLaunchArgument(
         'map_topic',
-        default_value='/map',
+        default_value='/pirobot2/map',
         description='OccupancyGrid map output topic',
+    )
+
+    tf_topic_arg = DeclareLaunchArgument(
+        'tf_topic',
+        default_value='/tf',
+        description='TF topic to use for transforms',
+    )
+
+    tf_static_topic_arg = DeclareLaunchArgument(
+        'tf_static_topic',
+        default_value='/tf_static',
+        description='Static TF topic to use for static transforms',
     )
 
     deployment_arg = DeclareLaunchArgument(
@@ -155,17 +167,17 @@ def generate_launch_description():
 
     remote_mode_notice = LogInfo(
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('deployment'), "' == 'remote'"])),
-        msg='scan_imu_slam: deployment=remote, local lidar/imu publishers are disabled. Expect external /scan and /imu/data_raw publishers.',
+        msg='scan_imu_slam: deployment=remote, local lidar/imu publishers are disabled. Expect external /pirobot2/scan and /pirobot2/imu/data_raw publishers.',
     )
 
     lidar_disabled_notice = LogInfo(
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('start_lidar'), "' == 'false'"])),
-        msg='scan_imu_slam: start_lidar=false, no local /scan publisher will be started.',
+        msg='scan_imu_slam: start_lidar=false, no local /pirobot2/scan publisher will be started.',
     )
 
     imu_disabled_notice = LogInfo(
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('start_imu'), "' == 'false'"])),
-        msg='scan_imu_slam: start_imu=false, no local /imu/data_raw publisher will be started.',
+        msg='scan_imu_slam: start_imu=false, no local /pirobot2/imu/data_raw publisher will be started.',
     )
 
     laser_tf_node = Node(
@@ -174,6 +186,10 @@ def generate_launch_description():
         name='base_to_laser_tf',
         output='screen',
         condition=IfCondition(LaunchConfiguration('start_static_tf')),
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=[
             '--x', '0',
             '--y', '0',
@@ -192,6 +208,10 @@ def generate_launch_description():
         name='base_to_imu_tf',
         output='screen',
         condition=IfCondition(LaunchConfiguration('start_static_tf')),
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=[
             '--x', '0',
             '--y', '0',
@@ -209,6 +229,10 @@ def generate_launch_description():
         executable='scan_imu_slam_node',
         name='scan_imu_slam_node',
         output='screen',
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         parameters=[{
             'scan_topic': LaunchConfiguration('scan_topic'),
             'imu_topic': LaunchConfiguration('imu_topic'),
@@ -223,6 +247,8 @@ def generate_launch_description():
             'zupt_accel_threshold': LaunchConfiguration('zupt_accel_threshold'),
             'zupt_gyro_threshold': LaunchConfiguration('zupt_gyro_threshold'),
             'zupt_min_samples': LaunchConfiguration('zupt_min_samples'),
+            'pose_topic': '/pirobot2/slam_pose',
+            'path_topic': '/pirobot2/slam_path',
             'map_frame': 'map',
             'base_frame': 'base_link',
         }],
@@ -234,6 +260,10 @@ def generate_launch_description():
         name='pirobot2_slam_rviz',
         output='screen',
         condition=IfCondition(LaunchConfiguration('start_rviz')),
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=['-d', LaunchConfiguration('rviz_config')],
     )
 
@@ -241,6 +271,8 @@ def generate_launch_description():
         scan_topic_arg,
         imu_topic_arg,
         map_topic_arg,
+        tf_topic_arg,
+        tf_static_topic_arg,
         deployment_arg,
         start_lidar_arg,
         start_imu_arg,

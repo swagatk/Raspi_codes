@@ -56,7 +56,7 @@ class IMUPublisher(Node):
 
         self.declare_parameter('bus_num', 1)
         self.declare_parameter('frame_id', 'imu_link')
-        self.declare_parameter('topic', '/imu/data_raw')
+        self.declare_parameter('topic', '/pirobot2/imu/data_raw')
         self.declare_parameter('rate_hz', 50.0)
         self.declare_parameter('accel_alpha', 0.25)
         self.declare_parameter('gyro_alpha', 0.20)

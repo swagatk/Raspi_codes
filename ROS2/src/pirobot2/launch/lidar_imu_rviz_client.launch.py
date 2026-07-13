@@ -47,11 +47,27 @@ def generate_launch_description():
         description='Frame ID used by IMU messages',
     )
 
+    tf_topic_arg = DeclareLaunchArgument(
+        'tf_topic',
+        default_value='/tf',
+        description='TF topic to use for transforms',
+    )
+
+    tf_static_topic_arg = DeclareLaunchArgument(
+        'tf_static_topic',
+        default_value='/tf_static',
+        description='Static TF topic to use for static transforms',
+    )
+
     static_tf_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='pirobot2_rviz_static_tf',
         output='screen',
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_parent_frame'), LaunchConfiguration('tf_child_frame')],
     )
 
@@ -60,6 +76,10 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='pirobot2_rviz_lidar_tf',
         output='screen',
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_child_frame'), LaunchConfiguration('lidar_frame')],
     )
 
@@ -68,6 +88,10 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='pirobot2_rviz_imu_tf',
         output='screen',
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('tf_child_frame'), LaunchConfiguration('imu_frame')],
     )
 
@@ -76,6 +100,10 @@ def generate_launch_description():
         executable='rviz2',
         name='pirobot2_lidar_imu_rviz',
         output='screen',
+        remappings=[
+            ('/tf', LaunchConfiguration('tf_topic')),
+            ('/tf_static', LaunchConfiguration('tf_static_topic')),
+        ],
         arguments=['-d', LaunchConfiguration('rviz_config'), '-f', LaunchConfiguration('fixed_frame')],
     )
 
@@ -86,6 +114,8 @@ def generate_launch_description():
         tf_child_arg,
         lidar_frame_arg,
         imu_frame_arg,
+        tf_topic_arg,
+        tf_static_topic_arg,
         static_tf_node,
         lidar_tf_node,
         imu_tf_node,

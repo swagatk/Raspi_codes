@@ -1,0 +1,44 @@
+running egg_info
+writing ../../build/pirobot2/pirobot2.egg-info/PKG-INFO
+writing dependency_links to ../../build/pirobot2/pirobot2.egg-info/dependency_links.txt
+writing entry points to ../../build/pirobot2/pirobot2.egg-info/entry_points.txt
+writing requirements to ../../build/pirobot2/pirobot2.egg-info/requires.txt
+writing top-level names to ../../build/pirobot2/pirobot2.egg-info/top_level.txt
+reading manifest file '../../build/pirobot2/pirobot2.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file '../../build/pirobot2/pirobot2.egg-info/SOURCES.txt'
+running build
+running build_py
+copying pirobot2/imu_publisher.py -> /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2
+copying pirobot2/scan_imu_slam.py -> /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2
+copying pirobot2/lidar_publisher.py -> /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2
+running install
+running install_lib
+copying /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2/imu_publisher.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2
+copying /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2/scan_imu_slam.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2
+copying /home/pi/Raspi_codes/ROS2/build/pirobot2/build/lib/pirobot2/lidar_publisher.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2
+byte-compiling /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2/imu_publisher.py to imu_publisher.cpython-311.pyc
+byte-compiling /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2/scan_imu_slam.py to scan_imu_slam.cpython-311.pyc
+byte-compiling /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2/lidar_publisher.py to lidar_publisher.cpython-311.pyc
+running install_data
+copying launch/imu_publisher.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+copying launch/lidar_imu_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+copying launch/lidar_publisher.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+copying launch/scan_imu_slam.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+copying rviz/lidar_imu_combined.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+copying rviz/lidar_scan.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+copying rviz/slam_map.rviz -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz
+running install_egg_info
+removing '/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2-0.0.0-py3.11.egg-info' (and everything under it)
+Copying ../../build/pirobot2/pirobot2.egg-info to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2-0.0.0-py3.11.egg-info
+running install_scripts
+Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing motion_subscriber_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing obstacle_avoidance_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing scan_imu_slam_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing serial_bridge_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing teleop_keyboard_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+Installing ultrasonic_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+writing list of installed files to '/home/pi/Raspi_codes/ROS2/build/pirobot2/install.log'

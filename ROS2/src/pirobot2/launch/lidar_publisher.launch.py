@@ -19,7 +19,7 @@ def generate_launch_description():
 
     scan_topic_arg = DeclareLaunchArgument(
         'scan_topic',
-        default_value='/scan',
+        default_value='/pirobot2/scan',
         description='Topic used to publish raw LaserScan data',
     )
 

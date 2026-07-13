@@ -34,7 +34,7 @@ class LidarPublisher(Node):
         self.declare_parameter('port', '/dev/ttyUSB0')
         self.declare_parameter('baudrate', 115200)
         self.declare_parameter('frame_id', 'laser')
-        self.declare_parameter('scan_topic', '/scan')
+        self.declare_parameter('scan_topic', '/pirobot2/scan')
         self.declare_parameter('scan_resolution', 360)
         self.declare_parameter('range_min_m', 0.15)
         self.declare_parameter('range_max_m', 16.0)

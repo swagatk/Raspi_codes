@@ -37,7 +37,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /scan
+        Value: /pirobot2/scan
       Use Fixed Frame: true
       Use rainbow: true
       Value: true

@@ -27,11 +27,11 @@ class ScanImuSlamNode(Node):
     def __init__(self):
         super().__init__('scan_imu_slam_node')
 
-        self.declare_parameter('scan_topic', '/scan')
-        self.declare_parameter('imu_topic', '/imu/data_raw')
-        self.declare_parameter('map_topic', '/map')
-        self.declare_parameter('pose_topic', '/slam_pose')
-        self.declare_parameter('path_topic', '/slam_path')
+        self.declare_parameter('scan_topic', '/pirobot2/scan')
+        self.declare_parameter('imu_topic', '/pirobot2/imu/data_raw')
+        self.declare_parameter('map_topic', '/pirobot2/map')
+        self.declare_parameter('pose_topic', '/pirobot2/slam_pose')
+        self.declare_parameter('path_topic', '/pirobot2/slam_path')
         self.declare_parameter('map_frame', 'map')
         self.declare_parameter('base_frame', 'base_link')
         self.declare_parameter('resolution', 0.05)

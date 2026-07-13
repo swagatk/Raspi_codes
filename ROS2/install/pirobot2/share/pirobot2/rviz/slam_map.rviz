@@ -24,7 +24,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /map
+        Value: /pirobot2/map
       Alpha: 0.8
       Color Scheme: map
       Draw Behind: false
@@ -36,7 +36,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /scan
+        Value: /pirobot2/scan
       Color: 255; 120; 0
       Color Transformer: FlatColor
       Size (Pixels): 3
@@ -50,7 +50,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /slam_pose
+        Value: /pirobot2/slam_pose
       Arrow Length: 0.4
       Arrow Radius: 0.03
       Shaft Length: 0.3
@@ -66,7 +66,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /slam_path
+        Value: /pirobot2/slam_path
       Color: 0; 200; 255
       Line Style: Lines
       Line Width: 0.03

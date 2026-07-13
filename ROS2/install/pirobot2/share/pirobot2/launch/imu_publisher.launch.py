@@ -19,7 +19,7 @@ def generate_launch_description():
 
     topic_arg = DeclareLaunchArgument(
         'topic',
-        default_value='/imu/data_raw',
+        default_value='/pirobot2/imu/data_raw',
         description='Topic to publish filtered IMU data',
     )
 
