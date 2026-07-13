@@ -55,6 +55,24 @@ def generate_launch_description():
         description='Publish map->base_link transform from SLAM node',
     )
 
+    zupt_accel_threshold_arg = DeclareLaunchArgument(
+        'zupt_accel_threshold',
+        default_value='0.15',
+        description='ZUPT acceleration threshold in m/s^2 used to detect stationary state',
+    )
+
+    zupt_gyro_threshold_arg = DeclareLaunchArgument(
+        'zupt_gyro_threshold',
+        default_value='0.05',
+        description='ZUPT angular velocity threshold in rad/s used to detect stationary state',
+    )
+
+    zupt_min_samples_arg = DeclareLaunchArgument(
+        'zupt_min_samples',
+        default_value='8',
+        description='Consecutive IMU samples below thresholds before zeroing velocity',
+    )
+
     start_static_tf_arg = DeclareLaunchArgument(
         'start_static_tf',
         default_value='true',
@@ -160,6 +178,9 @@ def generate_launch_description():
             'imu_topic': LaunchConfiguration('imu_topic'),
             'map_topic': LaunchConfiguration('map_topic'),
             'publish_tf': LaunchConfiguration('publish_tf'),
+            'zupt_accel_threshold': LaunchConfiguration('zupt_accel_threshold'),
+            'zupt_gyro_threshold': LaunchConfiguration('zupt_gyro_threshold'),
+            'zupt_min_samples': LaunchConfiguration('zupt_min_samples'),
             'map_frame': 'map',
             'base_frame': 'base_link',
         }],
@@ -182,6 +203,9 @@ def generate_launch_description():
         start_lidar_arg,
         start_imu_arg,
         publish_tf_arg,
+        zupt_accel_threshold_arg,
+        zupt_gyro_threshold_arg,
+        zupt_min_samples_arg,
         start_static_tf_arg,
         start_rviz_arg,
         rviz_config_arg,

@@ -1,1 +1,0 @@
-/home/pi/Raspi_codes/ROS2/src/pirobot2/setup.py

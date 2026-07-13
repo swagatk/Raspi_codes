@@ -1,1 +1,98 @@
-/home/pi/Raspi_codes/ROS2/build/pirobot2/rviz/slam_map.rviz
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Selection
+    Name: Selection
+  - Class: rviz_common/Tool Properties
+    Name: Tool Properties
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Plane Cell Count: 40
+      Reference Frame: <Fixed Frame>
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: OccupancyMap
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /map
+      Alpha: 0.8
+      Color Scheme: map
+      Draw Behind: false
+    - Class: rviz_default_plugins/LaserScan
+      Enabled: true
+      Name: LiveScan
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /scan
+      Color: 255; 120; 0
+      Color Transformer: FlatColor
+      Size (Pixels): 3
+      Style: Points
+      Use Fixed Frame: true
+    - Class: rviz_default_plugins/Pose
+      Enabled: true
+      Name: SlamPose
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /slam_pose
+      Arrow Length: 0.4
+      Arrow Radius: 0.03
+      Shaft Length: 0.3
+      Shaft Radius: 0.02
+      Head Length: 0.1
+      Head Radius: 0.06
+      Color: 50; 220; 50
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Name: SlamPath
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /slam_path
+      Color: 0; 200; 255
+      Line Style: Lines
+      Line Width: 0.03
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+  Enabled: true
+  Global Options:
+    Background Color: 34; 34; 34
+    Fixed Frame: map
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 18
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Pitch: 1.2
+      Yaw: 0.6

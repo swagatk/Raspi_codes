@@ -1,0 +1,31 @@
+[3.881s] Invoking command in '/home/pi/Raspi_codes/ROS2/src/pirobot2': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/pirobot2 build --build-base /home/pi/Raspi_codes/ROS2/build/pirobot2/build install --record /home/pi/Raspi_codes/ROS2/build/pirobot2/install.log --single-version-externally-managed install_data
+[5.284s] running egg_info
+[5.349s] writing ../../build/pirobot2/pirobot2.egg-info/PKG-INFO
+[5.350s] writing dependency_links to ../../build/pirobot2/pirobot2.egg-info/dependency_links.txt
+[5.353s] writing entry points to ../../build/pirobot2/pirobot2.egg-info/entry_points.txt
+[5.354s] writing requirements to ../../build/pirobot2/pirobot2.egg-info/requires.txt
+[5.355s] writing top-level names to ../../build/pirobot2/pirobot2.egg-info/top_level.txt
+[5.492s] reading manifest file '../../build/pirobot2/pirobot2.egg-info/SOURCES.txt'
+[5.492s] adding license file 'LICENSE'
+[5.492s] writing manifest file '../../build/pirobot2/pirobot2.egg-info/SOURCES.txt'
+[5.493s] running build
+[5.493s] running build_py
+[5.494s] running install
+[5.515s] running install_lib
+[5.583s] running install_data
+[5.584s] copying launch/scan_imu_slam.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[5.585s] running install_egg_info
+[5.659s] removing '/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2-0.0.0-py3.11.egg-info' (and everything under it)
+[5.663s] Copying ../../build/pirobot2/pirobot2.egg-info to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2-0.0.0-py3.11.egg-info
+[5.666s] running install_scripts
+[5.928s] Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.928s] Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.933s] Installing motion_subscriber_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.933s] Installing obstacle_avoidance_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.933s] Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.933s] Installing scan_imu_slam_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.934s] Installing serial_bridge_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.935s] Installing teleop_keyboard_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.936s] Installing ultrasonic_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[5.938s] writing list of installed files to '/home/pi/Raspi_codes/ROS2/build/pirobot2/install.log'
+[6.133s] Invoked command in '/home/pi/Raspi_codes/ROS2/src/pirobot2' returned '0': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/pirobot2 build --build-base /home/pi/Raspi_codes/ROS2/build/pirobot2/build install --record /home/pi/Raspi_codes/ROS2/build/pirobot2/install.log --single-version-externally-managed install_data

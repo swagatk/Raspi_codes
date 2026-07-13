@@ -46,6 +46,9 @@ class ScanImuSlamNode(Node):
         self.declare_parameter('accel_deadband', 0.10)
         self.declare_parameter('motion_decay', 0.97)
         self.declare_parameter('max_speed', 1.0)
+        self.declare_parameter('zupt_accel_threshold', 0.15)
+        self.declare_parameter('zupt_gyro_threshold', 0.05)
+        self.declare_parameter('zupt_min_samples', 8)
         self.declare_parameter('publish_tf', True)
 
         self.scan_topic = self.get_parameter('scan_topic').value
@@ -68,6 +71,9 @@ class ScanImuSlamNode(Node):
         self.accel_deadband = float(self.get_parameter('accel_deadband').value)
         self.motion_decay = float(self.get_parameter('motion_decay').value)
         self.max_speed = float(self.get_parameter('max_speed').value)
+        self.zupt_accel_threshold = float(self.get_parameter('zupt_accel_threshold').value)
+        self.zupt_gyro_threshold = float(self.get_parameter('zupt_gyro_threshold').value)
+        self.zupt_min_samples = int(self.get_parameter('zupt_min_samples').value)
         self.publish_tf = bool(self.get_parameter('publish_tf').value)
 
         self.log_odds = [0.0] * (self.width * self.height)
@@ -78,6 +84,7 @@ class ScanImuSlamNode(Node):
         self.vx = 0.0
         self.vy = 0.0
         self.last_imu_time = None
+        self.stationary_count = 0
 
         self.path_msg = Path()
         self.path_msg.header.frame_id = self.map_frame
@@ -122,6 +129,23 @@ class ScanImuSlamNode(Node):
             ax = 0.0
         if abs(ay) < self.accel_deadband:
             ay = 0.0
+
+        accel_norm = math.sqrt(ax * ax + ay * ay)
+        gyro_norm = math.sqrt(
+            msg.angular_velocity.x * msg.angular_velocity.x
+            + msg.angular_velocity.y * msg.angular_velocity.y
+            + msg.angular_velocity.z * msg.angular_velocity.z
+        )
+        if accel_norm < self.zupt_accel_threshold and gyro_norm < self.zupt_gyro_threshold:
+            self.stationary_count += 1
+        else:
+            self.stationary_count = 0
+
+        if self.stationary_count >= self.zupt_min_samples:
+            # Zero Velocity Update (ZUPT): clamp velocity when robot is static.
+            self.vx = 0.0
+            self.vy = 0.0
+            return
 
         cos_yaw = math.cos(self.yaw)
         sin_yaw = math.sin(self.yaw)
