@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from collections import deque
 import math
 
 import rclpy
@@ -44,8 +45,12 @@ class ScanImuSlamNode(Node):
         self.declare_parameter('max_log_odds', 4.0)
         self.declare_parameter('publish_rate_hz', 2.0)
         self.declare_parameter('accel_deadband', 0.10)
-        self.declare_parameter('motion_decay', 0.97)
-        self.declare_parameter('max_speed', 1.0)
+        self.declare_parameter('scan_match_enabled', True)
+        self.declare_parameter('scan_match_window_m', 0.25)
+        self.declare_parameter('scan_match_step_m', 0.05)
+        self.declare_parameter('scan_match_min_points', 20)
+        self.declare_parameter('scan_match_prior_weight', 0.20)
+        self.declare_parameter('yaw_filter_window', 5)
         self.declare_parameter('zupt_accel_threshold', 0.15)
         self.declare_parameter('zupt_gyro_threshold', 0.05)
         self.declare_parameter('zupt_min_samples', 8)
@@ -69,8 +74,12 @@ class ScanImuSlamNode(Node):
         self.max_log_odds = float(self.get_parameter('max_log_odds').value)
         self.publish_rate_hz = float(self.get_parameter('publish_rate_hz').value)
         self.accel_deadband = float(self.get_parameter('accel_deadband').value)
-        self.motion_decay = float(self.get_parameter('motion_decay').value)
-        self.max_speed = float(self.get_parameter('max_speed').value)
+        self.scan_match_enabled = bool(self.get_parameter('scan_match_enabled').value)
+        self.scan_match_window_m = float(self.get_parameter('scan_match_window_m').value)
+        self.scan_match_step_m = float(self.get_parameter('scan_match_step_m').value)
+        self.scan_match_min_points = int(self.get_parameter('scan_match_min_points').value)
+        self.scan_match_prior_weight = float(self.get_parameter('scan_match_prior_weight').value)
+        self.yaw_filter_window = max(1, int(self.get_parameter('yaw_filter_window').value))
         self.zupt_accel_threshold = float(self.get_parameter('zupt_accel_threshold').value)
         self.zupt_gyro_threshold = float(self.get_parameter('zupt_gyro_threshold').value)
         self.zupt_min_samples = int(self.get_parameter('zupt_min_samples').value)
@@ -81,15 +90,18 @@ class ScanImuSlamNode(Node):
         self.x = 0.0
         self.y = 0.0
         self.yaw = 0.0
-        self.vx = 0.0
-        self.vy = 0.0
         self.last_imu_time = None
         self.stationary_count = 0
+        self.is_stationary = False
+        self.map_initialized = False
+        self.yaw_sin_buffer = deque(maxlen=self.yaw_filter_window)
+        self.yaw_cos_buffer = deque(maxlen=self.yaw_filter_window)
 
         self.path_msg = Path()
         self.path_msg.header.frame_id = self.map_frame
         self.last_path_x = 0.0
         self.last_path_y = 0.0
+        self.last_path_yaw = 0.0
 
         self.map_publisher = self.create_publisher(OccupancyGrid, self.map_topic, 1)
         self.pose_publisher = self.create_publisher(PoseStamped, self.pose_topic, 10)
@@ -104,6 +116,21 @@ class ScanImuSlamNode(Node):
         self.get_logger().info(
             f'Scan+IMU SLAM node started. scan={self.scan_topic}, imu={self.imu_topic}, map={self.map_topic}'
         )
+        if self.scan_match_enabled:
+            self.get_logger().info(
+                f'Scan matching enabled. window={self.scan_match_window_m:.2f} m, step={self.scan_match_step_m:.2f} m'
+            )
+        else:
+            self.get_logger().warn('Scan matching is disabled; pose XY will remain fixed unless changed externally.')
+        self.get_logger().info(f'Yaw moving-average filter window: {self.yaw_filter_window} samples')
+
+    def _update_filtered_yaw(self, raw_yaw):
+        self.yaw_sin_buffer.append(math.sin(raw_yaw))
+        self.yaw_cos_buffer.append(math.cos(raw_yaw))
+
+        mean_sin = sum(self.yaw_sin_buffer) / len(self.yaw_sin_buffer)
+        mean_cos = sum(self.yaw_cos_buffer) / len(self.yaw_cos_buffer)
+        return math.atan2(mean_sin, mean_cos)
 
     def imu_callback(self, msg):
         stamp = msg.header.stamp
@@ -113,7 +140,8 @@ class ScanImuSlamNode(Node):
 
         if self.last_imu_time is None:
             self.last_imu_time = current_time
-            self.yaw = yaw_from_quaternion(msg.orientation)
+            raw_yaw = yaw_from_quaternion(msg.orientation)
+            self.yaw = self._update_filtered_yaw(raw_yaw)
             return
 
         dt = current_time - self.last_imu_time
@@ -121,7 +149,8 @@ class ScanImuSlamNode(Node):
         if dt <= 0.0 or dt > 0.5:
             return
 
-        self.yaw = yaw_from_quaternion(msg.orientation)
+        raw_yaw = yaw_from_quaternion(msg.orientation)
+        self.yaw = self._update_filtered_yaw(raw_yaw)
 
         ax = msg.linear_acceleration.x
         ay = msg.linear_acceleration.y
@@ -141,46 +170,96 @@ class ScanImuSlamNode(Node):
         else:
             self.stationary_count = 0
 
-        if self.stationary_count >= self.zupt_min_samples:
-            # Zero Velocity Update (ZUPT): clamp velocity when robot is static.
-            self.vx = 0.0
-            self.vy = 0.0
-            return
-
-        cos_yaw = math.cos(self.yaw)
-        sin_yaw = math.sin(self.yaw)
-        ax_world = cos_yaw * ax - sin_yaw * ay
-        ay_world = sin_yaw * ax + cos_yaw * ay
-
-        self.vx = self.motion_decay * self.vx + ax_world * dt
-        self.vy = self.motion_decay * self.vy + ay_world * dt
-
-        speed = math.sqrt(self.vx * self.vx + self.vy * self.vy)
-        if speed > self.max_speed and speed > 0.0:
-            scale = self.max_speed / speed
-            self.vx *= scale
-            self.vy *= scale
-
-        self.x += self.vx * dt
-        self.y += self.vy * dt
-
-        # Add pose to path only when position changes enough to keep Path lightweight.
-        dx = self.x - self.last_path_x
-        dy = self.y - self.last_path_y
-        if dx * dx + dy * dy >= 0.01:
-            pose = self.build_pose_stamped(msg.header.stamp)
-            self.path_msg.poses.append(pose)
-            self.last_path_x = self.x
-            self.last_path_y = self.y
+        self.is_stationary = self.stationary_count >= self.zupt_min_samples
 
     def scan_callback(self, msg):
+        points = []
         angle = msg.angle_min
         for distance in msg.ranges:
             if math.isfinite(distance) and msg.range_min <= distance <= msg.range_max:
-                end_x = self.x + distance * math.cos(self.yaw + angle)
-                end_y = self.y + distance * math.sin(self.yaw + angle)
-                self.update_ray(self.x, self.y, end_x, end_y)
+                points.append((distance, angle))
             angle += msg.angle_increment
+
+        if self.scan_match_enabled and not self.is_stationary:
+            self.update_pose_from_scan_matching(points)
+
+        for distance, beam_angle in points:
+            end_x = self.x + distance * math.cos(self.yaw + beam_angle)
+            end_y = self.y + distance * math.sin(self.yaw + beam_angle)
+            self.update_ray(self.x, self.y, end_x, end_y)
+
+        if points:
+            self.map_initialized = True
+
+        self.update_path(msg.header.stamp)
+
+    def update_path(self, stamp):
+        dx = self.x - self.last_path_x
+        dy = self.y - self.last_path_y
+        dyaw = abs(math.atan2(math.sin(self.yaw - self.last_path_yaw), math.cos(self.yaw - self.last_path_yaw)))
+
+        if dx * dx + dy * dy >= 0.01 or dyaw >= math.radians(3.0):
+            pose = self.build_pose_stamped(stamp)
+            self.path_msg.poses.append(pose)
+            self.last_path_x = self.x
+            self.last_path_y = self.y
+            self.last_path_yaw = self.yaw
+
+    def update_pose_from_scan_matching(self, points):
+        if not self.map_initialized:
+            return
+
+        if len(points) < self.scan_match_min_points:
+            return
+
+        best_x = self.x
+        best_y = self.y
+        best_score = float('-inf')
+
+        window = max(0.0, self.scan_match_window_m)
+        step = max(0.01, self.scan_match_step_m)
+        max_steps = int(window / step)
+
+        for ix in range(-max_steps, max_steps + 1):
+            candidate_x = self.x + ix * step
+            for iy in range(-max_steps, max_steps + 1):
+                candidate_y = self.y + iy * step
+                score = self.score_scan_pose(points, candidate_x, candidate_y)
+
+                # Small motion prior helps avoid jumping between equivalent local optima.
+                offset_sq = (candidate_x - self.x) * (candidate_x - self.x) + (candidate_y - self.y) * (candidate_y - self.y)
+                score -= self.scan_match_prior_weight * offset_sq
+
+                if score > best_score:
+                    best_score = score
+                    best_x = candidate_x
+                    best_y = candidate_y
+
+        self.x = best_x
+        self.y = best_y
+
+    def score_scan_pose(self, points, pose_x, pose_y):
+        score = 0.0
+        hit_count = 0
+        for distance, beam_angle in points:
+            end_x = pose_x + distance * math.cos(self.yaw + beam_angle)
+            end_y = pose_y + distance * math.sin(self.yaw + beam_angle)
+            gx, gy = self.world_to_grid(end_x, end_y)
+            if not self.in_bounds(gx, gy):
+                continue
+
+            idx = gy * self.width + gx
+            value = self.log_odds[idx]
+
+            if value > 0.0:
+                score += value
+                hit_count += 1
+            elif value < 0.0:
+                score += 0.2 * value
+
+        if hit_count == 0:
+            return -1e6
+        return score
 
     def world_to_grid(self, wx, wy):
         gx = int((wx - self.origin_x) / self.resolution)

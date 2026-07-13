@@ -55,6 +55,42 @@ def generate_launch_description():
         description='Publish map->base_link transform from SLAM node',
     )
 
+    scan_match_enabled_arg = DeclareLaunchArgument(
+        'scan_match_enabled',
+        default_value='true',
+        description='Use lidar scan matching to estimate XY motion',
+    )
+
+    scan_match_window_m_arg = DeclareLaunchArgument(
+        'scan_match_window_m',
+        default_value='0.25',
+        description='XY search window in meters for scan matching',
+    )
+
+    scan_match_step_m_arg = DeclareLaunchArgument(
+        'scan_match_step_m',
+        default_value='0.05',
+        description='XY search step in meters for scan matching',
+    )
+
+    scan_match_min_points_arg = DeclareLaunchArgument(
+        'scan_match_min_points',
+        default_value='20',
+        description='Minimum valid scan points required before matching',
+    )
+
+    scan_match_prior_weight_arg = DeclareLaunchArgument(
+        'scan_match_prior_weight',
+        default_value='0.20',
+        description='Penalty weight for large XY jumps during scan matching',
+    )
+
+    yaw_filter_window_arg = DeclareLaunchArgument(
+        'yaw_filter_window',
+        default_value='5',
+        description='Moving-average window size (samples) for IMU yaw stabilization',
+    )
+
     zupt_accel_threshold_arg = DeclareLaunchArgument(
         'zupt_accel_threshold',
         default_value='0.15',
@@ -178,6 +214,12 @@ def generate_launch_description():
             'imu_topic': LaunchConfiguration('imu_topic'),
             'map_topic': LaunchConfiguration('map_topic'),
             'publish_tf': LaunchConfiguration('publish_tf'),
+            'scan_match_enabled': LaunchConfiguration('scan_match_enabled'),
+            'scan_match_window_m': LaunchConfiguration('scan_match_window_m'),
+            'scan_match_step_m': LaunchConfiguration('scan_match_step_m'),
+            'scan_match_min_points': LaunchConfiguration('scan_match_min_points'),
+            'scan_match_prior_weight': LaunchConfiguration('scan_match_prior_weight'),
+            'yaw_filter_window': LaunchConfiguration('yaw_filter_window'),
             'zupt_accel_threshold': LaunchConfiguration('zupt_accel_threshold'),
             'zupt_gyro_threshold': LaunchConfiguration('zupt_gyro_threshold'),
             'zupt_min_samples': LaunchConfiguration('zupt_min_samples'),
@@ -203,6 +245,12 @@ def generate_launch_description():
         start_lidar_arg,
         start_imu_arg,
         publish_tf_arg,
+        scan_match_enabled_arg,
+        scan_match_window_m_arg,
+        scan_match_step_m_arg,
+        scan_match_min_points_arg,
+        scan_match_prior_weight_arg,
+        yaw_filter_window_arg,
         zupt_accel_threshold_arg,
         zupt_gyro_threshold_arg,
         zupt_min_samples_arg,
