@@ -49,6 +49,12 @@ def generate_launch_description():
         description='slam_toolbox YAML parameter file',
     )
 
+    debug_logging_arg = DeclareLaunchArgument(
+        'debug_logging',
+        default_value='false',
+        description='Enable verbose slam_toolbox logging',
+    )
+
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false',
@@ -129,10 +135,12 @@ def generate_launch_description():
         parameters=[
             LaunchConfiguration('params_file'),
             {
+                'scan_topic': LaunchConfiguration('scan_topic'),
                 'use_sim_time': LaunchConfiguration('use_sim_time'),
                 'map_frame': LaunchConfiguration('map_frame'),
                 'odom_frame': LaunchConfiguration('odom_frame'),
                 'base_frame': LaunchConfiguration('base_frame'),
+                'debug_logging': LaunchConfiguration('debug_logging'),
             },
         ],
         remappings=[
@@ -195,6 +203,7 @@ def generate_launch_description():
         odom_frame_arg,
         base_frame_arg,
         params_file_arg,
+        debug_logging_arg,
         use_sim_time_arg,
         start_static_tf_arg,
         laser_frame_arg,

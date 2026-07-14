@@ -7,6 +7,7 @@
     map_frame: map
     odom_frame: odom
     base_frame: base_link
+    scan_topic: /pirobot2/scan
 
     # This robot currently maps without a wheel odometry source, so
     # the launch file can supply an identity odom->base_link transform.

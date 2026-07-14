@@ -219,6 +219,10 @@ Run slam_toolbox on remote laptop:
 
 	ros2 launch pirobot2 slam_toolbox.launch.py
 
+If the node starts but never publishes `/pirobot2/map`, rerun once with debug logs enabled:
+
+	ros2 launch pirobot2 slam_toolbox.launch.py start_rviz:=false debug_logging:=true
+
 Defaults are chosen for robots without wheel odometry:
 
 - `odom_frame:=odom`
