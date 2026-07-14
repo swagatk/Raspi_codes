@@ -32,3 +32,4 @@ resource/pirobot2
 rviz/lidar_imu_combined.rviz
 rviz/lidar_scan.rviz
 rviz/slam_map.rviz
+rviz/slam_toolbox_map.rviz

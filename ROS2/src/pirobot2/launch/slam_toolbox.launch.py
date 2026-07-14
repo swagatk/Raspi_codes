@@ -11,7 +11,7 @@ import os
 def generate_launch_description():
     package_share = get_package_share_directory('pirobot2')
     default_params = os.path.join(package_share, 'config', 'slam_toolbox_mapper_params.yaml')
-    default_rviz_config = os.path.join(package_share, 'rviz', 'slam_map.rviz')
+    default_rviz_config = os.path.join(package_share, 'rviz', 'slam_toolbox_map.rviz')
 
     scan_topic_arg = DeclareLaunchArgument(
         'scan_topic',
@@ -33,8 +33,8 @@ def generate_launch_description():
 
     odom_frame_arg = DeclareLaunchArgument(
         'odom_frame',
-        default_value='odom',
-        description='Odometry frame id used internally by slam_toolbox',
+        default_value='base_link',
+        description='Odometry frame id used internally by slam_toolbox; use base_link if no wheel odometry exists',
     )
 
     base_frame_arg = DeclareLaunchArgument(
@@ -57,7 +57,7 @@ def generate_launch_description():
 
     start_static_tf_arg = DeclareLaunchArgument(
         'start_static_tf',
-        default_value='false',
+        default_value='true',
         description='Start base_link->laser static TF locally if your robot does not publish it',
     )
 
@@ -65,6 +65,42 @@ def generate_launch_description():
         'laser_frame',
         default_value='laser',
         description='Laser frame id for static TF publisher',
+    )
+
+    laser_x_arg = DeclareLaunchArgument(
+        'laser_x',
+        default_value='0.0',
+        description='Laser X offset from base frame in meters',
+    )
+
+    laser_y_arg = DeclareLaunchArgument(
+        'laser_y',
+        default_value='0.0',
+        description='Laser Y offset from base frame in meters',
+    )
+
+    laser_z_arg = DeclareLaunchArgument(
+        'laser_z',
+        default_value='0.0',
+        description='Laser Z offset from base frame in meters',
+    )
+
+    laser_roll_arg = DeclareLaunchArgument(
+        'laser_roll',
+        default_value='0.0',
+        description='Laser roll offset from base frame in radians',
+    )
+
+    laser_pitch_arg = DeclareLaunchArgument(
+        'laser_pitch',
+        default_value='0.0',
+        description='Laser pitch offset from base frame in radians',
+    )
+
+    laser_yaw_arg = DeclareLaunchArgument(
+        'laser_yaw',
+        default_value='0.0',
+        description='Laser yaw offset from base frame in radians',
     )
 
     start_rviz_arg = DeclareLaunchArgument(
@@ -107,7 +143,16 @@ def generate_launch_description():
         name='base_to_laser_tf_for_slam_toolbox',
         output='screen',
         condition=IfCondition(LaunchConfiguration('start_static_tf')),
-        arguments=['0', '0', '0', '0', '0', '0', LaunchConfiguration('base_frame'), LaunchConfiguration('laser_frame')],
+        arguments=[
+            '--x', LaunchConfiguration('laser_x'),
+            '--y', LaunchConfiguration('laser_y'),
+            '--z', LaunchConfiguration('laser_z'),
+            '--roll', LaunchConfiguration('laser_roll'),
+            '--pitch', LaunchConfiguration('laser_pitch'),
+            '--yaw', LaunchConfiguration('laser_yaw'),
+            '--frame-id', LaunchConfiguration('base_frame'),
+            '--child-frame-id', LaunchConfiguration('laser_frame'),
+        ],
     )
 
     rviz_node = Node(
@@ -129,6 +174,12 @@ def generate_launch_description():
         use_sim_time_arg,
         start_static_tf_arg,
         laser_frame_arg,
+        laser_x_arg,
+        laser_y_arg,
+        laser_z_arg,
+        laser_roll_arg,
+        laser_pitch_arg,
+        laser_yaw_arg,
         start_rviz_arg,
         rviz_config_arg,
         slam_toolbox_node,

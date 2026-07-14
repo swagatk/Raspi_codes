@@ -217,15 +217,35 @@ Run teleop on remote laptop (without local serial bridge):
 
 Run slam_toolbox on remote laptop:
 
-	ros2 launch pirobot2 slam_toolbox.launch.py start_static_tf:=false
+	ros2 launch pirobot2 slam_toolbox.launch.py
 
-If your robot does not publish `base_link -> laser` static TF, set `start_static_tf:=true` for the `slam_toolbox.launch.py` run.
+Defaults are chosen for robots without wheel odometry:
+
+- `odom_frame:=base_link`
+- `start_static_tf:=true`
+
+If your robot already publishes `base_link -> laser` static TF, set `start_static_tf:=false`.
+
+If the laser is not exactly at the robot origin, pass its pose explicitly, for example:
+
+	ros2 launch pirobot2 slam_toolbox.launch.py laser_x:=0.08 laser_y:=0.0 laser_yaw:=0.0
 
 Parameters are in:
 
 	config/slam_toolbox_mapper_params.yaml
 
 You can tune this file gradually (start with `map_update_interval`, `minimum_travel_distance`, `minimum_travel_heading`, and `loop_search_maximum_distance`).
+
+If RViz shows `Message Filter dropping message ... queue is full` for frame `laser`, the TF chain is incomplete. Check that:
+
+- `base_link -> laser` exists
+- `map -> base_link` is being published by slam_toolbox
+- the RViz fixed frame is `map`
+
+Useful checks:
+
+	ros2 run tf2_ros tf2_echo base_link laser
+	ros2 run tf2_ros tf2_echo map base_link
 
 ### 8.5 Cartographer and Hector notes
 
