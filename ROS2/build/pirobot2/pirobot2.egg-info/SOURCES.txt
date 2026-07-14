@@ -12,6 +12,7 @@ launch/scan_imu_slam.launch.py
 launch/serial_bridge.launch.py
 launch/slam_toolbox.launch.py
 pirobot2/__init__.py
+pirobot2/cmdvel_odom.py
 pirobot2/imu_publisher.py
 pirobot2/lidar_publisher.py
 pirobot2/motion_subscriber.py

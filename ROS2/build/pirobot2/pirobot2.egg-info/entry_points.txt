@@ -1,4 +1,5 @@
 [console_scripts]
+cmdvel_odom_node = pirobot2.cmdvel_odom:main
 imu_publisher_node = pirobot2.imu_publisher:main
 lidar_publisher_node = pirobot2.lidar_publisher:main
 motion_subscriber_node = pirobot2.motion_subscriber:main

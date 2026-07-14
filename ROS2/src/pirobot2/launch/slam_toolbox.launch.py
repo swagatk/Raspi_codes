@@ -111,8 +111,26 @@ def generate_launch_description():
 
     start_identity_odom_tf_arg = DeclareLaunchArgument(
         'start_identity_odom_tf',
-        default_value='true',
+        default_value='false',
         description='Start an identity odom->base_link TF when no wheel odometry publisher exists',
+    )
+
+    start_cmdvel_odom_arg = DeclareLaunchArgument(
+        'start_cmdvel_odom',
+        default_value='true',
+        description='Start cmd_vel-integrated odometry publisher (recommended when wheel odometry is unavailable)',
+    )
+
+    cmd_vel_topic_arg = DeclareLaunchArgument(
+        'cmd_vel_topic',
+        default_value='/pirobot2/cmd_vel',
+        description='Twist topic consumed by cmd_vel odometry node',
+    )
+
+    odom_topic_arg = DeclareLaunchArgument(
+        'odom_topic',
+        default_value='/odom',
+        description='Odometry topic published by cmd_vel odometry node',
     )
 
     start_rviz_arg = DeclareLaunchArgument(
@@ -193,6 +211,21 @@ def generate_launch_description():
         ],
     )
 
+    cmdvel_odom_node = Node(
+        package='pirobot2',
+        executable='cmdvel_odom_node',
+        name='cmdvel_odom_node',
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('start_cmdvel_odom')),
+        parameters=[{
+            'cmd_vel_topic': LaunchConfiguration('cmd_vel_topic'),
+            'odom_topic': LaunchConfiguration('odom_topic'),
+            'odom_frame': LaunchConfiguration('odom_frame'),
+            'base_frame': LaunchConfiguration('base_frame'),
+            'publish_tf': True,
+        }],
+    )
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -242,12 +275,16 @@ def generate_launch_description():
         laser_pitch_arg,
         laser_yaw_arg,
         start_identity_odom_tf_arg,
+        start_cmdvel_odom_arg,
+        cmd_vel_topic_arg,
+        odom_topic_arg,
         start_rviz_arg,
         autostart_arg,
         rviz_config_arg,
         slam_toolbox_node,
         laser_tf_node,
         odom_tf_node,
+        cmdvel_odom_node,
         configure_slam_toolbox,
         activate_slam_toolbox,
         rviz_node,

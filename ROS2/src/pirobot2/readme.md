@@ -235,11 +235,14 @@ Defaults are chosen for robots without wheel odometry:
 
 - `odom_frame:=odom`
 - `start_static_tf:=true`
-- `start_identity_odom_tf:=true`
+- `start_cmdvel_odom:=true`
+- `start_identity_odom_tf:=false`
 
 If your robot already publishes `base_link -> laser` static TF, set `start_static_tf:=false`.
 
 If your robot already publishes `odom -> base_link`, set `start_identity_odom_tf:=false`.
+
+If your map does not update while moving and you do not have wheel encoders, keep `start_cmdvel_odom:=true` so odometry is integrated from `/pirobot2/cmd_vel`.
 
 If the laser is not exactly at the robot origin, pass its pose explicitly, for example:
 
@@ -263,6 +266,10 @@ Useful checks:
 	ros2 run tf2_ros tf2_echo odom base_link
 	ros2 run tf2_ros tf2_echo base_link laser
 	ros2 run tf2_ros tf2_echo map odom
+
+If you need to disable cmd_vel odometry and use a fixed identity transform instead:
+
+	ros2 launch pirobot2 slam_toolbox.launch.py start_cmdvel_odom:=false start_identity_odom_tf:=true
 
 ### 8.5 Cartographer and Hector notes
 
