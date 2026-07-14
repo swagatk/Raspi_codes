@@ -221,10 +221,13 @@ Run slam_toolbox on remote laptop:
 
 Defaults are chosen for robots without wheel odometry:
 
-- `odom_frame:=base_link`
+- `odom_frame:=odom`
 - `start_static_tf:=true`
+- `start_identity_odom_tf:=true`
 
 If your robot already publishes `base_link -> laser` static TF, set `start_static_tf:=false`.
+
+If your robot already publishes `odom -> base_link`, set `start_identity_odom_tf:=false`.
 
 If the laser is not exactly at the robot origin, pass its pose explicitly, for example:
 
@@ -238,14 +241,16 @@ You can tune this file gradually (start with `map_update_interval`, `minimum_tra
 
 If RViz shows `Message Filter dropping message ... queue is full` for frame `laser`, the TF chain is incomplete. Check that:
 
+- `odom -> base_link` exists
 - `base_link -> laser` exists
-- `map -> base_link` is being published by slam_toolbox
+- `map -> odom` is being published by slam_toolbox
 - the RViz fixed frame is `map`
 
 Useful checks:
 
+	ros2 run tf2_ros tf2_echo odom base_link
 	ros2 run tf2_ros tf2_echo base_link laser
-	ros2 run tf2_ros tf2_echo map base_link
+	ros2 run tf2_ros tf2_echo map odom
 
 ### 8.5 Cartographer and Hector notes
 

@@ -5,11 +5,11 @@
 
     # Keep frames aligned with the existing pirobot2 stack.
     map_frame: map
-    odom_frame: base_link
+    odom_frame: odom
     base_frame: base_link
 
     # This robot currently maps without a wheel odometry source, so
-    # slam_toolbox should publish map->base_link directly.
+    # the launch file can supply an identity odom->base_link transform.
     provide_odom_frame: false
     publish_to_tf: true
 

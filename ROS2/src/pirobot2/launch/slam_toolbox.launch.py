@@ -33,8 +33,8 @@ def generate_launch_description():
 
     odom_frame_arg = DeclareLaunchArgument(
         'odom_frame',
-        default_value='base_link',
-        description='Odometry frame id used internally by slam_toolbox; use base_link if no wheel odometry exists',
+        default_value='odom',
+        description='Odometry frame id used internally by slam_toolbox',
     )
 
     base_frame_arg = DeclareLaunchArgument(
@@ -103,6 +103,12 @@ def generate_launch_description():
         description='Laser yaw offset from base frame in radians',
     )
 
+    start_identity_odom_tf_arg = DeclareLaunchArgument(
+        'start_identity_odom_tf',
+        default_value='true',
+        description='Start an identity odom->base_link TF when no wheel odometry publisher exists',
+    )
+
     start_rviz_arg = DeclareLaunchArgument(
         'start_rviz',
         default_value='true',
@@ -155,6 +161,24 @@ def generate_launch_description():
         ],
     )
 
+    odom_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='odom_to_base_tf_for_slam_toolbox',
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('start_identity_odom_tf')),
+        arguments=[
+            '--x', '0.0',
+            '--y', '0.0',
+            '--z', '0.0',
+            '--roll', '0.0',
+            '--pitch', '0.0',
+            '--yaw', '0.0',
+            '--frame-id', LaunchConfiguration('odom_frame'),
+            '--child-frame-id', LaunchConfiguration('base_frame'),
+        ],
+    )
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -180,9 +204,11 @@ def generate_launch_description():
         laser_roll_arg,
         laser_pitch_arg,
         laser_yaw_arg,
+        start_identity_odom_tf_arg,
         start_rviz_arg,
         rviz_config_arg,
         slam_toolbox_node,
         laser_tf_node,
+        odom_tf_node,
         rviz_node,
     ])
