@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -121,6 +121,12 @@ def generate_launch_description():
         description='Start RViz with map config',
     )
 
+    autostart_arg = DeclareLaunchArgument(
+        'autostart',
+        default_value='true',
+        description='Automatically configure and activate the slam_toolbox lifecycle node',
+    )
+
     rviz_config_arg = DeclareLaunchArgument(
         'rviz_config',
         default_value=default_rviz_config,
@@ -196,6 +202,28 @@ def generate_launch_description():
         arguments=['-d', LaunchConfiguration('rviz_config')],
     )
 
+    configure_slam_toolbox = TimerAction(
+        period=2.0,
+        actions=[
+            ExecuteProcess(
+                cmd=['ros2', 'lifecycle', 'set', '/pirobot2_slam_toolbox', 'configure'],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('autostart')),
+            ),
+        ],
+    )
+
+    activate_slam_toolbox = TimerAction(
+        period=4.0,
+        actions=[
+            ExecuteProcess(
+                cmd=['ros2', 'lifecycle', 'set', '/pirobot2_slam_toolbox', 'activate'],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('autostart')),
+            ),
+        ],
+    )
+
     return LaunchDescription([
         scan_topic_arg,
         map_topic_arg,
@@ -215,9 +243,12 @@ def generate_launch_description():
         laser_yaw_arg,
         start_identity_odom_tf_arg,
         start_rviz_arg,
+        autostart_arg,
         rviz_config_arg,
         slam_toolbox_node,
         laser_tf_node,
         odom_tf_node,
+        configure_slam_toolbox,
+        activate_slam_toolbox,
         rviz_node,
     ])

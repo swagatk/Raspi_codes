@@ -219,9 +219,17 @@ Run slam_toolbox on remote laptop:
 
 	ros2 launch pirobot2 slam_toolbox.launch.py
 
+The launch file will automatically configure and activate the `slam_toolbox` lifecycle node.
+
 If the node starts but never publishes `/pirobot2/map`, rerun once with debug logs enabled:
 
 	ros2 launch pirobot2 slam_toolbox.launch.py start_rviz:=false debug_logging:=true
+
+If needed, you can disable lifecycle autostart and drive transitions manually:
+
+	ros2 launch pirobot2 slam_toolbox.launch.py autostart:=false start_rviz:=false
+	ros2 lifecycle set /pirobot2_slam_toolbox configure
+	ros2 lifecycle set /pirobot2_slam_toolbox activate
 
 Defaults are chosen for robots without wheel odometry:
 
