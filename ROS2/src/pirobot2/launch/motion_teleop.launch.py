@@ -1,5 +1,6 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -77,6 +78,12 @@ def generate_launch_description():
         description='Initial Arduino speed command to send at startup (1/2/3)',
     )
 
+    start_serial_bridge_arg = DeclareLaunchArgument(
+        'start_serial_bridge',
+        default_value='true',
+        description='Start local serial bridge (set false for remote teleop)',
+    )
+
     speed_1_arg = DeclareLaunchArgument(
         'speed_1',
         default_value='0.10',
@@ -112,6 +119,7 @@ def generate_launch_description():
         executable='serial_bridge_node',
         name='serial_bridge_node',
         output='screen',
+        condition=IfCondition(LaunchConfiguration('start_serial_bridge')),
         parameters=[{
             'cmd_vel_topic': LaunchConfiguration('cmd_vel_topic'),
             'ultrasonic_topic': LaunchConfiguration('ultrasonic_topic'),
@@ -157,6 +165,7 @@ def generate_launch_description():
         speed_1_max_arg,
         speed_2_max_arg,
         default_speed_command_arg,
+        start_serial_bridge_arg,
         speed_1_arg,
         speed_2_arg,
         speed_3_arg,
