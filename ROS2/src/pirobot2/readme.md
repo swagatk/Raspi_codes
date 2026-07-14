@@ -4,6 +4,15 @@ This package provides motion control, Arduino serial bridging, ultrasonic obstac
 
 Tested in this workspace with ROS 2 Jazzy and a Raspberry Pi robot.
 
+
+## Images & Videos
+
+![Robot Image1](./images/robot1.jpg)
+![Robot Image2](./images/robot2.jpg)
+![SLAM MAP](./images/slam_map.png)
+![Watch the Video](https://youtube.com/shorts/Z99jtxbsr18)
+
+
 ## 1) Package Contents
 
 Main launch files:
@@ -253,6 +262,68 @@ Parameters are in:
 	config/slam_toolbox_mapper_params.yaml
 
 You can tune this file gradually (start with `map_update_interval`, `minimum_travel_distance`, `minimum_travel_heading`, and `loop_search_maximum_distance`).
+
+### 8.4.1 Current slam_toolbox hyper-parameter defaults (LiDAR + MPU6050)
+
+The current workspace defaults are tuned for a no-encoder setup using LiDAR plus IMU-assisted odometry.
+
+slam_toolbox mapping parameters (`config/slam_toolbox_mapper_params.yaml`):
+
+- `map_update_interval: 0.8`
+- `resolution: 0.05`
+- `minimum_time_interval: 0.06`
+- `transform_timeout: 0.30`
+- `throttle_scans: 1`
+- `use_scan_matching: true`
+- `do_loop_closing: true`
+- `minimum_travel_distance: 0.03`
+- `minimum_travel_heading: 0.03`
+- `scan_buffer_size: 40`
+- `link_match_minimum_response_fine: 0.12`
+- `loop_search_maximum_distance: 6.0`
+
+cmd_vel + IMU odometry fusion parameters (`slam_toolbox.launch.py`):
+
+- `start_cmdvel_odom:=true`
+- `imu_topic:=/pirobot2/imu/data_raw`
+- `odom_use_imu_yaw:=true`
+- `odom_imu_yaw_weight:=0.85`
+- `odom_linear_scale:=1.0`
+- `odom_angular_scale:=1.0`
+
+Recommended baseline launch with these settings:
+
+	ros2 launch pirobot2 slam_toolbox.launch.py start_cmdvel_odom:=true odom_use_imu_yaw:=true odom_imu_yaw_weight:=0.85 odom_linear_scale:=1.0 odom_angular_scale:=1.0
+
+### 8.4.2 Practical tuning presets for map merging quality
+
+If you still see translated duplicate submaps (same structure repeated with a fixed offset), try these presets.
+
+Preset A (stronger IMU heading correction):
+
+	ros2 launch pirobot2 slam_toolbox.launch.py odom_imu_yaw_weight:=0.92
+
+Preset B (very strong IMU heading correction):
+
+	ros2 launch pirobot2 slam_toolbox.launch.py odom_imu_yaw_weight:=0.95
+
+Preset C (translation scale correction if map appears stretched):
+
+	ros2 launch pirobot2 slam_toolbox.launch.py odom_linear_scale:=0.92
+
+Preset D (translation scale correction if map appears compressed):
+
+	ros2 launch pirobot2 slam_toolbox.launch.py odom_linear_scale:=1.08
+
+Preset E (heading scale correction if turns are under-estimated):
+
+	ros2 launch pirobot2 slam_toolbox.launch.py odom_angular_scale:=1.10
+
+Preset F (heading scale correction if turns are over-estimated):
+
+	ros2 launch pirobot2 slam_toolbox.launch.py odom_angular_scale:=0.90
+
+Tip: tune one parameter at a time, drive the same loop, and compare overlap after returning to the start point.
 
 If RViz shows `Message Filter dropping message ... queue is full` for frame `laser`, the TF chain is incomplete. Check that:
 
