@@ -133,6 +133,36 @@ def generate_launch_description():
         description='Odometry topic published by cmd_vel odometry node',
     )
 
+    imu_topic_arg = DeclareLaunchArgument(
+        'imu_topic',
+        default_value='/pirobot2/imu/data_raw',
+        description='IMU topic used by cmd_vel odometry fusion',
+    )
+
+    odom_linear_scale_arg = DeclareLaunchArgument(
+        'odom_linear_scale',
+        default_value='1.0',
+        description='Scale factor applied to cmd_vel linear.x in odometry integration',
+    )
+
+    odom_angular_scale_arg = DeclareLaunchArgument(
+        'odom_angular_scale',
+        default_value='1.0',
+        description='Scale factor applied to cmd_vel angular.z in odometry integration',
+    )
+
+    odom_use_imu_yaw_arg = DeclareLaunchArgument(
+        'odom_use_imu_yaw',
+        default_value='true',
+        description='Blend IMU yaw into odometry heading estimate',
+    )
+
+    odom_imu_yaw_weight_arg = DeclareLaunchArgument(
+        'odom_imu_yaw_weight',
+        default_value='0.85',
+        description='Blend weight for IMU yaw correction [0..1]',
+    )
+
     start_rviz_arg = DeclareLaunchArgument(
         'start_rviz',
         default_value='true',
@@ -223,6 +253,11 @@ def generate_launch_description():
             'odom_frame': LaunchConfiguration('odom_frame'),
             'base_frame': LaunchConfiguration('base_frame'),
             'publish_tf': True,
+            'imu_topic': LaunchConfiguration('imu_topic'),
+            'linear_scale': LaunchConfiguration('odom_linear_scale'),
+            'angular_scale': LaunchConfiguration('odom_angular_scale'),
+            'use_imu_yaw': LaunchConfiguration('odom_use_imu_yaw'),
+            'imu_yaw_weight': LaunchConfiguration('odom_imu_yaw_weight'),
         }],
     )
 
@@ -278,6 +313,11 @@ def generate_launch_description():
         start_cmdvel_odom_arg,
         cmd_vel_topic_arg,
         odom_topic_arg,
+        imu_topic_arg,
+        odom_linear_scale_arg,
+        odom_angular_scale_arg,
+        odom_use_imu_yaw_arg,
+        odom_imu_yaw_weight_arg,
         start_rviz_arg,
         autostart_arg,
         rviz_config_arg,
