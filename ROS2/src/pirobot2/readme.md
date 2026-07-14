@@ -34,9 +34,14 @@ System dependencies:
 
 - ROS 2 Jazzy installed and sourced
 - rviz2
+- slam-toolbox (recommended for production maps)
 - pyserial
 - rplidar (Python package)
 - smbus2 (or smbus)
+
+Install slam-toolbox (Ubuntu/ROS 2 apt):
+
+	sudo apt install ros-jazzy-slam-toolbox
 
 Install useful Python dependencies:
 
@@ -93,6 +98,10 @@ Default keyboard controls:
 Useful overrides:
 
 	ros2 launch pirobot2 motion_teleop.launch.py serial_port:=/dev/ttyACM0 baudrate:=115200
+
+Remote teleop (serial bridge already running on robot):
+
+	ros2 launch pirobot2 motion_teleop.launch.py start_serial_bridge:=false
 
 ### 5.2 Serial bridge only
 
@@ -192,6 +201,37 @@ IMU stabilization:
 Example tuned run:
 
 	ros2 launch pirobot2 scan_imu_slam.launch.py deployment:=remote start_static_tf:=false scan_match_window_m:=0.25 scan_match_step_m:=0.05 scan_match_prior_weight:=0.25 yaw_filter_window:=7 zupt_accel_threshold:=0.20 zupt_gyro_threshold:=0.06 zupt_min_samples:=12
+
+### 8.4 Recommended upgrade: slam_toolbox (loop closure)
+
+The lightweight `scan_imu_slam` node is useful for quick experiments but does not perform full global loop-closure optimization. For cleaner maps after revisiting the same area, prefer `slam_toolbox`.
+
+Run sensor publishers on robot:
+
+	ros2 launch pirobot2 lidar_publisher.launch.py
+	ros2 launch pirobot2 imu_publisher.launch.py
+
+Run teleop on remote laptop (without local serial bridge):
+
+	ros2 launch pirobot2 motion_teleop.launch.py start_serial_bridge:=false
+
+Run slam_toolbox on remote laptop:
+
+	ros2 launch pirobot2 slam_toolbox.launch.py start_static_tf:=false
+
+If your robot does not publish `base_link -> laser` static TF, set `start_static_tf:=true` for the `slam_toolbox.launch.py` run.
+
+Parameters are in:
+
+	config/slam_toolbox_mapper_params.yaml
+
+You can tune this file gradually (start with `map_update_interval`, `minimum_travel_distance`, `minimum_travel_heading`, and `loop_search_maximum_distance`).
+
+### 8.5 Cartographer and Hector notes
+
+- Cartographer can improve global consistency, but setup and tuning effort are higher than slam_toolbox.
+- Hector SLAM can work for lidar-only use cases, but ROS 2 Jazzy support is less straightforward than slam_toolbox.
+- Recommended path: stabilize with slam_toolbox first, then evaluate Cartographer if needed.
 
 ## 9) Multi-machine Notes (Robot + Remote)
 

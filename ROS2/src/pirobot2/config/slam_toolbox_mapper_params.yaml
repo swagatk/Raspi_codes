@@ -1,0 +1,31 @@
+/**:
+  ros__parameters:
+    mode: mapping
+    use_sim_time: false
+
+    # Keep frames aligned with the existing pirobot2 stack.
+    map_frame: map
+    odom_frame: odom
+    base_frame: base_link
+
+    # With a differential-drive robot and no wheel odometry source,
+    # do not publish an odom frame from slam_toolbox.
+    provide_odom_frame: false
+    publish_to_tf: true
+
+    map_update_interval: 1.5
+    resolution: 0.05
+    max_laser_range: 12.0
+    minimum_time_interval: 0.10
+    transform_timeout: 0.30
+    tf_buffer_duration: 30.0
+    throttle_scans: 1
+    enable_interactive_mode: true
+
+    # Conservative defaults for small indoor spaces.
+    minimum_travel_distance: 0.05
+    minimum_travel_heading: 0.05
+    scan_buffer_size: 20
+    scan_buffer_maximum_scan_distance: 12.0
+    link_match_minimum_response_fine: 0.10
+    loop_search_maximum_distance: 4.0

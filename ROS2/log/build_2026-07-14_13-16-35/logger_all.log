@@ -1,0 +1,239 @@
+[0.595s] DEBUG:colcon:Command line arguments: ['/usr/local/bin/colcon', 'build', '--packages-select', 'pirobot2', '--symlink-install']
+[0.595s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=True, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=4, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=['pirobot2'], packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7fa0d49c90>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7fa0f5c510>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7fa0f5c510>>)
+[1.609s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[1.610s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[1.610s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[1.610s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[1.610s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[1.611s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[1.611s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/pi/Raspi_codes/ROS2'
+[1.611s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[1.611s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[1.612s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[1.753s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[1.753s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[1.753s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[1.753s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[1.754s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[1.754s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[1.754s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[1.754s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[1.755s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[1.755s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[1.756s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[1.756s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[1.756s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[1.757s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[1.757s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[1.757s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[1.757s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[1.758s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[1.759s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[1.759s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[1.759s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[1.759s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[1.759s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extensions ['ignore', 'ignore_ament_install']
+[1.759s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extension 'ignore'
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extension 'ignore_ament_install'
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extensions ['colcon_pkg']
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extension 'colcon_pkg'
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extensions ['colcon_meta']
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extension 'colcon_meta'
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extensions ['ros']
+[1.760s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot) by extension 'ros'
+[1.773s] DEBUG:colcon.colcon_core.package_identification:Package 'src/pirobot' with type 'ros.ament_python' and name 'pirobot'
+[1.773s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extensions ['ignore', 'ignore_ament_install']
+[1.774s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extension 'ignore'
+[1.774s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extension 'ignore_ament_install'
+[1.774s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extensions ['colcon_pkg']
+[1.774s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extension 'colcon_pkg'
+[1.775s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extensions ['colcon_meta']
+[1.775s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extension 'colcon_meta'
+[1.775s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extensions ['ros']
+[1.775s] Level 1:colcon.colcon_core.package_identification:_identify(src/pirobot2) by extension 'ros'
+[1.779s] DEBUG:colcon.colcon_core.package_identification:Package 'src/pirobot2' with type 'ros.ament_python' and name 'pirobot2'
+[1.779s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extensions ['ignore', 'ignore_ament_install']
+[1.779s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'ignore'
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'ignore_ament_install'
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extensions ['colcon_pkg']
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'colcon_pkg'
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extensions ['colcon_meta']
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'colcon_meta'
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extensions ['ros']
+[1.780s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'ros'
+[1.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extensions ['cmake', 'python']
+[1.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'cmake'
+[1.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'python'
+[1.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extensions ['python_setup_py']
+[1.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials) by extension 'python_setup_py'
+[1.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extensions ['ignore', 'ignore_ament_install']
+[1.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'ignore'
+[1.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'ignore_ament_install'
+[1.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extensions ['colcon_pkg']
+[1.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'colcon_pkg'
+[1.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extensions ['colcon_meta']
+[1.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'colcon_meta'
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extensions ['ros']
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'ros'
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extensions ['cmake', 'python']
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'cmake'
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'python'
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extensions ['python_setup_py']
+[1.783s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1) by extension 'python_setup_py'
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extensions ['ignore', 'ignore_ament_install']
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extension 'ignore'
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extension 'ignore_ament_install'
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extensions ['colcon_pkg']
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extension 'colcon_pkg'
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extensions ['colcon_meta']
+[1.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extension 'colcon_meta'
+[1.785s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extensions ['ros']
+[1.785s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_1/hello_world) by extension 'ros'
+[1.787s] DEBUG:colcon.colcon_core.package_identification:Package 'src/ros2_tutorials/tutorial_1/hello_world' with type 'ros.ament_python' and name 'hello_world'
+[1.788s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extensions ['ignore', 'ignore_ament_install']
+[1.788s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'ignore'
+[1.788s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'ignore_ament_install'
+[1.789s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extensions ['colcon_pkg']
+[1.789s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'colcon_pkg'
+[1.789s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extensions ['colcon_meta']
+[1.789s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'colcon_meta'
+[1.789s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extensions ['ros']
+[1.790s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'ros'
+[1.790s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extensions ['cmake', 'python']
+[1.790s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'cmake'
+[1.790s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'python'
+[1.790s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extensions ['python_setup_py']
+[1.791s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2) by extension 'python_setup_py'
+[1.791s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extensions ['ignore', 'ignore_ament_install']
+[1.791s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extension 'ignore'
+[1.791s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extension 'ignore_ament_install'
+[1.792s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extensions ['colcon_pkg']
+[1.792s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extension 'colcon_pkg'
+[1.792s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extensions ['colcon_meta']
+[1.792s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extension 'colcon_meta'
+[1.792s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extensions ['ros']
+[1.792s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_2/lifecycle_demo) by extension 'ros'
+[1.796s] DEBUG:colcon.colcon_core.package_identification:Package 'src/ros2_tutorials/tutorial_2/lifecycle_demo' with type 'ros.ament_python' and name 'lifecycle_demo'
+[1.796s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extensions ['ignore', 'ignore_ament_install']
+[1.797s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'ignore'
+[1.798s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'ignore_ament_install'
+[1.799s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extensions ['colcon_pkg']
+[1.799s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'colcon_pkg'
+[1.799s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extensions ['colcon_meta']
+[1.799s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'colcon_meta'
+[1.799s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extensions ['ros']
+[1.800s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'ros'
+[1.800s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extensions ['cmake', 'python']
+[1.800s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'cmake'
+[1.800s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'python'
+[1.800s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extensions ['python_setup_py']
+[1.800s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3) by extension 'python_setup_py'
+[1.801s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extensions ['ignore', 'ignore_ament_install']
+[1.801s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extension 'ignore'
+[1.801s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extension 'ignore_ament_install'
+[1.801s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extensions ['colcon_pkg']
+[1.801s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extension 'colcon_pkg'
+[1.802s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extensions ['colcon_meta']
+[1.802s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extension 'colcon_meta'
+[1.802s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extensions ['ros']
+[1.802s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_tutorials/tutorial_3/qos_demo) by extension 'ros'
+[1.805s] DEBUG:colcon.colcon_core.package_identification:Package 'src/ros2_tutorials/tutorial_3/qos_demo' with type 'ros.ament_python' and name 'qos_demo'
+[1.805s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extensions ['ignore', 'ignore_ament_install']
+[1.806s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extension 'ignore'
+[1.806s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extension 'ignore_ament_install'
+[1.806s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extensions ['colcon_pkg']
+[1.806s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extension 'colcon_pkg'
+[1.806s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extensions ['colcon_meta']
+[1.806s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extension 'colcon_meta'
+[1.807s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extensions ['ros']
+[1.807s] Level 1:colcon.colcon_core.package_identification:_identify(src/rplidar_scan) by extension 'ros'
+[1.809s] DEBUG:colcon.colcon_core.package_identification:Package 'src/rplidar_scan' with type 'ros.ament_python' and name 'rplidar_scan'
+[1.809s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[1.809s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[1.809s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[1.809s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[1.809s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[1.928s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'hello_world' in 'src/ros2_tutorials/tutorial_1/hello_world'
+[1.928s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'lifecycle_demo' in 'src/ros2_tutorials/tutorial_2/lifecycle_demo'
+[1.928s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'pirobot' in 'src/pirobot'
+[1.928s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'qos_demo' in 'src/ros2_tutorials/tutorial_3/qos_demo'
+[1.928s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'rplidar_scan' in 'src/rplidar_scan'
+[1.930s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'cmake_args' from command line to 'None'
+[1.930s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'cmake_target' from command line to 'None'
+[1.930s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.930s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'cmake_clean_cache' from command line to 'False'
+[1.931s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'cmake_clean_first' from command line to 'False'
+[1.931s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'cmake_force_configure' from command line to 'False'
+[1.931s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'ament_cmake_args' from command line to 'None'
+[1.931s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'catkin_cmake_args' from command line to 'None'
+[1.932s] Level 5:colcon.colcon_core.verb:set package 'pirobot2' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.932s] DEBUG:colcon.colcon_core.verb:Building package 'pirobot2' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/pi/Raspi_codes/ROS2/build/pirobot2', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/pi/Raspi_codes/ROS2/install/pirobot2', 'merge_install': False, 'path': '/home/pi/Raspi_codes/ROS2/src/pirobot2', 'symlink_install': True, 'test_result_base': None}
+[1.933s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.940s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.941s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/pi/Raspi_codes/ROS2/src/pirobot2' with build type 'ament_python'
+[1.942s] Level 1:colcon.colcon_core.shell:create_environment_hook('pirobot2', 'ament_prefix_path')
+[1.958s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.959s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/hook/ament_prefix_path.ps1'
+[1.962s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/hook/ament_prefix_path.dsv'
+[1.966s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/hook/ament_prefix_path.sh'
+[1.969s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.970s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[3.401s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/pi/Raspi_codes/ROS2/src/pirobot2'
+[3.402s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[3.402s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/ament_index/resource_index/packages/pirobot2
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/package.xml
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/lidar_rviz_client.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/imu_publisher.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/obstacle_avoidance.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/lidar_imu_rviz_client.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/serial_bridge.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/lidar_publisher.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/motion_teleop.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/scan_imu_slam.launch.py
+[6.466s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz/lidar_imu_combined.rviz
+[6.467s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz/lidar_scan.rviz
+[6.467s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/rviz/slam_map.rviz
+[6.467s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/imu_publisher_node
+[6.467s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/lidar_publisher_node
+[6.467s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/motion_subscriber_node
+[6.467s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/obstacle_avoidance_node
+[6.468s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/pirobot2
+[6.468s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/scan_imu_slam_node
+[6.468s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/serial_bridge_node
+[6.468s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/teleop_keyboard_node
+[6.468s] DEBUG:colcon.colcon_core.task.python.build:While undoing a previous installation files outside the Python library path are being ignored: /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2/ultrasonic_publisher_node
+[6.476s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/pi/Raspi_codes/ROS2/build/pirobot2': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data --force
+[9.322s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/pi/Raspi_codes/ROS2/build/pirobot2' returned '1': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data --force
+[9.332s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[9.333s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[9.333s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '1'
+[9.334s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[9.373s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[9.377s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[9.399s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[9.400s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[9.406s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Notifications was not provided by any .service files
+[9.407s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[9.409s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/pi/Raspi_codes/ROS2/install/local_setup.ps1'
+[9.419s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/pi/Raspi_codes/ROS2/install/_local_setup_util_ps1.py'
+[9.429s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/pi/Raspi_codes/ROS2/install/setup.ps1'
+[9.441s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/pi/Raspi_codes/ROS2/install/local_setup.sh'
+[9.450s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/pi/Raspi_codes/ROS2/install/_local_setup_util_sh.py'
+[9.461s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/pi/Raspi_codes/ROS2/install/setup.sh'
+[9.478s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/pi/Raspi_codes/ROS2/install/local_setup.bash'
+[9.490s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/pi/Raspi_codes/ROS2/install/setup.bash'
+[9.500s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/pi/Raspi_codes/ROS2/install/local_setup.zsh'
+[9.509s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/pi/Raspi_codes/ROS2/install/setup.zsh'

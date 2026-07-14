@@ -1,0 +1,33 @@
+[4.533s] Invoking command in '/home/pi/Raspi_codes/ROS2/build/pirobot2': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data --force
+[5.911s] running develop
+[6.786s] running egg_info
+[6.866s] writing pirobot2.egg-info/PKG-INFO
+[6.867s] writing dependency_links to pirobot2.egg-info/dependency_links.txt
+[6.872s] writing entry points to pirobot2.egg-info/entry_points.txt
+[6.874s] writing requirements to pirobot2.egg-info/requires.txt
+[6.875s] writing top-level names to pirobot2.egg-info/top_level.txt
+[7.031s] reading manifest file 'pirobot2.egg-info/SOURCES.txt'
+[7.037s] writing manifest file 'pirobot2.egg-info/SOURCES.txt'
+[7.109s] running build_ext
+[7.110s] Creating /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages/pirobot2.egg-link (link to .)
+[7.112s] Installing imu_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.115s] Installing lidar_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.115s] Installing motion_subscriber_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.116s] Installing obstacle_avoidance_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.116s] Installing pirobot2 script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.118s] Installing scan_imu_slam_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.119s] Installing serial_bridge_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.120s] Installing teleop_keyboard_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.121s] Installing ultrasonic_publisher_node script to /home/pi/Raspi_codes/ROS2/install/pirobot2/lib/pirobot2
+[7.125s] 
+[7.125s] Installed /home/pi/Raspi_codes/ROS2/build/pirobot2
+[7.128s] running symlink_data
+[7.135s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/resource/pirobot2 -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/ament_index/resource_index/packages
+[7.135s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/package.xml -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2
+[7.135s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[7.136s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/imu_publisher.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[7.138s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/obstacle_avoidance.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[7.138s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/lidar_imu_rviz_client.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[7.140s] symbolically linking /home/pi/Raspi_codes/ROS2/build/pirobot2/launch/serial_bridge.launch.py -> /home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch
+[7.141s] error: [Errno 2] No such file or directory: '/home/pi/Raspi_codes/ROS2/install/pirobot2/share/pirobot2/launch/slam_toolbox.launch.py'
+[7.379s] Invoked command in '/home/pi/Raspi_codes/ROS2/build/pirobot2' returned '1': PYTHONPATH=/home/pi/Raspi_codes/ROS2/build/pirobot2/prefix_override:/usr/local/lib/python3.11/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pi/Raspi_codes/ROS2/install/pirobot2/lib/python3.11/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pi/Raspi_codes/ROS2/build/pirobot2/build --no-deps symlink_data --force

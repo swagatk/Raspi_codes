@@ -5,4 +5,3 @@ Summary: ROS2 control interface for PiRobot 2
 Maintainer: pi
 Maintainer-email: swagat.kumar@gmail.com
 License: Apache-2.0
-License-File: LICENSE
