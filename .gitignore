@@ -5,3 +5,11 @@
 **/*.pyc
 __pycache__/
 .DS_Store
+
+# ROS / colcon build artifacts and logs
+build/
+install/
+log/
+ROS2/build/
+ROS2/install/
+ROS2/log/

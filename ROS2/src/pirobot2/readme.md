@@ -10,7 +10,7 @@ Tested in this workspace with ROS 2 Jazzy and a Raspberry Pi robot.
 ![Robot Image1](./images/robot1.jpg)
 ![Robot Image2](./images/robot2.jpg)
 ![SLAM MAP](./images/slam_map.png)
-![Watch the Video](https://youtube.com/shorts/Z99jtxbsr18)
+[![Watch the Video](https://img.youtube.com/vi/Z99jtxbsr18/hqdefault.jpg)](https://youtube.com/shorts/Z99jtxbsr18)
 
 
 ## 1) Package Contents
