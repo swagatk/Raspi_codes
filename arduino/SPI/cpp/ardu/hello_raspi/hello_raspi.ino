@@ -24,8 +24,8 @@ byte marker = 0;
                     
 void setup (void)
 {
-  //Serial.begin(115200);
-  //pinMode(MOSI, INPUT);
+  Serial.begin(115200);
+  pinMode(MOSI, INPUT);
   pinMode(MISO, OUTPUT);
 
   // turn on SPI on slave mode
@@ -47,7 +47,7 @@ void loop (void)
 
   if((SPSR & (1 << SPIF)) != 0)
   {
-    //Serial.println(SPDR);
+    Serial.println(SPDR);
     SPDR = hello[marker];
     marker++;
    
