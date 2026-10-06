@@ -8,32 +8,29 @@ import time
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 INFERENCE_SIZE = 320
-NCNN = False
+NCNN = True
 # --- Model and Camera Setup ---
 
 # Load the YOLO "nano" model
 if not NCNN:
     print("Using PyTorch Model")
-    model = YOLO("/home/pi/yolo_project/yolov8n.pt")
+    model = YOLO("/home/pi/yolo_models/yolov8n.pt")
     #model = YOLO("yolo11n.pt")
 else:
     print("Using NCNN model ...")
-    model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
+    model = YOLO("/home/pi/yolo_models/yolov8n_ncnn_model")
     #model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
 
 
 # Initialize Picamera2
 picam2 = Picamera2()
 
-# We use a 640x480 resolution for better compatibility with Pi 5 hardware
-# We set the format to "RGB888" to match likely native format (we'll convert for display)
-CAPTURE_WIDTH = 640
-CAPTURE_HEIGHT = 480
+
 
 # Configure the camera
 # Increase buffer_count significantly to avoid running out of buffers 
 config = picam2.create_video_configuration(
-    main={"size": (CAPTURE_WIDTH, CAPTURE_HEIGHT), "format": "RGB888"},
+    main={"size": (IMAGE_WIDTH, IMAGE_HEIGHT), "format": "RGB888"},
     buffer_count=12
 )
 picam2.configure(config)

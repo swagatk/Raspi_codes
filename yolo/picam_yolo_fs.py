@@ -15,11 +15,11 @@ NCNN = True
 
 # Load the YOLO "nano" model
 if not NCNN:
-    model = YOLO("yolov8n.pt")
+    model = YOLO("/home/pi/yolo_models/yolov8n.pt")
     #model = YOLO("yolo11n.pt")
 else:
     print("Using NCNN model")
-    model = YOLO("/home/pi/yolo_project/yolov8n_ncnn_model")
+    model = YOLO("/home/pi/yolo_models/yolov8n_ncnn_model")
     #model = YOLO("/home/pi/yolo_project/yolo11n_ncnn_model")
 
 # --- Camera Setup ---
